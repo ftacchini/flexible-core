@@ -1,0 +1,37 @@
+{
+  "name": "flexible",
+  "version": "0.0.1",
+  "description": "Flexible",
+  "main": "dist/src/index.js",
+  "scripts": {
+    "unit-test": "jasmine JASMINE_CONFIG_PATH=jasmine.unit-test.json",
+    "integration-test": "jasmine JASMINE_CONFIG_PATH=jasmine.integration-test.json",
+    "build": "rimraf dist && rimraf dts && tsc",
+    "version-minor": "npm version minor && git push && git push --tags",
+    "version-patch": "npm version patch && git push && git push --tags",
+    "version-major": "npm version major && git push && git push --tags"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ftacchini/flexible.git"
+  },
+  "author": "ftacchini",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ftacchini/flexible/issues"
+  },
+  "homepage": "https://github.com/ftacchini/flexible#readme",
+  "typings": "./dts/src/index.d.ts",
+  "dependencies": {
+    "@types/lodash": "^4.14.117",
+    "@types/node": "^8.10.36",
+    "inversify": "^4.13.0",
+    "lodash": "^4.17.11"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^2.8.9",
+    "jasmine": "^2.99.0",
+    "rimraf": "^2.6.1",
+    "typescript": "^2.9.2"
+  }
+}

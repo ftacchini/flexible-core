@@ -22,10 +22,6 @@ export class FlexibleApp {
 
     private initialization: Promise<FlexibleRouter> = null;
     private recipeCrafter: FlexibleRecipeCrafter;
-    
-    public get builder(): FlexibleAppBuilder{
-        return FlexibleAppBuilder.instance;
-    }
 
     public constructor(
         private frameworks: FlexibleFramework[],

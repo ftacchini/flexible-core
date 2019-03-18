@@ -24,7 +24,7 @@ export class FlexibleTreeRouter implements FlexibleRouter {
         var plainRouteData = this.turnIntoPlainRouteData(event.routeData);
         var fitlers = this.baseNode.getRouteFilters(plainRouteData);
 
-        return fitlers.map(filter => filter.getEventPipeline(event));
+        return fitlers.map(filter => filter.getEventPipeline(event, true));
     }
 
     public addPipeline(filters: (FlexibleFilter | FlexibleFilter[])[], pipeline: FlexiblePipeline): void {

@@ -21,46 +21,42 @@ export class RouteDataIterator {
     }
 
     public next(): RouteValueMatcher {
+        var current = this.getValueFromPropertyIndex(this.currentPropertyIndex);
 
-        var hasNext = this.setNextIndexes();
-
-        if(!hasNext) {
-            return null;
+        if (this.routeDataHelper.isRouteDataArray(current)) {
+            current = current[this.currentValueIndex];
         }
 
-        var nextValue = this.getValueFromPropertyIndex(this.currentPropertyIndex);
-
-        if (this.routeDataHelper.isRouteDataArray(nextValue)) {
-            nextValue = nextValue[this.currentValueIndex];
+        if(isNullOrUndefined(current)) {
+            return current;
         }
-
-        return new RouteValueMatcher(
+        
+        var routeMatcher = new RouteValueMatcher(
             this.routeDataHelper,
             this.sortedProperties[this.currentPropertyIndex],
-            nextValue
+            current
         );
+        
+        this.setNextIndexes();
+
+        return routeMatcher; 
     }
 
     private getSortedProperties(routeData: PlainRouteData): string[] {
         return Object.keys(routeData).sort();
     }
 
-    private setNextIndexes(): boolean {
+    private setNextIndexes(): void {
         var currentPropertyValue = this.getValueFromPropertyIndex(this.currentPropertyIndex);
 
         if (this.routeDataHelper.isRouteDataArray(currentPropertyValue) &&
             !isNullOrUndefined(currentPropertyValue[this.currentValueIndex + 1])) {
             this.currentValueIndex++;
         }
-        else if (!isNullOrUndefined(this.getValueFromPropertyIndex(this.currentPropertyIndex + 1))) {
+        else {
             this.currentPropertyIndex++;
             this.currentValueIndex = 0;
         }
-        else {
-            return false;
-        }
-        
-        return true
     }
 
     private getValueFromPropertyIndex(index: number): PlainRouteValue {

@@ -10,6 +10,7 @@ export class FilterCascadeBuilder {
     private pipeline: FlexiblePipeline;
 
     constructor(private routeDataHelper: RouteDataHelper) {
+        this.reset();
     }
 
     public withPipeline(flexiblePipeline: FlexiblePipeline): this {
@@ -23,9 +24,15 @@ export class FilterCascadeBuilder {
         var filters = isArray(flexibleFilters) ? flexibleFilters : [flexibleFilters];  
 
         filters.forEach((flexibleFilter)=> {
-            this.filterNodes.forEach((filterNode) => {
-                filterNodes.push(new FilterCascadeNode(this.routeDataHelper, flexibleFilter, filterNode));
-            })
+            if(this.filterNodes.length) {
+                this.filterNodes.forEach((filterNode) => {
+                    filterNodes.push(new FilterCascadeNode(this.routeDataHelper, flexibleFilter, filterNode));
+                })
+            }
+            else {
+                filterNodes.push(new FilterCascadeNode(this.routeDataHelper, flexibleFilter));
+            }
+
         })
 
         this.filterNodes = filterNodes;

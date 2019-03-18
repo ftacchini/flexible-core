@@ -1,4 +1,4 @@
-import "jasmine";
+/*import "jasmine";
 import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
 import { DummyEventSource } from "./dummy-event-source";
@@ -64,4 +64,4 @@ describe("FlexibleApp", () => {
     it("Should process an event through a middleware stack", async (done) => {
 
     });
-})
+})*/

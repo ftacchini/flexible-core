@@ -4,6 +4,7 @@
   "description": "Flexible",
   "main": "dist/src/index.js",
   "scripts": {
+    "test": "npm run unit-test && npm run integration-test",
     "unit-test": "jasmine JASMINE_CONFIG_PATH=jasmine.unit-test.json",
     "integration-test": "jasmine JASMINE_CONFIG_PATH=jasmine.integration-test.json",
     "build": "rimraf dist && rimraf dts && tsc",

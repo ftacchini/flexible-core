@@ -13,58 +13,261 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter) {
             router = initializeRouter();
         })
 
-        it("should return pipelines for event with empty static filter", () => {
-            //ARRANGE
-            var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+        describe("with single filter", () => {
 
-            var filter: FlexibleFilter = {
-                staticRouting: {}
-            };
+            it("should return pipelines for event with empty static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
-            var event: FlexibleEvent = {
-                data: {},
-                routeData: {
-                    something: "a"
-                },
-                eventType: "sample"
-            };
+                var filter: FlexibleFilter = {
+                    staticRouting: {}
+                };
 
-            //ACT
-            router.addPipeline([filter], pipeline);
-            var result = router.getEventPipelines(event);
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        something: "a"
+                    },
+                    eventType: "sample"
+                };
 
-            //ASSERT
-            expect(result).toEqual([pipeline]);
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
+            it("should return pipelines for event with plain static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: "a",
+                        b: 1,
+                        c: true
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: "a",
+                        b: 1,
+                        c: true
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
+            it("should not return pipelines for event with plain static filter that do not match event", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: "a",
+                        b: 1,
+                        c: true
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: "a",
+                        c: true
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([]);
+            });
+
+            it("should return pipelines for event with array static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: ["a", "b", "c"]
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: ["a", "b", "c"]
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
+            it("should return pipelines for event with sub array static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: ["c", "b"]
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: ["a", "b", "c"]
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
+            it("should return pipelines for event with plain array member static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: "c"
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: ["a", "b", "c"]
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
+            it("should  not return pipelines return pipelines for event with array static filter that do not match event", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: ["c", "b"]
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: ["a", "b"]
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([]);
+            });
+
+            it("should return pipelines for event with nested object static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: { b: { c: true } }
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: { b: { c: true } }
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
+            it("should return pipelines for event with nested object and array static filter", () => {
+                //ARRANGE
+                var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter: FlexibleFilter = {
+                    staticRouting: {
+                        a: {
+                            b: {
+                                c: true,
+                                a: ["b", "c"]
+                            }
+                        }
+                    }
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                        a: {
+                            b: {
+                                c: true,
+                                a: ["a", "b", "c"]
+                            }
+                        }
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addPipeline([filter], pipeline);
+                var result = router.getEventPipelines(event);
+
+                //ASSERT
+                expect(result).toEqual([pipeline]);
+            });
+
         });
 
-        it("should return pipelines for event with plain static filter", () => {
-            //ARRANGE
-            var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+        describe("with multiple filters", () => {
 
-            var filter: FlexibleFilter = {
-                staticRouting: {
-                    a: "a",
-                    b: 1,
-                    c: true
-                }
-            };
-
-            var event: FlexibleEvent = {
-                data: {},
-                routeData: {
-                    a: "a",
-                    b: 1,
-                    c: true
-                },
-                eventType: "sample"
-            };
-
-            //ACT
-            router.addPipeline([filter], pipeline);
-            var result = router.getEventPipelines(event);
-
-            //ASSERT
-            expect(result).toEqual([pipeline]);
-        });
+        })
     }
 }

@@ -1,6 +1,6 @@
 import { RouteData, RouteValue } from "../../../router/route-data";
 import { FlexibleFilter, FlexibleEvent } from "../../../event";
-import { intersection, merge } from "lodash";
+import { intersection, mergeWith, union } from "lodash";
 import { FlexiblePipeline } from "../../flexible-pipeline";
 import { RouteDataHelper } from "../../../router/route-data-helper";
 
@@ -11,7 +11,7 @@ export class FilterCascadeNode {
     constructor(
         private routeDataHelper: RouteDataHelper,
         private filter: FlexibleFilter,
-        private parentNode: FilterCascadeNode) {
+        private parentNode: FilterCascadeNode = null) {
 
     }
 
@@ -46,11 +46,25 @@ export class FilterCascadeNode {
             return null;
         }
 
-        return merge({}, routeData, this.filter.staticRouting);
+        return mergeWith({}, routeData, this.filter.staticRouting, (objValue, srcValue) => {
+            if (this.routeDataHelper.isRouteDataArray(objValue) && this.routeDataHelper.isRouteDataArray(srcValue) ||
+                this.isArrayAndSameType(objValue, srcValue) || this.isArrayAndSameType(srcValue, objValue)) {
+
+                if (!this.routeDataHelper.isRouteDataArray(objValue)) {
+                    objValue = [objValue];
+                }
+
+                if (!this.routeDataHelper.isRouteDataArray(srcValue)) {
+                    srcValue = [srcValue];
+                }
+
+                return union(objValue, srcValue);
+            }
+        });
     }
 
     public getEventPipeline(
-        event: FlexibleEvent, 
+        event: FlexibleEvent,
         ignoreStaticRouting: boolean = false): FlexiblePipeline {
 
         var pipeline = this._pipeline;
@@ -69,7 +83,7 @@ export class FilterCascadeNode {
 
         var isMatch = ignoreStaticRouting || this.isRouteMatch(this.filter.staticRouting, event.routeData);
 
-        if (this.filter) {
+        if (this.filter.filterEvent) {
             isMatch = this.filter.filterEvent(event);
         }
 
@@ -86,13 +100,32 @@ export class FilterCascadeNode {
             var ownRouteValue = ownRoute[innerProperty];
             var routeValue = routeData[innerProperty];
 
-            return typeof ownRouteValue === typeof routeValue && (
-                this.routeDataHelper.isRouteData(ownRouteValue) && this.routeDataHelper.isRouteData(routeValue) &&
-                this.isRouteMatch(ownRouteValue, routeValue) ||
-                this.routeDataHelper.isRouteDataArray(ownRouteValue) && this.routeDataHelper.isRouteDataArray(routeValue) &&
-                intersection<RouteValue>(ownRouteValue, routeValue).length === ownRouteValue.length ||
-                ownRouteValue === routeValue
-            );
+            if (typeof ownRouteValue === typeof routeValue) {
+                if (this.routeDataHelper.isRouteData(ownRouteValue) &&
+                    this.routeDataHelper.isRouteData(routeValue) &&
+                    this.isRouteMatch(ownRouteValue, routeValue)) {
+                    return true;
+                }
+
+                if (this.routeDataHelper.isRouteDataArray(ownRouteValue) &&
+                    this.routeDataHelper.isRouteDataArray(routeValue) &&
+                    intersection<RouteValue>(ownRouteValue, routeValue).length === ownRouteValue.length) {
+                    return true;
+                }
+
+                if (ownRouteValue === routeValue) {
+                    return true;
+                }
+            }
+            else if (this.isArrayAndSameType(ownRouteValue, routeValue)) {
+                (<any[]>ownRouteValue).indexOf(ownRouteValue) != -1
+            }
+            else if (this.isArrayAndSameType(routeValue, ownRouteValue)) {
+                return (<any[]>routeValue).indexOf(ownRouteValue) != -1
+            }
+
+            return false;
+
         });
     }
 
@@ -105,14 +138,30 @@ export class FilterCascadeNode {
     }
 
     private validateProperty(rootDataProperty: RouteValue, ownDataProperty: RouteValue): boolean {
-        return rootDataProperty === undefined ||
+
+        if (rootDataProperty === undefined) {
+            return true;
+        }
+
+        if (typeof rootDataProperty === typeof ownDataProperty &&
             (
-                typeof rootDataProperty === typeof ownDataProperty &&
-                (
-                    this.routeDataHelper.isRouteData(rootDataProperty) && this.validateMerge(rootDataProperty, ownDataProperty as RouteData) ||
-                    this.routeDataHelper.isRouteDataArray(rootDataProperty) ||
-                    rootDataProperty === ownDataProperty
-                )
-            );
+                this.routeDataHelper.isRouteData(rootDataProperty) && this.validateMerge(rootDataProperty, ownDataProperty as RouteData) ||
+                this.routeDataHelper.isRouteDataArray(rootDataProperty) && this.isArrayAndSameType(ownDataProperty, rootDataProperty[0]) ||
+                rootDataProperty === ownDataProperty
+            )) {
+
+            return true;
+        }
+
+        if (this.isArrayAndSameType(ownDataProperty, rootDataProperty) ||
+            this.isArrayAndSameType(rootDataProperty, ownDataProperty)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private isArrayAndSameType(value1: RouteValue, value2: RouteValue): boolean {
+        return this.routeDataHelper.isRouteDataArray(value1) && (typeof value1[0] === typeof value2);
     }
 }

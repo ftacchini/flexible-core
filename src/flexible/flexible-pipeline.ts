@@ -17,8 +17,8 @@ export class FlexiblePipeline {
 
         for(var i = 0; i < this.middlewareStack.length; i++) {
             try {
-                response = await this.middlewareStack[i].processEvent(event, response);
-                response.responseStack.push(response);
+                var newResponse = await this.middlewareStack[i].processEvent(event, response);
+                response.responseStack.push(newResponse);
             }
             catch(ex) {
                 response.errorStack.push(ex);

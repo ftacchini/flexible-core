@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import "jasmine";
 import { FilterCascadeBuilder } from "../../../../../src/flexible/router/filter-cascade/filter-cascade-builder";
 import { RouteDataHelper } from "../../../../../src/router";
@@ -7,7 +8,7 @@ import { FlexibleFilter, FlexibleEvent } from "../../../../../src/event";
 
 describe("FilterCascadeNode", () => {
 
-    let builder: FilterCascadeBuilder;
+    let builder: FilterCascadeBuilder<FlexiblePipeline>;
 
     beforeAll(() => {
         builder = new FilterCascadeBuilder(new RouteDataHelper())
@@ -33,7 +34,7 @@ describe("FilterCascadeNode", () => {
 
             var node = builder
                 .addFlexibleFilters(filter)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
             //ACT
@@ -64,7 +65,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
             //ACT
@@ -100,7 +101,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
             //ACT
@@ -136,7 +137,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
             //ACT
@@ -168,7 +169,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
 
@@ -194,7 +195,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
 
@@ -220,7 +221,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
 
@@ -248,7 +249,7 @@ describe("FilterCascadeNode", () => {
             var node = builder
                 .addFlexibleFilters(filter1)
                 .addFlexibleFilters(filter2)
-                .withPipeline(pipeline)
+                .withResource(pipeline)
                 .build();
 
 
@@ -257,7 +258,7 @@ describe("FilterCascadeNode", () => {
         })
     })
 
-    describe("getEventPipeline", () => {
+    describe("getEventResources", () => {
 
         describe("ignoreStaticRouting is false", () => {
 
@@ -276,7 +277,7 @@ describe("FilterCascadeNode", () => {
 
                 var node = builder
                     .addFlexibleFilters(filter)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
                 var event: FlexibleEvent = {
@@ -291,7 +292,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event);
+                var result = node[0].getEventResources(event);
 
                 //ASSERT
                 expect(result).toEqual(pipeline);
@@ -318,7 +319,7 @@ describe("FilterCascadeNode", () => {
                 var node = builder
                     .addFlexibleFilters(filter1)
                     .addFlexibleFilters(filter2)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
 
@@ -334,7 +335,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event);
+                var result = node[0].getEventResources(event);
 
                 //ASSERT
                 expect(result).toEqual(pipeline);
@@ -361,7 +362,7 @@ describe("FilterCascadeNode", () => {
                 var node = builder
                     .addFlexibleFilters(filter1)
                     .addFlexibleFilters(filter2)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
 
@@ -376,7 +377,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event);
+                var result = node[0].getEventResources(event);
 
                 //ASSERT
                 expect(result).toBeNull();
@@ -398,7 +399,7 @@ describe("FilterCascadeNode", () => {
  
                  var node = builder
                      .addFlexibleFilters(filter)
-                     .withPipeline(pipeline)
+                     .withResource(pipeline)
                      .build();
  
                  var event: FlexibleEvent = {
@@ -413,7 +414,7 @@ describe("FilterCascadeNode", () => {
                  }
  
                  //ACT
-                 var result = node[0].getEventPipeline(event);
+                 var result = node[0].getEventResources(event);
  
                  //ASSERT
                  expect(filter.filterEvent).toHaveBeenCalledWith(event);
@@ -443,7 +444,7 @@ describe("FilterCascadeNode", () => {
                 var node = builder
                     .addFlexibleFilters(filter1)
                     .addFlexibleFilters(filter2)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
 
@@ -459,7 +460,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event);
+                var result = node[0].getEventResources(event);
 
                 //ASSERT
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event);
@@ -490,7 +491,7 @@ describe("FilterCascadeNode", () => {
                 var node = builder
                     .addFlexibleFilters(filter1)
                     .addFlexibleFilters(filter2)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
 
@@ -506,7 +507,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event);
+                var result = node[0].getEventResources(event);
 
                 //ASSERT
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event);
@@ -534,7 +535,7 @@ describe("FilterCascadeNode", () => {
  
                  var node = builder
                      .addFlexibleFilters(filter)
-                     .withPipeline(pipeline)
+                     .withResource(pipeline)
                      .build();
  
                  var event: FlexibleEvent = {
@@ -545,7 +546,7 @@ describe("FilterCascadeNode", () => {
                  }
  
                  //ACT
-                 var result = node[0].getEventPipeline(event, true);
+                 var result = node[0].getEventResources(event, true);
  
                  //ASSERT
                  expect(filter.filterEvent).toHaveBeenCalledWith(event);
@@ -575,7 +576,7 @@ describe("FilterCascadeNode", () => {
                 var node = builder
                     .addFlexibleFilters(filter1)
                     .addFlexibleFilters(filter2)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
 
@@ -587,7 +588,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event, true);
+                var result = node[0].getEventResources(event, true);
 
                 //ASSERT
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event);
@@ -618,7 +619,7 @@ describe("FilterCascadeNode", () => {
                 var node = builder
                     .addFlexibleFilters(filter1)
                     .addFlexibleFilters(filter2)
-                    .withPipeline(pipeline)
+                    .withResource(pipeline)
                     .build();
 
 
@@ -630,7 +631,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventPipeline(event, true);
+                var result = node[0].getEventResources(event, true);
 
                 //ASSERT
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event);

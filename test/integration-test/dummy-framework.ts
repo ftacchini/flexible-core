@@ -2,11 +2,11 @@ import { FlexibleFramework, FlexiblePipelineDocument } from "../../src/framework
 import { AsyncContainerModule } from "inversify";
 
 export class DummyFramework implements FlexibleFramework {
-    public readonly containerModule: AsyncContainerModule;
+    public readonly container: AsyncContainerModule;
     private definitions: FlexiblePipelineDocument[] = [];
 
     constructor() {
-        this.containerModule = new AsyncContainerModule(async (module) => {
+        this.container = new AsyncContainerModule(async (module) => {
             return;
         });
     }

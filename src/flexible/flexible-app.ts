@@ -1,149 +1,184 @@
 import { FlexibleEventSource } from "../event/flexible-event-source";
 import { FlexibleFramework } from "../framework/flexible-framework";
-import { FlexibleLogger } from "../logging/flexible-logger";
 import { Container } from "inversify";
 import { FlexiblePipeline } from "./flexible-pipeline";
 import { FlexibleRouter } from "../router/flexible-router";
 import { FlexibleMiddleware } from "./flexible-middleware";
-import { FlexibleFilter, FlexibleExtractor } from "../event";
-import { FlexibleAppBuilder } from "./flexible-app-builder";
+import { FlexibleFilter, FlexibleExtractor, FlexibleEventSourceModule } from "../event";
 import { FlexibleRecipeCrafter } from "./flexible-recipe-crafter";
-import { FLEXIBLE_APP_TYPES } from "./flexible-app-types";
 
 import { flatten, filter, includes } from "lodash";
+import { FlexibleFrameworkModule } from "../framework/flexible-framework-module";
+import { FlexibleLoggerModule } from "../logging/flexible-logger-module";
+import { FlexibleModule } from "../module/flexible-module";
+import { FlexibleLogger } from "../logging/flexible-logger";
+import { FlexibleRouterModule } from "../router/flexible-router-module";
+import { FlexibleProvider } from "../module/flexible-provider";
+import { isArray } from "util";
 
 const NO_FRAMEWORK_DEFINED = "Cannot build a flexible app without any framework";
 const NO_SERVER_DEFINED = "Cannot build a flexible app without any server";
 const NO_CONTAINER_DEFINED = "Cannot build a flexible app without a container";
 const NO_LOGGER_DEFINED = "Cannot build a flexible app without a logger";
+const NO_ROUTER_DEFINED = "Cannot build a flexible app without a router";
+const NO_EXTRACTORS_ROUTER_DEFINED = "Cannot build a flexible app without an extrators router";
 const DUPLICATE_EVENT_TYPES = (types: String[]) => `There is more than one eventSource that emits events with the same type: ${types}`;
 
 export class FlexibleApp {
 
-    private initialization: Promise<FlexibleRouter> = null;
     private recipeCrafter: FlexibleRecipeCrafter;
+    private logger: FlexibleLogger;
+    private eventSources: FlexibleEventSource[];
+    private frameworks: FlexibleFramework[];
+    private router: FlexibleRouter<FlexiblePipeline>;
+    private initialized: boolean;
 
     public constructor(
-        private frameworks: FlexibleFramework[],
-        private eventSources: FlexibleEventSource[],
-        private container: Container,
-        private logger: FlexibleLogger) {
+        private frameworkModules: FlexibleFrameworkModule[],
+        private eventSourceModules: FlexibleEventSourceModule[],
+        private loggerModule: FlexibleLoggerModule,
+        private routerModule: FlexibleRouterModule<FlexiblePipeline>,
+        private extractorsRouterModule: FlexibleRouterModule<FlexibleExtractor>,
+        private modules: FlexibleModule[],
+        private container: Container) {
 
-        if (!logger) {
+        if (!loggerModule) {
             throw NO_LOGGER_DEFINED;
         }
 
-        if (!frameworks || !frameworks.length) {
-            logger.emergency(NO_FRAMEWORK_DEFINED);
+        if (!routerModule) {
+            throw NO_ROUTER_DEFINED;
+        }
+
+        if (!extractorsRouterModule) {
+            throw NO_EXTRACTORS_ROUTER_DEFINED;
+        }
+
+        if (!frameworkModules || !frameworkModules.length) {
             throw NO_FRAMEWORK_DEFINED;
         }
 
-        if (!eventSources || !eventSources.length) {
-            logger.emergency(NO_SERVER_DEFINED);
+        if (!eventSourceModules || !eventSourceModules.length) {
             throw NO_SERVER_DEFINED;
         }
 
         if (!container) {
-            logger.emergency(NO_CONTAINER_DEFINED);
             throw NO_CONTAINER_DEFINED;
         }
 
         this.recipeCrafter = new FlexibleRecipeCrafter(container);
     }
 
-    public async initialize(): Promise<FlexibleRouter> {
-        if (!this.initialization) {
-            this.duplicateEventTypesWarning(this.eventSources);
-            this.initialization = new Promise<FlexibleRouter>(async (resolve, reject) => {
-                try {
-                    await this.setupContainer();
-                    var router = await this.setupRouting();
-                    
-                    resolve(router);
-                }
-                catch (err) {
-                    this.logger.emergency(JSON.stringify(err));
-                    reject(err);
-                }
-            })
+    public async setUp(): Promise<FlexibleRouter<FlexiblePipeline>> {
+
+        if (!this.initialized) {
+
+            try {
+                this.container.unbindAll();
+
+                var dependencies = [
+                    this.loggerModule.container,
+                    this.routerModule.container,
+                    this.extractorsRouterModule.container,
+                    ...this.eventSourceModules.map(x => x.container),
+                    ...this.frameworkModules.map(x => x.container),
+                    ...this.modules.map(x => x.container)];
+
+                await Promise.all(dependencies.map(x => this.container.loadAsync(x)));
+
+                this.logger = this.loggerModule.getInstance(this.container);
+                this.eventSources = this.eventSourceModules.map(x => x.getInstance(this.container));
+                this.duplicateEventTypesWarning(this.logger, this.eventSources);
+
+                this.frameworks = this.frameworkModules.map(x => x.getInstance(this.container));
+                this.router = this.routerModule.getInstance(this.container);
+                await this.setupRouting(this.router, this.frameworks, this.extractorsRouterModule);
+
+                this.initialized = true;
+
+            }
+            catch (err) {
+                this.logger.emergency(JSON.stringify(err));
+                this.initialized = false;
+                throw err;
+            }
         }
 
-        return this.initialization;
+        return this.router;
     }
 
     public async run(): Promise<any[]> {
-        var router = await this.initialize();
+        var router = await this.setUp();
+        var promises = this.eventSources.map(source => this.runEventSource(router, source))
+        var results = await Promise.all(promises);
 
-        var promises = this.eventSources.map(e => {
-            //e.onEvent(router.processEvent);
-            return e.run();
-        })
-
-        return Promise.all(promises);
+        return results;
     }
 
-    private duplicateEventTypesWarning(eventSources: FlexibleEventSource[]): void {
+    private async runEventSource(router: FlexibleRouter<FlexiblePipeline>, eventSource: FlexibleEventSource): Promise<boolean> {
+        eventSource.onEvent(async event => {
+            //Events should be routable by event type.
+            event.routeData.eventType = event.eventType;
+            var pipelines = router.getEventResources(event);
+            var responses = await Promise.all(pipelines.map(pipeline => pipeline.processEvent(event)));
+            return responses;
+        })
+
+        return eventSource.run();
+    }
+
+    private duplicateEventTypesWarning(logger: FlexibleLogger, eventSources: FlexibleEventSource[]): void {
         var eventTypes = flatten(eventSources.map(es => es.availableEventTypes));
         var duplicates = filter(eventTypes, (val, i, iteratee) => includes(iteratee, val, i + 1));
 
-        if(duplicates.length) {
-            this.logger.warning(DUPLICATE_EVENT_TYPES(duplicates));
+        if (duplicates.length) {
+            logger.warning(DUPLICATE_EVENT_TYPES(duplicates));
         }
     }
 
-    private async setupContainer(): Promise<void> {
+    private async setupRouting(
+        router: FlexibleRouter<FlexiblePipeline>, 
+        frameworks: FlexibleFramework[], 
+        extractorsRouterProvider: FlexibleProvider<FlexibleRouter<FlexibleExtractor>>): Promise<void> {
         
-        //Bind flexible app utils
-        this.container.bind(FLEXIBLE_APP_TYPES.CONTAINER).toConstantValue(this.container);
-        this.container.bind(FLEXIBLE_APP_TYPES.RECIPE_CRAFTER).toConstantValue(this.recipeCrafter);
-        this.container.bind(FLEXIBLE_APP_TYPES.LOGGER).toConstantValue(this.logger);
+        var pipelineDefinitions = flatten(await Promise.all(
+            frameworks.map(framework => framework.createPipelineDefinitions())));
         
-        //Bind framework and event source dependencies
-        var eventSourcesContainerPromises = this.eventSources.map(s => s.containerModule);
-        var frameworkContainerPromises = this.frameworks.map(f => f.containerModule);
+        pipelineDefinitions.forEach(definition => {
+            var filters = definition.filterStack.map(filterRecipes => {
+                if(!isArray(filterRecipes)) {
+                    filterRecipes = [filterRecipes]
+                }
 
-        var containerPromises = eventSourcesContainerPromises.concat(frameworkContainerPromises);
-        var containers = await Promise.all(containerPromises);
-
-        await Promise.all(containers.filter(c => c).map(c => this.container.load(c)));
-    }
-
-    private async setupRouting(): Promise<FlexibleRouter> {
-        /*var router = new FlexibleAppRouter();
-        var routerSetup = this.frameworks.map(async framework => this.setupFramework(router, framework));
-
-        await Promise.all(routerSetup);
-        
-        return router;*/
-        //TODO
-        return null
-    }
-
-    private async setupFramework(router: FlexibleRouter, framework: FlexibleFramework): Promise<void> {
-        var definitions = await framework.createPipelineDefinitions();
-
-        definitions.forEach(definition => {
-            var filters = definition.filterStack.map(filterRecipe => {
-                return this.recipeCrafter.craftRecipe<FlexibleFilter>(filterRecipe);
+                return filterRecipes.map(filterRecipe => this.recipeCrafter.craftRecipe<FlexibleFilter>(filterRecipe)) 
             })
 
             var middlewareStack = definition.middlewareStack.map(m => {
 
-                var extractors = m.extractorRecipes.map(extractorRecipe => {
-                    return this.recipeCrafter.craftRecipe<FlexibleExtractor>(extractorRecipe);
+
+                m.extractorRecipes.forEach(extractorRecipes => {
+                    
+                    var extractorsRouter = extractorsRouterProvider.getInstance(this.container);
+
+                    if(!isArray(extractorRecipes)) {
+                        extractorRecipes = [extractorRecipes];
+                    }
+
+                    var extractors = this.recipeCrafter.craftRecipe<FlexibleExtractor>(extractorRecipes);
+                    extractorsRouter.addResource(extractors, extractor);
                 })
 
-                return new FlexibleMiddleware(m.activationContext, extractors)
+                return new FlexibleMiddleware(m.activationContext, extractorsRouter)
             });
 
             var pipeline = new FlexiblePipeline(middlewareStack)
-            router.addPipeline(filters, pipeline);
+            router.addResource(filters, pipeline);
         });
     }
 
-    public stop(): Promise<any[]> {
-        var promises = this.eventSources.map(s => { 
-            return s.stop() 
+    public async stop(): Promise<any[]> {
+        var promises = this.eventSources.map(s => {
+            return s.stop()
         })
 
         return Promise.all(promises);

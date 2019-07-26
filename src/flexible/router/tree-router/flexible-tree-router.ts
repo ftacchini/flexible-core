@@ -1,35 +1,38 @@
-import { FlexiblePipeline } from "../../flexible-pipeline";
 import { FlexibleFilter, FlexibleEvent } from "../../../event";
 import { FlexibleRouter } from "../../../router/flexible-router";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { DecisionTreeNode } from "./decision-tree-node";
-import { RouteData, RouteDataHelper } from "../../../router";
-import { PlainRouteData } from "./plain-route-data";
+import { RouteDataHelper } from "../../../router";
 import { RouteDataIterator } from "./route-data-iterator";
-import { join } from "lodash";
+import { injectable, inject } from "inversify";
+import { TREE_ROUTER_TYPES } from "./tree-router-types";
+import { FilterCascadeNode } from "../filter-cascade/filter-cascade-node";
 
-const SEPARATOR = "@";
 
-export class FlexibleTreeRouter implements FlexibleRouter {
+@injectable()
+export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
 
-    private baseNode: DecisionTreeNode;
+    private baseNode: DecisionTreeNode<FilterCascadeNode<Resource>>;
 
     constructor(
-        private filterCascadeBuilder: FilterCascadeBuilder,
+        @inject(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER)
+        private filterCascadeBuilder: FilterCascadeBuilder<Resource>,
+        @inject(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)
         private routeDataHelper: RouteDataHelper) {
+
         this.baseNode = new DecisionTreeNode();
     }
 
-    public getEventPipelines(event: FlexibleEvent): FlexiblePipeline[] {
-        var plainRouteData = this.turnIntoPlainRouteData(event.routeData);
-        var fitlers = this.baseNode.getRouteFilters(plainRouteData);
+    public getEventResources(event: FlexibleEvent): Resource[] {
+        var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(event.routeData);
+        var fitlers = this.baseNode.getRouteLeaves(plainRouteData);
 
-        return fitlers.map(filter => filter.getEventPipeline(event, true));
+        return fitlers.map(filter => filter.getEventResources(event, true));
     }
 
-    public addPipeline(filters: (FlexibleFilter | FlexibleFilter[])[], pipeline: FlexiblePipeline): void {
+    public addResource(filters: (FlexibleFilter | FlexibleFilter[])[], resource: Resource): void {
         this.filterCascadeBuilder.reset()
-            .withPipeline(pipeline);
+            .withResource(resource);
 
         filters.forEach(filter => {
             this.filterCascadeBuilder.addFlexibleFilters(filter);
@@ -37,8 +40,8 @@ export class FlexibleTreeRouter implements FlexibleRouter {
 
         this.filterCascadeBuilder
             .build()
-            .forEach(filterCascade =>  {
-                var plainRouteData = this.turnIntoPlainRouteData(filterCascade.routeData);
+            .forEach(filterCascade => {
+                var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(filterCascade.routeData);
 
                 this.baseNode.addRouteData(
                     new RouteDataIterator(this.routeDataHelper, plainRouteData),
@@ -46,28 +49,5 @@ export class FlexibleTreeRouter implements FlexibleRouter {
             });
     }
 
-    private turnIntoPlainRouteData(routeData: RouteData, propertyChain: string[] = []): PlainRouteData {
-        var plainRouteData: PlainRouteData = {};
-
-        Object.keys(routeData).forEach(property => {
-
-            var value = routeData[property];
-
-            if (this.routeDataHelper.isRouteData(value)) {
-                plainRouteData = {
-                    ...plainRouteData,
-                    ...this.turnIntoPlainRouteData(value, [property, ...propertyChain])
-                };
-            }
-            else {
-                plainRouteData[this.getPropertyString(propertyChain, property)] = value;
-            }
-        });
-
-        return plainRouteData;
-    }
-
-    private getPropertyString(propertyChain: string[], property: string): string {
-        return join([property, ...propertyChain], SEPARATOR);
-    }
+    
 }

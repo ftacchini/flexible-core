@@ -3,6 +3,6 @@ import { FlexibleFilterRecipe } from "./flexible-filter-recipe";
 import { FlexibleMiddlewareDocument } from "./flexible-middleware-document";
 
 export interface FlexiblePipelineDocument {
-    readonly filterStack: FlexibleFilterRecipe<FlexibleFilter>[];
+    readonly filterStack: (FlexibleFilterRecipe<FlexibleFilter> | FlexibleFilterRecipe<FlexibleFilter>[])[];
     readonly middlewareStack: FlexibleMiddlewareDocument[];
 }

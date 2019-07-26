@@ -1,27 +1,38 @@
-/*import "jasmine";
+import "reflect-metadata";
+import "jasmine";
 import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
+import { FlexibleFrameworkModule } from "../../src/framework/flexible-framework-module";
 import { DummyEventSource } from "./dummy-event-source";
 import { DummyFramework } from "./dummy-framework";
-import { Container } from "inversify";
+import { AsyncContainerModule } from "inversify";
+import { FlexibleEventSourceModule, FlexibleEvent } from "../../src/event";
+import { IfEventIs } from "../../src/flexible/filter/if-event-is";
+import { EventType } from "../../src/flexible/extractor/event-type";
+import { EventData } from "../../src/flexible/extractor/event-data";
 
 describe("FlexibleApp", () => {
 
     let app: FlexibleApp;
     let eventSource: DummyEventSource;
     let framework: DummyFramework;
-    let container: Container;
 
-    beforeAll(() => {
-
-        container = new Container();
+    beforeEach(() => {
         eventSource = new DummyEventSource();
         framework = new DummyFramework();
 
+        let frameworkModule: FlexibleFrameworkModule = {
+            getInstance: () => framework,
+            container: new AsyncContainerModule(async () => { })
+        };
+        let eventSourceModule: FlexibleEventSourceModule = {
+            getInstance: () => eventSource,
+            container: new AsyncContainerModule(async () => { })
+        };
+
         app = FlexibleAppBuilder.instance
-            .withContainer(container)
-            .addEventSource(eventSource)
-            .addFramework(framework)
+            .addEventSource(eventSourceModule)
+            .addFramework(frameworkModule)
             .createApp();
     })
 
@@ -29,10 +40,11 @@ describe("FlexibleApp", () => {
         //Arrange
 
         //Act
-        await app.run();
+        var result = await app.run();
 
         //Assert
         expect(eventSource.running).toBeTruthy();
+        expect(result[0]).toBeTruthy();
         done();
     });
 
@@ -41,27 +53,58 @@ describe("FlexibleApp", () => {
         await app.run();
 
         //Act
-        await app.stop()
+        var result = await app.stop()
 
         //Assert
         expect(eventSource.running).toBeFalsy();
+        expect(result[0]).toBeFalsy();
         done();
 
     });
 
     it("Should route events correctly through flexible router", async (done) => {
+        //Arrange
+        var event: FlexibleEvent = {
+            eventType: "testEvent",
+            data: {
+             key: "value"       
+            },
+            routeData: {}
+        }
 
-    });
+        framework.addPipelineDefinition({
+            filterStack: [{
+                type: IfEventIs,
+                configuration: {
+                    eventType: event.eventType
+                }
+            }],
+            middlewareStack: [{
+                activationContext: { 
+                    activate: async (eventType: string, eventData: any) => {
+                        return { eventType: eventType, eventData: eventData };
+                    }
+                },
+                extractorRecipes: [{
+                    configuration: {},
+                    type: EventType
+                }, {
+                    configuration: {},
+                    type: EventData
+                }]
+            }]
+        });
 
-    it("Should route events correctly through server router", async (done) => {
+        //Act
+        await app.run();
+        var result = await eventSource.generateEvent(event);
 
-    });
-
-    it("Should extract values from event correctly", async (done) => {
-
+        //Assert
+        expect(result.responseStack).toEqual([{ eventType: event.eventType, eventData: event.data }])
+        done();
     });
 
     it("Should process an event through a middleware stack", async (done) => {
-
+        done();
     });
-})*/
+})

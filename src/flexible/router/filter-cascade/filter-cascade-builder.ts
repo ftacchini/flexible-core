@@ -1,36 +1,40 @@
 import { FilterCascadeNode } from "./filter-cascade-node";
 import { FlexibleFilter } from "../../../event";
-import { FlexiblePipeline } from "../../flexible-pipeline";
 import { isArray } from "util";
 import { RouteDataHelper } from "../../../router";
+import { injectable, inject } from "inversify";
+import { TREE_ROUTER_TYPES } from "../tree-router/tree-router-types";
 
-export class FilterCascadeBuilder {
+@injectable()
+export class FilterCascadeBuilder<Resource> {
 
-    private filterNodes: FilterCascadeNode[];
-    private pipeline: FlexiblePipeline;
+    private filterNodes: FilterCascadeNode<Resource>[];
+    private resource: Resource;
 
-    constructor(private routeDataHelper: RouteDataHelper) {
+    constructor(
+        @inject(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER) 
+        private routeDataHelper: RouteDataHelper) {
         this.reset();
     }
 
-    public withPipeline(flexiblePipeline: FlexiblePipeline): this {
-        this.pipeline = flexiblePipeline;
+    public withResource(resource: Resource): this {
+        this.resource = resource;
         return this;
     }
 
     public addFlexibleFilters(flexibleFilters: FlexibleFilter | FlexibleFilter[]): this {
 
-        var filterNodes: FilterCascadeNode[] = [];
+        var filterNodes: FilterCascadeNode<Resource>[] = [];
         var filters = isArray(flexibleFilters) ? flexibleFilters : [flexibleFilters];  
 
         filters.forEach((flexibleFilter)=> {
             if(this.filterNodes.length) {
                 this.filterNodes.forEach((filterNode) => {
-                    filterNodes.push(new FilterCascadeNode(this.routeDataHelper, flexibleFilter, filterNode));
+                    filterNodes.push(new FilterCascadeNode<Resource>(this.routeDataHelper, flexibleFilter, filterNode));
                 })
             }
             else {
-                filterNodes.push(new FilterCascadeNode(this.routeDataHelper, flexibleFilter));
+                filterNodes.push(new FilterCascadeNode<Resource>(this.routeDataHelper, flexibleFilter));
             }
 
         })
@@ -40,14 +44,14 @@ export class FilterCascadeBuilder {
         return this;
     }
 
-    public build(): FilterCascadeNode[] {
+    public build(): FilterCascadeNode<Resource>[] {
 
-        if(!this.pipeline) {
+        if(!this.resource) {
             throw "";
         }
 
         this.filterNodes.forEach(filterNode => {
-            filterNode.pipeline = this.pipeline;
+            filterNode.resource = this.resource;
         });
 
         var nodes = this.filterNodes;
@@ -58,7 +62,7 @@ export class FilterCascadeBuilder {
 
     public reset(): this {
         this.filterNodes = [];
-        this.pipeline = null;
+        this.resource = null;
         return this;
     }
 }

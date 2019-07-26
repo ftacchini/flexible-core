@@ -1,19 +1,18 @@
-import { FilterCascadeNode } from "../filter-cascade/filter-cascade-node";
 import { RouteDataIterator } from "./route-data-iterator";
 import { RouteValueMatcher } from "./route-value-matcher";
 import { PlainRouteData } from "./plain-route-data";
 
-export class DecisionTreeNode {
+export class DecisionTreeNode<LeafType> {
 
     private valueMatcher: RouteValueMatcher;
-    private allLink: DecisionTreeNode;
-    private matchLink: DecisionTreeNode;
+    private allLink: DecisionTreeNode<LeafType>;
+    private matchLink: DecisionTreeNode<LeafType>;
 
-    private filters: FilterCascadeNode[] = [];
+    private leaves: LeafType[] = [];
 
     public addRouteData(
         iterator: RouteDataIterator,
-        filter: FilterCascadeNode): void {
+        filter: LeafType): void {
 
         if (this.valueMatcher) {
             this.propagateRouteData(iterator, filter);
@@ -25,22 +24,22 @@ export class DecisionTreeNode {
                 this.propagateRouteData(iterator, filter);
             }
             else {
-                this.filters.push(filter);
+                this.leaves.push(filter);
             }
         }
     }
 
-    public getRouteFilters(routeData: PlainRouteData): FilterCascadeNode[] {
-        var filters: FilterCascadeNode[] = this.filters;
+    public getRouteLeaves(routeData: PlainRouteData): LeafType[] {
+        var filters: LeafType[] = this.leaves;
 
         if (this.valueMatcher && 
             this.valueMatcher.isMatch(routeData) && 
             this.matchLink) {
-            filters = [...filters, ...this.matchLink.getRouteFilters(routeData)];
+            filters = [...filters, ...this.matchLink.getRouteLeaves(routeData)];
         }
 
         if(this.allLink) {
-            filters = [...filters, ...this.allLink.getRouteFilters(routeData)];
+            filters = [...filters, ...this.allLink.getRouteLeaves(routeData)];
         }
 
         return filters;
@@ -48,7 +47,7 @@ export class DecisionTreeNode {
 
     private propagateRouteData(
         iterator: RouteDataIterator,
-        filter: FilterCascadeNode): void {
+        filter: LeafType): void {
 
         if (this.valueMatcher.isMatch(iterator.routeData)) {
             this.matchLink || (this.matchLink = new DecisionTreeNode());

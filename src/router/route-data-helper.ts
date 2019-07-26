@@ -1,6 +1,12 @@
 import { RouteValue, RouteData } from './route-data';
 import { isObject, isArray, isString, isNumber, isBoolean } from "util";
+import { injectable } from 'inversify';
+import { PlainRouteData } from '../flexible/router/tree-router/plain-route-data';
+import { join } from "lodash";
 
+const SEPARATOR = "@";
+
+@injectable()
 export class RouteDataHelper {
     public isBoolean(object: RouteValue): object is boolean {
         return isBoolean(object);
@@ -28,5 +34,30 @@ export class RouteDataHelper {
 
     public isRouteDataArray(object: RouteValue) : object is (number[] | string[]) {
         return this.isArrayNumber(object) || this.isArrayString(object);
+    }
+
+    public turnIntoPlainRouteData(routeData: RouteData, propertyChain: string[] = []): PlainRouteData {
+        var plainRouteData: PlainRouteData = {};
+
+        Object.keys(routeData).forEach(property => {
+
+            var value = routeData[property];
+
+            if (this.isRouteData(value)) {
+                plainRouteData = {
+                    ...plainRouteData,
+                    ...this.turnIntoPlainRouteData(value, [property, ...propertyChain])
+                };
+            }
+            else {
+                plainRouteData[this.getPropertyString(propertyChain, property)] = value;
+            }
+        });
+
+        return plainRouteData;
+    }
+
+    private getPropertyString(propertyChain: string[], property: string): string {
+        return join([property, ...propertyChain], SEPARATOR);
     }
 }

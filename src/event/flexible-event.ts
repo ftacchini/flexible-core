@@ -3,5 +3,5 @@ import { RouteData } from "../router/route-data";
 export interface FlexibleEvent {
     readonly data: any;
     readonly routeData: RouteData;
-    readonly eventType: String;
+    readonly eventType: string;
 }

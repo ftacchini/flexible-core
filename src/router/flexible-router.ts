@@ -1,7 +1,6 @@
-import { FlexiblePipeline } from "../flexible/flexible-pipeline";
 import { FlexibleFilter, FlexibleEvent } from "../event";
 
-export interface FlexibleRouter {
-    addPipeline(filters: FlexibleFilter[], pipelines: FlexiblePipeline): void;
-    getEventPipelines(event: FlexibleEvent): FlexiblePipeline[];
+export interface FlexibleRouter<Resource> {
+    addResource(filters: (FlexibleFilter | FlexibleFilter[])[], pipelines: Resource): void;
+    getEventResources(event: FlexibleEvent): Resource[];
 }

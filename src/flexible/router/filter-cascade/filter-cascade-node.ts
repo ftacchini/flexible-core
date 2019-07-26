@@ -1,26 +1,25 @@
 import { RouteData, RouteValue } from "../../../router/route-data";
 import { FlexibleFilter, FlexibleEvent } from "../../../event";
 import { intersection, mergeWith, union } from "lodash";
-import { FlexiblePipeline } from "../../flexible-pipeline";
 import { RouteDataHelper } from "../../../router/route-data-helper";
 
-export class FilterCascadeNode {
+export class FilterCascadeNode<Resource> {
 
-    private _pipeline?: FlexiblePipeline;
+    private _resource?: Resource;
 
     constructor(
         private routeDataHelper: RouteDataHelper,
         private filter: FlexibleFilter,
-        private parentNode: FilterCascadeNode = null) {
+        private parentNode: FilterCascadeNode<Resource> = null) {
 
     }
 
-    public set pipeline(pipeline: FlexiblePipeline) {
+    public set resource(resource: Resource) {
         if (this.parentNode) {
-            this.parentNode.pipeline = pipeline;
+            this.parentNode.resource = resource;
         }
         else {
-            this._pipeline = pipeline;
+            this._resource = resource;
         }
     }
 
@@ -63,18 +62,18 @@ export class FilterCascadeNode {
         });
     }
 
-    public getEventPipeline(
+    public getEventResources(
         event: FlexibleEvent,
-        ignoreStaticRouting: boolean = false): FlexiblePipeline {
+        ignoreStaticRouting: boolean = false): Resource {
 
-        var pipeline = this._pipeline;
+        var pipeline = this._resource;
 
-        if (!this.parentNode && !this._pipeline) {
+        if (!this.parentNode && !this._resource) {
             throw "Parent Node without Pipeline";
         }
 
         if (this.parentNode) {
-            pipeline = this.parentNode.getEventPipeline(event, ignoreStaticRouting);
+            pipeline = this.parentNode.getEventResources(event, ignoreStaticRouting);
 
             if (pipeline === null) {
                 return null;

@@ -3,7 +3,7 @@ import { Type } from "../../src/flexible/omit-type";
 import { AsyncContainerModule } from "inversify";
 
 export class DummyEventSource implements FlexibleEventSource {
-    readonly containerModule: AsyncContainerModule;
+    readonly container: AsyncContainerModule;
     readonly availableExtractors: Type<FlexibleExtractor>[] = [];
     readonly availableFilters: Type<FlexibleFilter>[] = [];
     
@@ -19,14 +19,14 @@ export class DummyEventSource implements FlexibleEventSource {
     }
 
     public async stop(): Promise<boolean> {
-        return !(this.running = false);
+        return this.running = false;
     }
 
     public onEvent(handler: (event: FlexibleEvent) => Promise<any>): void {
         this.eventHandler = handler;
     }
 
-    public generateEvent(event: FlexibleEvent): any{
+    public generateEvent(event: FlexibleEvent): Promise<any>{
         if(this.running){
             return this.eventHandler(event);
         }

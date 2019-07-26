@@ -1,7 +1,12 @@
-import { FlexibleLogger } from "./flexible-logger";
-import { unmanaged } from "inversify";
+import { FlexibleLogger } from "../../logging/flexible-logger";
+import { injectable, inject } from "inversify";
+import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 
+@injectable()
 export class FlexibleConsoleLogger implements FlexibleLogger {
+
+    public static readonly TYPE: symbol = Symbol("FlexibleConsoleLogger");
+
     private static EMERGENCY_PREFIX: string = "EMERGENCY";
     private static ALERT_PREFIX: string = "ALERT";
     private static CRITICAL_PREFIX: string = "CRITICAL";
@@ -12,7 +17,7 @@ export class FlexibleConsoleLogger implements FlexibleLogger {
     private static DEBUG_PREFIX: string = "DEBUG";
     private static SEPARATOR: string = ": ";
 
-    constructor(@unmanaged() private consoleInstance: Console = console) {
+    constructor(@inject(FLEXIBLE_LOGGER_TYPES.CONSOLE) private consoleInstance: Console = console) {
     }
 
     

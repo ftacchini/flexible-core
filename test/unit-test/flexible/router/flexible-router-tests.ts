@@ -1,7 +1,7 @@
 import "jasmine";
 import { FlexibleRouter } from "../../../../src/router";
 import { FlexibleFilter, FlexibleEvent } from "../../../../src/event";
-import { FlexiblePipeline } from "../../../../src/flexible/flexible-pipeline";
+import { FlexiblePipeline } from "../../../../src/flexible/pipeline/flexible-pipeline";
 
 export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>) {
 

@@ -2,7 +2,7 @@ import "reflect-metadata";
 import "jasmine";
 import { FilterCascadeBuilder } from "../../../../../src/flexible/router/filter-cascade/filter-cascade-builder";
 import { RouteDataHelper } from "../../../../../src/router";
-import { FlexiblePipeline } from "../../../../../src/flexible/flexible-pipeline";
+import { FlexiblePipeline } from "../../../../../src/flexible/pipeline/flexible-pipeline";
 import { FlexibleFilter, FlexibleEvent } from "../../../../../src/event";
 
 

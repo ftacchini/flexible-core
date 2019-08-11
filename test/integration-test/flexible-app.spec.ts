@@ -67,7 +67,7 @@ describe("FlexibleApp", () => {
         var event: FlexibleEvent = {
             eventType: "testEvent",
             data: {
-             key: "value"       
+                key: "value"
             },
             routeData: {}
         }
@@ -80,18 +80,21 @@ describe("FlexibleApp", () => {
                 }
             }],
             middlewareStack: [{
-                activationContext: { 
+                activationContext: {
                     activate: async (eventType: string, eventData: any) => {
                         return { eventType: eventType, eventData: eventData };
                     }
                 },
-                extractorRecipes: [{
-                    configuration: {},
-                    type: EventType
-                }, {
-                    configuration: {},
-                    type: EventData
-                }]
+                extractorRecipes: {
+                    0: {
+                        configuration: {},
+                        type: EventType
+                    },
+                    1: {
+                        configuration: {},
+                        type: EventData
+                    }
+                }
             }]
         });
 
@@ -100,7 +103,7 @@ describe("FlexibleApp", () => {
         var result = await eventSource.generateEvent(event);
 
         //Assert
-        expect(result.responseStack).toEqual([{ eventType: event.eventType, eventData: event.data }])
+        expect(result[0].responseStack).toEqual([{ eventType: event.eventType, eventData: event.data }])
         done();
     });
 

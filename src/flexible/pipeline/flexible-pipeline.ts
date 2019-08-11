@@ -1,6 +1,6 @@
-import { FlexibleEvent } from "../event";
+import { FlexibleEvent } from "../../event";
 import { FlexibleMiddleware } from "./flexible-middleware";
-import { FlexibleResponse } from "./flexible-response";
+import { FlexibleResponse } from "../flexible-response";
 
 export class FlexiblePipeline {
 

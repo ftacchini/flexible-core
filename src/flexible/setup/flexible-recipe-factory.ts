@@ -1,11 +1,13 @@
-import { FlexibleRecipe } from "./flexible-recipe";
-import { Container } from "inversify";
+import { FlexibleRecipe } from "../flexible-recipe";
+import { Container, injectable, inject } from "inversify";
+import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
 
 const RECIPE_HAS_NO_TYPE_ERROR = "A recipe has no specified tpye and cannot be crafted";
 
-export class FlexibleRecipeCrafter {
+@injectable()
+export class FlexibleRecipeFactory {
 
-    constructor(private container: Container) {
+    constructor(@inject(FLEXIBLE_APP_TYPES.CONTAINER) private container: Container) {
     }
 
     public craftRecipe<recipeType extends object>(recipe: FlexibleRecipe<recipeType>): recipeType {

@@ -7,8 +7,9 @@ import { ConsoleLoggerModule } from "./logging/console-logger-module";
 import { FlexibleRouterModule } from "../router/flexible-router-module";
 import { FlexibleTreeRouterModule } from "./router/tree-router/flexible-tree-router-module";
 import { FlexibleModule } from "../module/flexible-module";
-import { FlexiblePipeline } from "./flexible-pipeline";
+import { FlexiblePipeline } from "./pipeline/flexible-pipeline";
 import { FlexibleExtractor } from "../event";
+import { SetupManager } from "./setup/setup-manager";
 
 
 export class FlexibleAppBuilder {
@@ -39,13 +40,14 @@ export class FlexibleAppBuilder {
         this.extractorsRouter || (this.extractorsRouter = new FlexibleTreeRouterModule());
 
         var app =  new FlexibleApp(
-            this.frameworks,
-            this.eventSources,
-            this.logger,
-            this.router,
-            this.extractorsRouter,
-            this.modules,
-            this.container
+            new SetupManager(
+                this.frameworks,
+                this.eventSources,
+                this.logger,
+                this.router,
+                this.extractorsRouter,
+                this.modules,
+                this.container)
         );
 
         this.reset();

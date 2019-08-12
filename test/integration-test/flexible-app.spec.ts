@@ -108,6 +108,55 @@ describe("FlexibleApp", () => {
     });
 
     it("Should process an event through a middleware stack", async (done) => {
+        //Arrange
+        var event: FlexibleEvent = {
+            eventType: "testEvent",
+            data: {
+                key: "value"
+            },
+            routeData: {}
+        }
+
+        framework.addPipelineDefinition({
+            filterStack: [{
+                type: IfEventIs,
+                configuration: {
+                    eventType: event.eventType
+                }
+            }],
+            middlewareStack: [{
+                activationContext: {
+                    activate: async (eventType: string) => {
+                        return { eventType: eventType };
+                    }
+                },
+                extractorRecipes: {
+                    0: {
+                        configuration: {},
+                        type: EventType
+                    }
+                }
+            }, {
+                activationContext: {
+                    activate: async (eventData: any) => {
+                        return { eventData: eventData };
+                    }
+                },
+                extractorRecipes: {
+                    0: {
+                        configuration: {},
+                        type: EventData
+                    }
+                }
+            }]
+        });
+
+        //Act
+        await app.run();
+        var result = await eventSource.generateEvent(event);
+
+        //Assert
+        expect(result[0].responseStack).toEqual([{ eventType: event.eventType }, { eventData: event.data }])
         done();
     });
 })

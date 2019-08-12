@@ -292,7 +292,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event);
+                var result = node[0].getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual(pipeline);
@@ -335,7 +335,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event);
+                var result = node[0].getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual(pipeline);
@@ -377,7 +377,7 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event);
+                var result = node[0].getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toBeNull();
@@ -414,10 +414,10 @@ describe("FilterCascadeNode", () => {
                  }
  
                  //ACT
-                 var result = node[0].getEventResources(event);
+                 var result = node[0].getEventResources(event, {});
  
                  //ASSERT
-                 expect(filter.filterEvent).toHaveBeenCalledWith(event);
+                 expect(filter.filterEvent).toHaveBeenCalledWith(event, {});
                  expect(result).toEqual(pipeline);
             });
 
@@ -460,11 +460,11 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event);
+                var result = node[0].getEventResources(event, {});
 
                 //ASSERT
-                expect(filter1.filterEvent).toHaveBeenCalledWith(event);
-                expect(filter2.filterEvent).toHaveBeenCalledWith(event);
+                expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
+                expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toEqual(pipeline);
             });
 
@@ -507,11 +507,11 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event);
+                var result = node[0].getEventResources(event, {});
 
                 //ASSERT
-                expect(filter1.filterEvent).toHaveBeenCalledWith(event);
-                expect(filter2.filterEvent).toHaveBeenCalledWith(event);
+                expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
+                expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toBeNull();
             })
 
@@ -546,10 +546,10 @@ describe("FilterCascadeNode", () => {
                  }
  
                  //ACT
-                 var result = node[0].getEventResources(event, true);
+                 var result = node[0].getEventResources(event, {}, true);
  
                  //ASSERT
-                 expect(filter.filterEvent).toHaveBeenCalledWith(event);
+                 expect(filter.filterEvent).toHaveBeenCalledWith(event, {});
                  expect(result).toEqual(pipeline);
             });
 
@@ -588,11 +588,11 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event, true);
+                var result = node[0].getEventResources(event, {}, true);
 
                 //ASSERT
-                expect(filter1.filterEvent).toHaveBeenCalledWith(event);
-                expect(filter2.filterEvent).toHaveBeenCalledWith(event);
+                expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
+                expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toEqual(pipeline);
             });
 
@@ -631,11 +631,11 @@ describe("FilterCascadeNode", () => {
                 }
 
                 //ACT
-                var result = node[0].getEventResources(event, true);
+                var result = node[0].getEventResources(event, {}, true);
 
                 //ASSERT
-                expect(filter1.filterEvent).toHaveBeenCalledWith(event);
-                expect(filter2.filterEvent).toHaveBeenCalledWith(event);
+                expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
+                expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toBeNull();
             })
         })

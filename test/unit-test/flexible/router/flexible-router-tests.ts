@@ -33,7 +33,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
@@ -63,7 +63,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
@@ -92,7 +92,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([]);
@@ -118,7 +118,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
@@ -144,7 +144,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
@@ -170,7 +170,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
@@ -196,7 +196,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([]);
@@ -222,7 +222,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
@@ -258,7 +258,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event);
+                var result = router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);

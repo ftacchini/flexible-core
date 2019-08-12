@@ -10,7 +10,7 @@ export class SingleValueRouter<Resource> implements FlexibleRouter<Resource> {
         throw "Cannot add resources to a single value router"
     }
     
-    public getEventResources(event: FlexibleEvent): Resource[] {
+    public getEventResources(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): Resource[] {
         return [this.resource]
     }
 }

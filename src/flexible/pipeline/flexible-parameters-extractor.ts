@@ -2,6 +2,7 @@ import { FlexibleExtractor, FlexibleEvent } from "../../event";
 import { FlexibleRouter } from "../../router";
 import { UndefinedValue } from "../extractor/undefined-value";
 import { SingleValueRouter } from "../router/single-value-router";
+import { FlexibleResponse } from "../flexible-response";
 
 export class FlexibleParametersExtractor {
 
@@ -17,10 +18,10 @@ export class FlexibleParametersExtractor {
         }
     }
 
-    public extractParams(event: FlexibleEvent): any[] {
+    public extractParams(event: FlexibleEvent, response: FlexibleResponse): any[] {
        return this.extractorRouters.map(router => {
-            let extractors = router.getEventResources(event)
-            return extractors[0].extractValue(event);
+            let extractors = router.getEventResources(event, {})
+            return extractors[0].extractValue(event, response);
         });
     }
 

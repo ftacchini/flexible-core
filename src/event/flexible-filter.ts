@@ -3,5 +3,5 @@ import { RouteData } from "../router/route-data";
 
 export interface FlexibleFilter {
     readonly staticRouting: RouteData;
-    filterEvent?(event: FlexibleEvent): boolean;
+    filterEvent?(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): boolean;
 }

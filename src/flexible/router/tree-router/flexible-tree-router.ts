@@ -23,11 +23,11 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
         this.baseNode = new DecisionTreeNode();
     }
 
-    public getEventResources(event: FlexibleEvent): Resource[] {
+    public getEventResources(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): Resource[] {
         var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(event.routeData);
         var fitlers = this.baseNode.getRouteLeaves(plainRouteData);
 
-        return fitlers.map(filter => filter.getEventResources(event, true));
+        return fitlers.map(filter => filter.getEventResources(event, filterBinnacle, true));
     }
 
     public addResource(filters: (FlexibleFilter | FlexibleFilter[])[], resource: Resource): void {

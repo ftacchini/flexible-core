@@ -27,7 +27,7 @@
     "@types/lodash": "^4.14.117",
     "@types/node": "^8.10.36",
     "inversify": "^4.13.0",
-    "lodash": "^4.17.11",
+    "lodash": "^4.17.15",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {

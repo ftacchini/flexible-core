@@ -1,5 +1,5 @@
 {
-  "name": "flexible",
+  "name": "flexible-core",
   "version": "0.0.1",
   "description": "Flexible",
   "main": "dist/src/index.js",

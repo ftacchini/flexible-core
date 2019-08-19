@@ -1,9 +1,10 @@
 import { AsyncContainerModule, interfaces, Container } from "inversify";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { FlexibleTreeRouter } from "./flexible-tree-router";
-import { RouteDataHelper, FlexibleRouter } from "../../../router";
 import { FlexibleRouterModule } from "../../../router/flexible-router-module";
 import { TREE_ROUTER_TYPES } from "./tree-router-types";
+import { RouteDataHelper } from "../route-data-helper";
+import { FlexibleRouter } from "../../../router";
 
 export class FlexibleTreeRouterModule<Resource> implements FlexibleRouterModule<Resource> {
 

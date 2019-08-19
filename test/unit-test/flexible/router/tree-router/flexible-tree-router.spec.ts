@@ -2,8 +2,8 @@ import "reflect-metadata";
 import "jasmine";
 import { flexibleRouterTests } from "../flexible-router-tests";
 import { FilterCascadeBuilder } from "../../../../../src/flexible/router/filter-cascade/filter-cascade-builder";
-import { RouteDataHelper } from "../../../../../src/router";
 import { FlexibleTreeRouter } from "../../../../../src/flexible/router/tree-router";
+import { RouteDataHelper } from "../../../../../src/flexible/router/route-data-helper";
 
 function initialize() {
     var routeDataHelper = new RouteDataHelper();

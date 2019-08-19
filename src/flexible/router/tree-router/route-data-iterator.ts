@@ -1,7 +1,7 @@
 import { PlainRouteData, PlainRouteValue } from "./plain-route-data";
 import { isNullOrUndefined } from "util";
 import { RouteValueMatcher } from "./route-value-matcher";
-import { RouteDataHelper } from "../../../router";
+import { RouteDataHelper } from "../route-data-helper";
 
 
 export class RouteDataIterator {

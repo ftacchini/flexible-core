@@ -2,11 +2,11 @@ import { FlexibleFilter, FlexibleEvent } from "../../../event";
 import { FlexibleRouter } from "../../../router/flexible-router";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { DecisionTreeNode } from "./decision-tree-node";
-import { RouteDataHelper } from "../../../router";
 import { RouteDataIterator } from "./route-data-iterator";
 import { injectable, inject } from "inversify";
 import { TREE_ROUTER_TYPES } from "./tree-router-types";
 import { FilterCascadeNode } from "../filter-cascade/filter-cascade-node";
+import { RouteDataHelper } from "../route-data-helper";
 
 
 @injectable()

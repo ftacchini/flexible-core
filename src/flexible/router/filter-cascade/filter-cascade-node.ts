@@ -1,7 +1,7 @@
 import { RouteData, RouteValue } from "../../../router/route-data";
 import { FlexibleFilter, FlexibleEvent } from "../../../event";
 import { intersection, mergeWith, union } from "lodash";
-import { RouteDataHelper } from "../../../router/route-data-helper";
+import { RouteDataHelper } from "../route-data-helper";
 
 export class FilterCascadeNode<Resource> {
 

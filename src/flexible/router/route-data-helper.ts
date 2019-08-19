@@ -1,7 +1,7 @@
-import { RouteValue, RouteData } from './route-data';
+import { RouteValue, RouteData } from '../../router/route-data';
 import { isObject, isArray, isString, isNumber, isBoolean } from "util";
 import { injectable } from 'inversify';
-import { PlainRouteData } from '../flexible/router/tree-router/plain-route-data';
+import { PlainRouteData } from './tree-router/plain-route-data';
 import { join } from "lodash";
 
 const SEPARATOR = "@";

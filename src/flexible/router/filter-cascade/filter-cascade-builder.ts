@@ -1,9 +1,9 @@
 import { FilterCascadeNode } from "./filter-cascade-node";
 import { FlexibleFilter } from "../../../event";
 import { isArray } from "util";
-import { RouteDataHelper } from "../../../router";
 import { injectable, inject } from "inversify";
 import { TREE_ROUTER_TYPES } from "../tree-router/tree-router-types";
+import { RouteDataHelper } from "../route-data-helper";
 
 @injectable()
 export class FilterCascadeBuilder<Resource> {

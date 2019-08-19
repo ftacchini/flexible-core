@@ -2,7 +2,7 @@ import { FlexibleExtractor, FlexibleEvent } from "../../event";
 import { RouteData } from "../../router";
 import { FlexibleResponse } from "../flexible-response";
 
-export class PreviousResponse implements FlexibleExtractor {
+export class PreviousError implements FlexibleExtractor {
     public get staticRouting(): RouteData {
         return {};
     }

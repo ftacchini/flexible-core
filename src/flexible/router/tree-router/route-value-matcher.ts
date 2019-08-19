@@ -1,5 +1,5 @@
-import { RouteDataHelper } from "../../../router";
 import { PlainRouteData } from "./plain-route-data";
+import { RouteDataHelper } from "../route-data-helper";
 
 export class RouteValueMatcher {
 

@@ -7,7 +7,7 @@ export class IfEventIs implements FlexibleFilter {
 
     public eventType: string | string[] = [];
 
-    public get staticRouting(): RouteData {
+    public get staticRouting(): RouteData<"eventType"> {
         return {
             eventType: this.eventType
         };

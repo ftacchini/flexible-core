@@ -3,7 +3,7 @@ import { RouteData } from "../../router";
 
 export class Everything implements FlexibleFilter {
     
-    public get staticRouting(): RouteData {
+    public get staticRouting(): RouteData<string> {
         return {};
     }
 }

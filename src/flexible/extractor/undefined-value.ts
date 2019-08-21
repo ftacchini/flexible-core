@@ -3,7 +3,7 @@ import { RouteData } from "../../router";
 
 export class UndefinedValue implements FlexibleExtractor {
 
-    public get staticRouting(): RouteData {
+    public get staticRouting(): RouteData<string> {
         return {};
     }
     public extractValue(event: FlexibleEvent): any {

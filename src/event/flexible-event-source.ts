@@ -1,8 +1,8 @@
 import { FlexibleEvent } from "./flexible-event";
 import { FlexibleFilter } from "./flexible-filter";
 import { FlexibleExtractor } from "./flexible-extractor";
-import { Type } from "../flexible/omit-type";
 import { FlexibleResponse } from "../flexible/flexible-response";
+import { Type } from "../flexible";
 
 export interface FlexibleEventSource {
     readonly availableEventTypes?: String[];

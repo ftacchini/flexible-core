@@ -27,9 +27,9 @@ export class FilterCascadeNode<Resource> {
         return this.routeDataHelper.isRouteData(this.routeData);
     }
 
-    public get routeData(): RouteData {
+    public get routeData(): RouteData<string> {
 
-        var routeData: RouteData = {};
+        var routeData: RouteData<string> = {};
 
         if (this.parentNode) {
             routeData = this.parentNode.routeData;
@@ -94,7 +94,7 @@ export class FilterCascadeNode<Resource> {
         return pipeline;
     }
 
-    private isRouteMatch(ownRoute: RouteData, routeData: RouteData): boolean {
+    private isRouteMatch(ownRoute: RouteData<string>, routeData: RouteData<string>): boolean {
 
         return Object.keys(ownRoute).every(innerProperty => {
             var ownRouteValue = ownRoute[innerProperty];
@@ -109,7 +109,7 @@ export class FilterCascadeNode<Resource> {
 
                 if (this.routeDataHelper.isRouteDataArray(ownRouteValue) &&
                     this.routeDataHelper.isRouteDataArray(routeValue) &&
-                    intersection<RouteValue>(ownRouteValue, routeValue).length === ownRouteValue.length) {
+                    intersection<RouteValue<string>>(ownRouteValue, routeValue).length === ownRouteValue.length) {
                     return true;
                 }
 
@@ -129,7 +129,7 @@ export class FilterCascadeNode<Resource> {
         });
     }
 
-    private validateMerge(rootData: RouteData, ownRouteData: RouteData): boolean {
+    private validateMerge(rootData: RouteData<string>, ownRouteData: RouteData<string>): boolean {
         return Object.keys(ownRouteData).every(innerProperty => {
             return this.validateProperty(
                 rootData[innerProperty],
@@ -137,7 +137,7 @@ export class FilterCascadeNode<Resource> {
         });
     }
 
-    private validateProperty(rootDataProperty: RouteValue, ownDataProperty: RouteValue): boolean {
+    private validateProperty(rootDataProperty: RouteValue<string>, ownDataProperty: RouteValue<string>): boolean {
 
         if (rootDataProperty === undefined) {
             return true;
@@ -145,7 +145,7 @@ export class FilterCascadeNode<Resource> {
 
         if (typeof rootDataProperty === typeof ownDataProperty &&
             (
-                this.routeDataHelper.isRouteData(rootDataProperty) && this.validateMerge(rootDataProperty, ownDataProperty as RouteData) ||
+                this.routeDataHelper.isRouteData(rootDataProperty) && this.validateMerge(rootDataProperty, ownDataProperty as RouteData<string>) ||
                 this.routeDataHelper.isRouteDataArray(rootDataProperty) && this.isArrayAndSameType(ownDataProperty, rootDataProperty[0]) ||
                 rootDataProperty === ownDataProperty
             )) {
@@ -161,7 +161,7 @@ export class FilterCascadeNode<Resource> {
         return false;
     }
 
-    private isArrayAndSameType(value1: RouteValue, value2: RouteValue): boolean {
+    private isArrayAndSameType(value1: RouteValue<string>, value2: RouteValue<string>): boolean {
         return this.routeDataHelper.isRouteDataArray(value1) && (typeof value1[0] === typeof value2);
     }
 }

@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 
 @injectable()
 export class EventType implements FlexibleExtractor{
-    public get staticRouting(): RouteData {
+    public get staticRouting(): RouteData<string> {
         return {};
     }
 

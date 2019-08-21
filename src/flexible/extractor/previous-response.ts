@@ -3,9 +3,10 @@ import { RouteData } from "../../router";
 import { FlexibleResponse } from "../flexible-response";
 
 export class PreviousResponse implements FlexibleExtractor {
-    public get staticRouting(): RouteData {
+    public get staticRouting(): RouteData<string> {
         return {};
     }
+    
     public extractValue(event: FlexibleEvent, response: FlexibleResponse): any {
         return response.responseStack && 
             response.responseStack.length && 

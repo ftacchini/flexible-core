@@ -1,5 +1,4 @@
-import { Type } from "./omit-type";
-
+import { Type } from "./type";
 
 export interface FlexibleRecipe<RecipeType> {
     readonly configuration: any;

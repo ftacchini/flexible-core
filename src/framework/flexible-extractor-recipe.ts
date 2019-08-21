@@ -1,6 +1,7 @@
 import { FlexibleRecipe } from "../flexible/flexible-recipe";
-import { Omit, Type } from "../flexible/omit-type";
+import { Omit } from "../flexible/omit-type";
 import { FlexibleExtractor } from "../event/flexible-extractor";
+import { Type } from "../flexible";
 
 export type ExtractorConfiguration<Extractor extends FlexibleExtractor> = Partial<Omit<Extractor, "extractValue">>;
 

@@ -1,6 +1,6 @@
 import { FlexibleEventSource, FlexibleExtractor, FlexibleFilter, FlexibleEvent } from "../../src/event";
-import { Type } from "../../src/flexible/omit-type";
 import { AsyncContainerModule } from "inversify";
+import { Type } from "../../src";
 
 export class DummyEventSource implements FlexibleEventSource {
     readonly container: AsyncContainerModule;

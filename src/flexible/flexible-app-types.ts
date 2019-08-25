@@ -1,12 +1,12 @@
 export const FLEXIBLE_APP_TYPES = {
-    CONTAINER: "FlexibleContainer",
-    LOGGER: "FlexibleLogger",
-    EVENT_SOURCES_PROVIDER: "FlexibleEventSourcesProvider",
-    FRAMEWORKS_PROVIDER: "FlexibleFrameworksProvider",
+    CONTAINER: Symbol("FlexibleContainer"),
+    LOGGER: Symbol("FlexibleLogger"),
+    EVENT_SOURCES_PROVIDER: Symbol("FlexibleEventSourcesProvider"),
+    FRAMEWORKS_PROVIDER: Symbol("FlexibleFrameworksProvider"),
     
-    ROUTER_FACTORY: "FlexibleRouterFactory",
-    EXTRACTOR_ROUTER_FACTORY: "FlexibleExtractorRouterFactory",
-    RECIPE_FACTORY: "RecipeFactory",
-    MIDDLEWARE_FACTORY: "MiddlewareFactory",
-    PIPELINE_FACTORY: "PipelineFactory",
+    ROUTER_FACTORY: Symbol("FlexibleRouterFactory"),
+    EXTRACTOR_ROUTER_FACTORY: Symbol("FlexibleExtractorRouterFactory"),
+    RECIPE_FACTORY: Symbol("RecipeFactory"),
+    MIDDLEWARE_FACTORY: Symbol("MiddlewareFactory"),
+    PIPELINE_FACTORY: Symbol("PipelineFactory"),
 }

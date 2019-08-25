@@ -11,6 +11,7 @@ import { FlexibleAppState } from "../flexible-app-state";
 import { SetupFlexibleContainerCommand } from "./setup-flexible-container-command";
 import { SetupEventSourcesCommand } from "./setup-event-sources-command";
 import { SetupLoggerCommand } from "./setup-logger-command";
+import { SetupInfrastructureCommand } from "./setup-infrastructure-command";
 
 const NO_FRAMEWORK_DEFINED = "Cannot build a flexible app without any framework";
 const NO_SERVER_DEFINED = "Cannot build a flexible app without any server";
@@ -64,16 +65,26 @@ export class SetupManager {
         var setupContainer = new Container();
         setupContainer.parent = this.container;
 
-        let setupRouterCommand =  new SetupContainerCommand(
+        let setupContainerCommand =  new SetupContainerCommand(
             this.loggerModule,
-            this.modules,
+            [
+                ...this.modules,
+                ...this.eventSourceModules,
+                ...this.frameworkModules
+            ],
             this.container);
 
-        await setupRouterCommand.execute();
+        await setupContainerCommand.execute();
+
+        let setupInfrastructureCommand = new SetupInfrastructureCommand(
+            this.eventSourceModules,
+            this.frameworkModules,
+            this.container
+        );
+
+        await setupInfrastructureCommand.execute();
 
         let setupFlexibleContainerCommand = new SetupFlexibleContainerCommand(
-            this.frameworkModules,
-            this.eventSourceModules,
             this.routerModule,
             this.extractorsRouterModule,
             setupContainer

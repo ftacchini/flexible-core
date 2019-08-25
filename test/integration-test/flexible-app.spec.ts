@@ -23,11 +23,13 @@ describe("FlexibleApp", () => {
 
         let frameworkModule: FlexibleFrameworkModule = {
             getInstance: () => framework,
-            container: new AsyncContainerModule(async () => { })
+            container: new AsyncContainerModule(async () => { }),
+            isolatedContainer: new AsyncContainerModule(async () => { })
         };
         let eventSourceModule: FlexibleEventSourceModule = {
             getInstance: () => eventSource,
-            container: new AsyncContainerModule(async () => { })
+            container: new AsyncContainerModule(async () => { }),
+            isolatedContainer: new AsyncContainerModule(async () => { })
         };
 
         app = FlexibleAppBuilder.instance

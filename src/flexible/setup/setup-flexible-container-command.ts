@@ -12,8 +12,6 @@ import { FlexibleMiddlewareFactory } from "./flexible-middleware-factory";
 export class SetupFlexibleContainerCommand {
 
     public constructor(
-        private frameworkModules: FlexibleFrameworkModule[],
-        private eventSourceModules: FlexibleEventSourceModule[],
         private routerModule: FlexibleRouterModule<FlexiblePipeline>,
         private extractorsRouterModule: FlexibleRouterModule<FlexibleExtractor>,
         private container: Container
@@ -25,25 +23,17 @@ export class SetupFlexibleContainerCommand {
 
         var dependencies = [
             this.routerModule.container,
-            this.extractorsRouterModule.container,
-            ...this.eventSourceModules.map(x => x.container),
-            ...this.frameworkModules.map(x => x.container)];
+            this.extractorsRouterModule.container];
 
         await Promise.all(dependencies.map(x => this.container.loadAsync(x)));
 
         this.container.bind(FLEXIBLE_APP_TYPES.ROUTER_FACTORY).toConstantValue(new FlexibleRouterFactory(
-            this.container, 
+            this.container,
             this.routerModule))
 
         this.container.bind(FLEXIBLE_APP_TYPES.EXTRACTOR_ROUTER_FACTORY).toConstantValue(new FlexibleRouterFactory(
-            this.container, 
+            this.container,
             this.extractorsRouterModule))
-            
-        this.container.bind(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER).toFactory(
-            () => () => this.eventSourceModules.map(x => x.getInstance(this.container)));
-        
-            this.container.bind(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER).toFactory(
-            () => () => this.frameworkModules.map(x => x.getInstance(this.container)));
 
         this.container.bind(FLEXIBLE_APP_TYPES.MIDDLEWARE_FACTORY).to(FlexibleMiddlewareFactory).inSingletonScope();
         this.container.bind(FLEXIBLE_APP_TYPES.RECIPE_FACTORY).to(FlexibleRecipeFactory).inSingletonScope();

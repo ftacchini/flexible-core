@@ -15,7 +15,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
         describe("with single filter", () => {
 
-            it("should return pipelines for event with empty static filter", () => {
+            it("should return pipelines for event with empty static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -33,13 +33,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
-            it("should return pipelines for event with plain static filter", () => {
+            it("should return pipelines for event with plain static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -63,13 +64,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
-            it("should not return pipelines for event with plain static filter that do not match event", () => {
+            it("should not return pipelines for event with plain static filter that do not match event", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -92,13 +94,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([]);
+                next();
             });
 
-            it("should return pipelines for event with array static filter", () => {
+            it("should return pipelines for event with array static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -118,13 +121,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
-            it("should return pipelines for event with sub array static filter", () => {
+            it("should return pipelines for event with sub array static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -144,13 +148,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
-            it("should return pipelines for event with plain array member static filter", () => {
+            it("should return pipelines for event with plain array member static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -170,13 +175,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
-            it("should  not return pipelines return pipelines for event with array static filter that do not match event", () => {
+            it("should  not return pipelines return pipelines for event with array static filter that do not match event", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -196,13 +202,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([]);
+                next();
             });
 
-            it("should return pipelines for event with nested object static filter", () => {
+            it("should return pipelines for event with nested object static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -222,13 +229,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
-            it("should return pipelines for event with nested object and array static filter", () => {
+            it("should return pipelines for event with nested object and array static filter", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -258,10 +266,11 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ACT
                 router.addResource([filter], pipeline);
-                var result = router.getEventResources(event, {});
+                var result = await router.getEventResources(event, {});
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
+                next();
             });
 
         });

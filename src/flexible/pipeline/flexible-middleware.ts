@@ -15,7 +15,7 @@ export class FlexibleMiddleware {
     public async processEvent(event: FlexibleEvent, response: FlexibleResponse): Promise<any> {
         if(!this.isErrorMiddleware && !response.errorStack.length ||
             this.isErrorMiddleware && response.errorStack.length) {
-                var params = this.paramsExtractor.extractParams(event, response);
+                var params = await this.paramsExtractor.extractParams(event, response);
                 return await this.activationContext.activate.apply(this.activationContext, params);
         }
     }

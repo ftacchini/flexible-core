@@ -3,5 +3,5 @@ import { FlexibleFilter } from "./flexible-filter";
 import { FlexibleResponse } from "../flexible/flexible-response";
 
 export interface FlexibleExtractor extends FlexibleFilter {
-    extractValue(event: FlexibleEvent, response: FlexibleResponse): any;
+    extractValue(event: FlexibleEvent, response: FlexibleResponse): Promise<any>;
 }

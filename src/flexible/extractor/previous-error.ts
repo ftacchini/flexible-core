@@ -6,7 +6,7 @@ export class PreviousError implements FlexibleExtractor {
     public get staticRouting(): RouteData<string> {
         return {};
     }
-    public extractValue(event: FlexibleEvent, response: FlexibleResponse): any {
+    public async extractValue(event: FlexibleEvent, response: FlexibleResponse): Promise<any> {
         return response.errorStack && 
             response.errorStack.length && 
             response.errorStack[response.errorStack.length -1];

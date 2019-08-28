@@ -39,7 +39,12 @@ export class SetupRouterCommand {
                     filterRecipes = [filterRecipes]
                 }
 
-                return filterRecipes.map(filterRecipe => this.recipeFactory.craftRecipe<FlexibleFilter>(filterRecipe)) 
+                var filters = filterRecipes
+                    .map(filterRecipe => this.recipeFactory.craftRecipe<FlexibleFilter>(filterRecipe))
+                
+                filters.forEach((filter, index, array) => filter.isLastFilter = (array.length - 1 == index)) 
+
+                return filters;
             })
 
             var middlewareStack = this.middlewareFactory.createMiddlewareStack(

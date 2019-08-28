@@ -18,11 +18,12 @@ export class FlexibleParametersExtractor {
         }
     }
 
-    public extractParams(event: FlexibleEvent, response: FlexibleResponse): any[] {
-       return this.extractorRouters.map(router => {
-            let extractors = router.getEventResources(event, {})
-            return extractors[0].extractValue(event, response);
-        });
+    public async extractParams(event: FlexibleEvent, response: FlexibleResponse): Promise<any[]> {
+       return Promise.all(this.extractorRouters.map(async router => {
+            return router.getEventResources(event, {}).then(extractors => {
+                return extractors[0].extractValue(event, response);
+            })
+        }));
     }
 
 }

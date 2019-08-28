@@ -8,7 +8,7 @@ export class EventType implements FlexibleExtractor{
         return {};
     }
 
-    public extractValue(event: FlexibleEvent): any {
+    public async extractValue(event: FlexibleEvent): Promise<any> {
         return event && event.eventType;
     }
 }

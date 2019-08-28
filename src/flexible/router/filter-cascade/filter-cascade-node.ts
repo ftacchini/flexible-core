@@ -62,10 +62,10 @@ export class FilterCascadeNode<Resource> {
         });
     }
 
-    public getEventResources(
+    public async getEventResources(
         event: FlexibleEvent,
         filterBinnacle: { [key: string]: string },
-        ignoreStaticRouting: boolean = false): Resource {
+        ignoreStaticRouting: boolean = false): Promise<Resource> {
 
         var pipeline = this._resource;
 
@@ -74,7 +74,7 @@ export class FilterCascadeNode<Resource> {
         }
 
         if (this.parentNode) {
-            pipeline = this.parentNode.getEventResources(event, filterBinnacle, ignoreStaticRouting);
+            pipeline = await this.parentNode.getEventResources(event, filterBinnacle, ignoreStaticRouting);
 
             if (pipeline === null) {
                 return null;
@@ -84,7 +84,7 @@ export class FilterCascadeNode<Resource> {
         var isMatch = ignoreStaticRouting || this.isRouteMatch(this.filter.staticRouting, event.routeData);
 
         if (this.filter.filterEvent) {
-            isMatch = this.filter.filterEvent(event, filterBinnacle);
+            isMatch = await this.filter.filterEvent(event, filterBinnacle);
         }
 
         if (!isMatch) {

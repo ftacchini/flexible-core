@@ -7,7 +7,7 @@ export class EventData implements FlexibleExtractor{
     public get staticRouting(): RouteData<string> {
         return {};
     }
-    public extractValue(event: FlexibleEvent): any {
+    public async extractValue(event: FlexibleEvent): Promise<any> {
         return event && event.data;
     }
 }

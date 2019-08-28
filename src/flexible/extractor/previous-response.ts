@@ -7,7 +7,7 @@ export class PreviousResponse implements FlexibleExtractor {
         return {};
     }
     
-    public extractValue(event: FlexibleEvent, response: FlexibleResponse): any {
+    public async extractValue(event: FlexibleEvent, response: FlexibleResponse): Promise<any> {
         return response.responseStack && 
             response.responseStack.length && 
             response.responseStack[response.responseStack.length -1];

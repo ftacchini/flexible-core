@@ -25,9 +25,10 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
 
     public async getEventResources(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): Promise<Resource[]> {
         var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(event.routeData);
-        var fitlers = this.baseNode.getRouteLeaves(plainRouteData);
+        var filters = this.baseNode.getRouteLeaves(plainRouteData);
 
-        return await Promise.all(fitlers.map(filter => filter.getEventResources(event, filterBinnacle, true)));
+        return (await Promise.all(filters.map(filter => filter.getEventResources(event, filterBinnacle, true))))
+            .filter(resource => resource);
     }
 
     public addResource(filters: (FlexibleFilter | FlexibleFilter[])[], resource: Resource): void {

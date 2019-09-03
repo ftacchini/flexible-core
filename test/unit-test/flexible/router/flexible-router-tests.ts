@@ -71,6 +71,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
                 next();
             });
 
+
             it("should not return pipelines for event with plain static filter that do not match event", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
@@ -273,7 +274,40 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
                 next();
             });
 
-        });
+            it("should return pipelines for event with dynamic filter", async (next) => {
+                //ARRANGE
+                var pipeline1 = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+                var pipeline2 = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
+
+                var filter1: FlexibleFilter = {
+                    staticRouting: {
+                    },
+                    filterEvent: async () => true
+                };
+                var filter2: FlexibleFilter = {
+                    staticRouting: {
+                    },
+                    filterEvent: async () => false
+                };
+
+                var event: FlexibleEvent = {
+                    data: {},
+                    routeData: {
+                    },
+                    eventType: "sample"
+                };
+
+                //ACT
+                router.addResource([filter1], pipeline1);
+                router.addResource([filter2], pipeline2);
+                var result = await router.getEventResources(event, {});
+
+                //ASSERT
+                expect(result).toEqual([pipeline1]);
+                next();
+            });
+        })
+            
 
         describe("with multiple filters", () => {
 

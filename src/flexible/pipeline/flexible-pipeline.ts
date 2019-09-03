@@ -8,7 +8,7 @@ export class FlexiblePipeline {
 
     }
 
-    public async processEvent(event: FlexibleEvent): Promise<FlexibleResponse> {
+    public async processEvent(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): Promise<FlexibleResponse> {
         
         let response: FlexibleResponse = {
             errorStack: [],
@@ -17,7 +17,7 @@ export class FlexiblePipeline {
 
         for(var i = 0; i < this.middlewareStack.length; i++) {
             try {
-                var newResponse = await this.middlewareStack[i].processEvent(event, response);
+                var newResponse = await this.middlewareStack[i].processEvent(event, response, filterBinnacle);
                 response.responseStack.push(newResponse);
             }
             catch(ex) {

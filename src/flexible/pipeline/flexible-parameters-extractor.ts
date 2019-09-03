@@ -18,10 +18,10 @@ export class FlexibleParametersExtractor {
         }
     }
 
-    public async extractParams(event: FlexibleEvent, response: FlexibleResponse): Promise<any[]> {
+    public async extractParams(event: FlexibleEvent, response: FlexibleResponse, filterBinnacle: { [key: string]: string }): Promise<any[]> {
        return Promise.all(this.extractorRouters.map(async router => {
-            return router.getEventResources(event, {}).then(extractors => {
-                return extractors[0].extractValue(event, response);
+            return router.getEventResources(event, filterBinnacle).then(extractors => {
+                return extractors[0].extractValue(event, response, filterBinnacle);
             })
         }));
     }

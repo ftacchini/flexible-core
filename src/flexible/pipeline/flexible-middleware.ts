@@ -12,10 +12,10 @@ export class FlexibleMiddleware {
         private paramsExtractor: FlexibleParametersExtractor) {
     }
 
-    public async processEvent(event: FlexibleEvent, response: FlexibleResponse): Promise<any> {
+    public async processEvent(event: FlexibleEvent, response: FlexibleResponse, filterBinnacle: { [key: string]: string }): Promise<any> {
         if(!this.isErrorMiddleware && !response.errorStack.length ||
             this.isErrorMiddleware && response.errorStack.length) {
-                var params = await this.paramsExtractor.extractParams(event, response);
+                var params = await this.paramsExtractor.extractParams(event, response, filterBinnacle);
                 return await this.activationContext.activate.apply(this.activationContext, params);
         }
     }

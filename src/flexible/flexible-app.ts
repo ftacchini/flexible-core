@@ -76,9 +76,9 @@ export class FlexibleApp {
     }
 
     public async stop(): Promise<any[]> {
-        var promises = this.eventSources.map(s => {
+        var promises = this.initialized ? this.eventSources.map(s => {
             return s.stop()
-        })
+        }) : [Promise.resolve()]
 
         return Promise.all(promises);
     }

@@ -34,15 +34,15 @@ export class SetupRouterCommand {
                 )));
         
         pipelineDefinitions.forEach(definition => {
-            var filters = definition.filterStack.map(filterRecipes => {
+            var filters = definition.filterStack.map((filterRecipes, index, array) => {
                 if(!isArray(filterRecipes)) {
                     filterRecipes = [filterRecipes]
                 }
 
                 var filters = filterRecipes
                     .map(filterRecipe => this.recipeFactory.craftRecipe<FlexibleFilter>(filterRecipe))
-                
-                filters.forEach((filter, index, array) => filter.isLastFilter = (array.length - 1 == index)) 
+
+                filters.forEach((filter) => filter.isLastFilter = (array.length - 1 == index)) 
 
                 return filters;
             })

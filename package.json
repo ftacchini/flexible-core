@@ -1,6 +1,6 @@
 {
   "name": "flexible-core",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "description": "Flexible",
   "main": "dist/src/index.js",
   "scripts": {

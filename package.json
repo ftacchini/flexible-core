@@ -24,13 +24,13 @@
   "homepage": "https://github.com/ftacchini/flexible#readme",
   "typings": "./dts/src/index.d.ts",
   "dependencies": {
+    "@types/node": "^12.7.5",
+    "@types/lodash": "^4.14.117",
     "inversify": "^4.13.0",
     "lodash": "^4.17.15",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "@types/node": "^12.7.5",
-    "@types/lodash": "^4.14.117",
     "@types/jasmine": "^2.8.9",
     "flexible-dummy-framework": "0.0.2",
     "flexible-dummy-source": "0.0.3",

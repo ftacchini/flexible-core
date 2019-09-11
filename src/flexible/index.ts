@@ -4,6 +4,5 @@ export * from "./flexible-response";
 export * from "./flexible-recipe";
 export * from "./filter";
 export * from "./extractor";
-export * from "./omit-type";
 export * from "./type";
 export * from "./flexible-app-types";

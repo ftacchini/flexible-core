@@ -38,7 +38,6 @@ export class SetupFlexibleContainerCommand {
         this.container.bind(FLEXIBLE_APP_TYPES.MIDDLEWARE_FACTORY).to(FlexibleMiddlewareFactory).inSingletonScope();
         this.container.bind(FLEXIBLE_APP_TYPES.RECIPE_FACTORY).to(FlexibleRecipeFactory).inSingletonScope();
         this.container.bind(FLEXIBLE_APP_TYPES.PIPELINE_FACTORY).to(FlexiblePipelineFactory).inSingletonScope();
-        this.container.bind(FLEXIBLE_APP_TYPES.CONTAINER).toConstantValue(this.container);
     }
 
 }

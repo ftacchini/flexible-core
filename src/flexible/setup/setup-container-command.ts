@@ -24,6 +24,8 @@ export class SetupContainerCommand {
         this.container.bind(FLEXIBLE_APP_TYPES.LOGGER).toDynamicValue(() => {
             return () => this.loggerModule.getInstance(this.container);
         })
+        
+        this.container.bind(FLEXIBLE_APP_TYPES.CONTAINER).toConstantValue(this.container);
     }
 
 }

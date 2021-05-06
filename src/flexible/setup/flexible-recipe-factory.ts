@@ -17,7 +17,7 @@ export class FlexibleRecipeFactory {
         }
 
         if(!this.container.isBound(recipe.type.name)) {
-            this.container.bind(recipe.type.name).to(recipe.type).inSingletonScope();
+            this.container.bind(recipe.type.name).to(recipe.type);
         }
 
         var instance = this.container.get<recipeType>(recipe.type.name);

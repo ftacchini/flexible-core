@@ -10,10 +10,14 @@ import { FlexiblePipelineFactory } from "./flexible-pipeline-factory";
 import { FlexibleRouterFactory } from "./flexible-router-factory";
 import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
 import { inject, injectable } from "inversify";
+import { FlexibleLogger } from "../../logging";
+
+const PIPELINE_SETUP_ERROR = "One of your pipelines could not be setup, there might be a problem with one of your filters/extractors/middleware"
 
 @injectable()
 export class SetupRouterCommand {
     constructor(
+        @inject(FLEXIBLE_APP_TYPES.LOGGER) private logger: FlexibleLogger,
         @inject(FLEXIBLE_APP_TYPES.ROUTER_FACTORY) private routerFactory: FlexibleRouterFactory<FlexiblePipeline>,
         @inject(FLEXIBLE_APP_TYPES.MIDDLEWARE_FACTORY) private middlewareFactory: FlexibleMiddlewareFactory,
         @inject(FLEXIBLE_APP_TYPES.RECIPE_FACTORY) private recipeFactory: FlexibleRecipeFactory,
@@ -34,24 +38,28 @@ export class SetupRouterCommand {
                 )));
         
         pipelineDefinitions.forEach(definition => {
-            var filters = definition.filterStack.map((filterRecipes, index, array) => {
-                if(!isArray(filterRecipes)) {
-                    filterRecipes = [filterRecipes]
-                }
+            try {
+                var filters = definition.filterStack.map((filterRecipes, index, array) => {
+                    if(!isArray(filterRecipes)) {
+                        filterRecipes = [filterRecipes]
+                    }
 
-                var filters = filterRecipes
-                    .map(filterRecipe => this.recipeFactory.craftRecipe<FlexibleFilter>(filterRecipe))
+                    var filters = filterRecipes
+                        .map(filterRecipe => this.recipeFactory.craftRecipe<FlexibleFilter>(filterRecipe))
 
-                filters.forEach((filter) => filter.isLastFilter = (array.length - 1 == index)) 
+                    filters.forEach((filter) => filter.isLastFilter = (array.length - 1 == index)) 
 
-                return filters;
-            })
+                    return filters;
+                })
 
-            var middlewareStack = this.middlewareFactory.createMiddlewareStack(
-                definition.middlewareStack);
+                var middlewareStack = this.middlewareFactory.createMiddlewareStack(
+                    definition.middlewareStack);
 
-            var pipeline = this.pipelineFactory.createPipeline(middlewareStack)
-            flexibleAppState.router.addResource(filters, pipeline);
+                var pipeline = this.pipelineFactory.createPipeline(middlewareStack)
+                flexibleAppState.router.addResource(filters, pipeline);
+            } catch(ex) {
+                this.logger.alert(`${PIPELINE_SETUP_ERROR}, exception is: ${JSON.stringify(ex)}`);
+            }
         });
 
     }

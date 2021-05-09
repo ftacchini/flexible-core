@@ -1,7 +1,9 @@
 import { FlexibleExtractor, FlexibleEvent } from "../../event";
 import { RouteData } from "../../router";
 import { FlexibleResponse } from "../flexible-response";
+import { injectable } from "inversify";
 
+@injectable()
 export class PreviousResponse implements FlexibleExtractor {
     public get staticRouting(): RouteData<string> {
         return {};

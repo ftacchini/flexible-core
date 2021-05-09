@@ -101,8 +101,9 @@ export class SetupManager {
         this.container.bind(SetupRouterCommand).to(SetupRouterCommand);
         this.container.bind(SetupEventSourcesCommand).to(SetupEventSourcesCommand);
 
+        await container.get<SetupLoggerCommand>(SetupLoggerCommand);
+
         let setupCommands = [
-            container.get<SetupLoggerCommand>(SetupLoggerCommand),
             container.get<SetupEventSourcesCommand>(SetupEventSourcesCommand),
             container.get<SetupRouterCommand>(SetupRouterCommand)
         ]

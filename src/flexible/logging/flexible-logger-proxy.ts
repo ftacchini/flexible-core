@@ -1,11 +1,11 @@
 import { inject, injectable } from "inversify";
 import { FlexibleLogger } from "../../logging";
-import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
+import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 
 @injectable()
 export class FlexibleLoggerProxy implements FlexibleLogger{
 
-    constructor (@inject(FLEXIBLE_APP_TYPES.LOGGER) private loggerProvider: () => FlexibleLogger) {
+    constructor (@inject(FLEXIBLE_LOGGER_TYPES.LOGGER_PROVIDER) private loggerProvider: () => FlexibleLogger) {
     }
 
     private logUsingLogger(log: String, method: keyof FlexibleLogger) {

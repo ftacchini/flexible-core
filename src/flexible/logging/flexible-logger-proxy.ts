@@ -6,7 +6,8 @@ import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 export class FlexibleLoggerProxy implements FlexibleLogger{
 
     constructor (@inject(FLEXIBLE_LOGGER_TYPES.LOGGER_PROVIDER) private loggerProvider: () => FlexibleLogger) {
-    }
+        console.log("loggerProvider is " + loggerProvider)
+    } 
 
     private logUsingLogger(log: String, method: keyof FlexibleLogger) {
         this.loggerProvider()[method](log);

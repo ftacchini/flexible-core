@@ -11,7 +11,9 @@ export class SetupLoggerCommand {
     }
 
     public execute(app: FlexibleAppState) {
+        this.logger.debug("Setting up logger...");
         app.logger = this.logger;
+        this.logger.debug("Logger setup done\n");
     }
     
 }

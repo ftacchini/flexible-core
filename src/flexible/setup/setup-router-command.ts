@@ -28,16 +28,16 @@ export class SetupRouterCommand {
 
     public async execute(flexibleAppState: FlexibleAppState): Promise<void> {
 
+        this.logger.debug("Setting up router...");
         flexibleAppState.router = this.routerFactory.createRouter();
 
         var frameworks = this.frameworksProvider()
+        this.logger.debug(`Collecting pipeline definitions from ${frameworks.length || 0} frameworks...`);
 
-        var pipelineDefinitions = flatten(await Promise.all(
-            frameworks.map(
-                framework => framework.createPipelineDefinitions()
-                )));
+        var pipelineDefinitions = flatten(await Promise.all(frameworks.map(framework => framework.createPipelineDefinitions())));
+        this.logger.debug(`Generating pipelines from ${pipelineDefinitions.length || 0} pipeline definitions...`);
         
-        pipelineDefinitions.forEach(definition => {
+        var pipelines = pipelineDefinitions.map(definition => {
             try {
                 var filters = definition.filterStack.map((filterRecipes, index, array) => {
                     if(!isArray(filterRecipes)) {
@@ -57,11 +57,15 @@ export class SetupRouterCommand {
 
                 var pipeline = this.pipelineFactory.createPipeline(middlewareStack)
                 flexibleAppState.router.addResource(filters, pipeline);
+
+                return pipeline;
+
             } catch(ex) {
                 this.logger.alert(`${PIPELINE_SETUP_ERROR}, exception is: ${JSON.stringify(ex)}`);
             }
-        });
+        }).filter(x => x);
 
+        this.logger.debug(`${pipelines.length || 0} pipelines successfully generated and added to router\n`);
     }
 
 }

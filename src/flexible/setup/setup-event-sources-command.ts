@@ -17,8 +17,11 @@ export class SetupEventSourcesCommand {
     }
 
     public execute(app: FlexibleAppState) {
+        this.logger.debug("Setting up event sources...");
         app.eventSources = this.eventSourcesProvider();
+        this.logger.debug(`Analysing events for ${app.eventSources.length || 0} event sources...`);
         this.duplicateEventTypesWarning(app.eventSources);
+        this.logger.debug(`Setup done for ${app.eventSources.length || 0} event sources\n`);
     }
     
     private duplicateEventTypesWarning(eventSources: FlexibleEventSource[]): void {
@@ -28,5 +31,7 @@ export class SetupEventSourcesCommand {
         if (duplicates.length) {
             this.logger.warning(DUPLICATE_EVENT_TYPES(duplicates));
         }
+        
+        this.logger.debug(`Your app will process ${eventTypes.length || 0} event types...`);
     }
 }

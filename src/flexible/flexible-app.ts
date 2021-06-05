@@ -38,11 +38,11 @@ export class FlexibleApp {
                         return that.logger;
                     },
                     set logger(logger: FlexibleLogger) {
-                        that.logger = logger
+                        that.logger = logger;
                     }
                 });
-
                 this.initialized = true;
+                this.logger.debug("APP SUCCESSFULLY INITIALIZED\n")
             }
             catch (err) {
                 this.logger && this.logger.emergency(JSON.stringify(err));

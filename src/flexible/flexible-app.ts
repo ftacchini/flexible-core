@@ -42,7 +42,7 @@ export class FlexibleApp {
                     }
                 });
                 this.initialized = true;
-                this.logger.debug("APP SUCCESSFULLY INITIALIZED\n")
+                this.logger.debug("APP SUCCESSFULLY INITIALIZED!\n")
             }
             catch (err) {
                 this.logger && this.logger.emergency(JSON.stringify(err));
@@ -56,8 +56,10 @@ export class FlexibleApp {
 
     public async run(): Promise<any[]> {
         var router = await this.setUp();
+        this.logger.debug("STARTING EVENT SOURCES\n")
         var promises = this.eventSources.map(source => this.runEventSource(router, source))
         var results = await Promise.all(promises);
+        this.logger.debug("APP RUNNING SUCCESSFULLY\n")
 
         return results;
     }
@@ -76,10 +78,14 @@ export class FlexibleApp {
     }
 
     public async stop(): Promise<any[]> {
+        this.logger.debug("STOPPING EVENT SOURCES\n")
         var promises = this.initialized ? this.eventSources.map(s => {
             return s.stop()
         }) : [Promise.resolve()]
 
-        return Promise.all(promises);
+        const results = Promise.all(promises);
+        this.logger.debug("EVENT SOURCES STOPPED SUCCESSFULLY\n")
+
+        return results;
     }
 }

@@ -1,4 +1,22 @@
-# Flexible
+# Table of Contents
+
+1. [What is flexible](#flexible)
+1. [Getting started with flexible](#what-is-flexible)
+1. [Available Components](#what-is-flexible)
+
+
+
+
+Architecture
+
+How tos
+How to build an event source
+How to build a framework
+How to create your logger
+How to create your router
+
+
+## What is flexible ## {#flexible}
 
 Flexible is a development platform that lets you build applications by connecting Event Sources to Frameworks. Many of the nowadays existing platforms are a bundle of both, an event source, and a way of processing that event. With flexible you can choose one or more event sources (http, web sockets, https, etc) and one or more frameworks (MVC like frameworks, plain js objects, etc) and connect them together. Lets make it more clear with an example:
 

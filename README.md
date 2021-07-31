@@ -1,84 +1,93 @@
 # Table of Contents
 
-1. [What is flexible](#flexible)
-1. [Getting started with flexible](#what-is-flexible)
-1. [Available Components](#what-is-flexible)
+1. [Introduction](#flexible)
+1. [Getting started](#getting-started)
+1. [Available Frameworks and Event Sources](#available-frameworks-and-event-sources)
+1. [Architecture](#architecture)
+1. [How-tos](#how-tos)
+    1. [How-to build an event source](#architecture)
+    1. [How-to build a framework](#architecture)
+    1. [How-to create your logger](#architecture)
+    1. [How-to create your router](#architecture)
+1. [FAQ](#architecture)
+1. [Contacts](#architecture)
+1. [Issues](#architecture)
+1. [License](#architecture)
 
 
 
+## Flexible
 
-Architecture
-
-How tos
-How to build an event source
-How to build a framework
-How to create your logger
-How to create your router
+Flexible is a library that lets you build applications by connecting Event Sources to Frameworks. Event sources emit events, which are basically javascript objects that are then filtered and processed by pipelines. Frameworks provide the structure for those pipelines. 
 
 
-## What is flexible {#flexible}
+## Getting started
 
-Flexible is a development platform that lets you build applications by connecting Event Sources to Frameworks. Many of the nowadays existing platforms are a bundle of both, an event source, and a way of processing that event. With flexible you can choose one or more event sources (http, web sockets, https, etc) and one or more frameworks (MVC like frameworks, plain js objects, etc) and connect them together. Lets make it more clear with an example:
+To install using flexible you need to install flexible's core package, one or more event sources and one or more frameworks.
 
-Decorated Framework + Http Event Source:
-
-`````
-e1
-`````
-
-Pain JS Controllers + Http Event Source:
-
-`````
-e2
-`````
-
-
-What this means, is that you can use any event source (or more than one) in combination with any framework (or more than one) and flexible will plug them together for you. Also, building an event source will make it automatically compatible with every framework and viceversa. 
-
-## How to create your first Flexible App?
-
+````
 npm install flexible-core
 npm install flexible-http #or any other
 npm install flexible-decorators #or any other
+````
 
-index.ts
+Once that's done, you need to initialize your app and you are good to go!
+
 
 `````
-var eventSourceModule = 
-var frameworkModule = 
+----------------------
+./index.ts:
+----------------------
 
+const httpEventSource = HttpModuleBuilder.instance
+    .build();
 
-var app = FlexibleAppBuilder.instance
-    .addEventSource(eventSourceModule)
-    .addFramework(frameworkModule)
+const decoratorsFramework = DecoratorsFrameworkModuleBuilder.instance
+    .withControllerLoader(new ExplicitControllerLoader([
+        HelloController
+    ]))
+    .build();
+
+const application = FlexibleAppBuilder.instance
+    .addEventSource(httpEventSource)
+    .addFramework(decoratorsFramework)
     .createApp();
 
-await app.start();
-`````
+application.run().then(status => {
+    console.log(JSON.stringify(status));
+});
 
-cats-controller.ts
+----------------------
+./hello-controller.ts:
+----------------------
 
-`````
-@Controller()
-@Route(HttpMethod)
-export class CatsController {
+@Controller({ filter: HttpMethod })
+export class HelloController {
 
-    @Route(HttpGet, { path: "/:id" })
-    public getCats(@FromPath() id: number) {
-        return {
-            id: id
-        }
+    @Route(HttpGet)
+    public world(): any {
+        return { some: "world" };
     }
 
-    @Route(HttpGet, { path: "/" })
-    public getCatById() {
-        return [{ id: 1 }, { id: 2 }]
-    }
 }
 `````
 
+## Available Frameworks and Event Sources
 
-## Diagram
+### Frameworks
+
+1. [flexible-decorators](https://github.com/ftacchini/flexible-decorators): a framework that uses typescript decorators to create controllers that shape your pipelines. 
+1. [flexible-dummy-framework](https://github.com/ftacchini/flexible-dummy-framework): a framework that helps you to easily create integration tests for newly created event sources.
+
+### Event Sources
+
+1. [flexible-http](https://github.com/ftacchini/flexible-http): an event source that allows you to feed and filter http and https events into pipelines.
+1. [flexible-dummy-source](https://github.com/ftacchini/flexible-dummy-source): an event sources that helps you easily create integration tests for newly created frameworks.
+
+
+## Architecture
+
+![Flexible's architecture](https://github.com/ftacchini/flexible-core/docs/img/flexible-core_7.11.2021.jpg)
 
 ## How do I create an Event Source?
 

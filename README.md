@@ -87,7 +87,7 @@ export class HelloController {
 
 ## Architecture
 
-![Flexible's architecture](https://github.com/ftacchini/flexible-core/docs/img/flexible-core_7.11.2021.jpg)
+![Flexible's architecture](docs/img/flexible-core_31-7-21.png)
 
 ## How do I create an Event Source?
 

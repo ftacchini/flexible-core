@@ -19,8 +19,8 @@ export class SetupInfrastructureCommand {
 
     private async bindProviders(modules: (FlexibleEventSourceModule | FlexibleFrameworkModule)[], type: symbol) {
         var providers = await Promise.all(modules.map(async m => {
-            var isolatedContainer = new Container();
-            isolatedContainer.parent = this.container;
+            var isolatedContainer =  this.container.createChild();
+
             return isolatedContainer.loadAsync(m.isolatedContainer).then(() => {{
                 return () => m.getInstance(isolatedContainer);
             }});

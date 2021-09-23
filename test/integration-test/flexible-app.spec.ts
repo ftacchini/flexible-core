@@ -10,6 +10,7 @@ import { FlexibleEventSourceModule, FlexibleEvent } from "../../src/event";
 import { IfEventIs } from "../../src/flexible/filter/if-event-is";
 import { EventType } from "../../src/flexible/extractor/event-type";
 import { EventData } from "../../src/flexible/extractor/event-data";
+import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
 
 describe("FlexibleApp", () => {
 
@@ -33,6 +34,7 @@ describe("FlexibleApp", () => {
         };
 
         app = FlexibleAppBuilder.instance
+            .withLogger(new SilentLoggerModule())
             .addEventSource(eventSourceModule)
             .addFramework(frameworkModule)
             .createApp();

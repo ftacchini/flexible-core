@@ -18,12 +18,12 @@
 
 ## Flexible
 
-Flexible is a library that lets you build applications by connecting Event Sources to Frameworks. Event sources emit events, which are basically javascript objects that are then filtered and processed by pipelines. Frameworks provide the structure for those pipelines. 
-
+Flexible is a library that helps you build event processing pipelines by connecting Event Sources to Frameworks. Event Sources provide events 
+as javascript objects and flexible routes them through middleware structured according to the Frameworks of your choice.
 
 ## Getting started
 
-To install using flexible you need to install flexible's core package, one or more event sources and one or more frameworks.
+To start using flexible you need to install flexible's core package, one or more event sources and one or more frameworks.
 
 ````
 npm install flexible-core
@@ -66,7 +66,7 @@ export class HelloController {
 
     @Route(HttpGet)
     public world(): any {
-        return { some: "world" };
+        return "hello world";
     }
 
 }
@@ -84,10 +84,16 @@ export class HelloController {
 1. [flexible-http](https://github.com/ftacchini/flexible-http): an event source that allows you to feed and filter http and https events into pipelines.
 1. [flexible-dummy-source](https://github.com/ftacchini/flexible-dummy-source): an event sources that helps you easily create integration tests for newly created frameworks.
 
-
 ## Architecture
 
+A simplified schema of Flexible can be seen below:
+
 ![Flexible's architecture](docs/img/flexible-core_31-7-21.png)
+
+- Flexible Core: 
+- Frameworks:
+- Event Sources:
+- User Code: 
 
 ## How do I create an Event Source?
 

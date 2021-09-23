@@ -71,7 +71,6 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
                 next();
             });
 
-
             it("should not return pipelines for event with plain static filter that do not match event", async (next) => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);

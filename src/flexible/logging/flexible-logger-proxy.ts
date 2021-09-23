@@ -3,7 +3,7 @@ import { FlexibleLogger } from "../../logging";
 import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 
 @injectable()
-export class FlexibleLoggerProxy implements FlexibleLogger{
+export class FlexibleLoggerProxy implements FlexibleLogger {
 
     constructor (@inject(FLEXIBLE_LOGGER_TYPES.LOGGER_PROVIDER) private loggerProvider: () => FlexibleLogger) {
         console.log("loggerProvider is " + loggerProvider)

@@ -93,6 +93,7 @@ export class FlexibleAppBuilder {
     reset(): this {
         this.frameworks = [];
         this.eventSources = [];
+        this.modules = [];
         this.container = null;
         this.logger = null;
         this.router = null;

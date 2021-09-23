@@ -62,10 +62,9 @@ export class SetupManager {
 
     private async setupContainers(): Promise<Container> {
 
-        var setupContainer = new Container();
-        setupContainer.parent = this.container;
+        var setupContainer = this.container.createChild();
 
-        let setupContainerCommand =  new SetupContainerCommand(
+        let setupContainerCommand = new SetupContainerCommand(
             this.loggerModule,
             [
                 ...this.modules,
@@ -97,9 +96,9 @@ export class SetupManager {
 
     private async setupApp(container: Container, app: FlexibleAppState): Promise<void> {
 
-        this.container.bind(SetupLoggerCommand).to(SetupLoggerCommand);
-        this.container.bind(SetupRouterCommand).to(SetupRouterCommand);
-        this.container.bind(SetupEventSourcesCommand).to(SetupEventSourcesCommand);
+        container.bind(SetupLoggerCommand).to(SetupLoggerCommand);
+        container.bind(SetupRouterCommand).to(SetupRouterCommand);
+        container.bind(SetupEventSourcesCommand).to(SetupEventSourcesCommand);
 
         await container.get<SetupLoggerCommand>(SetupLoggerCommand).execute(app);
         

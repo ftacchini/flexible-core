@@ -69,8 +69,12 @@ export class FlexibleApp {
             //Events should be routable by event type.
             event.routeData.eventType = event.eventType;
             var filterBinnacle = {};
+            var contextBinnacle = {};
             var pipelines = await router.getEventResources(event, filterBinnacle);
-            var responses = await Promise.all(pipelines.map(pipeline => pipeline.processEvent(event, filterBinnacle)));
+            var responses = await Promise.all(pipelines.map(pipeline => pipeline.processEvent(
+                event, 
+                filterBinnacle, 
+                contextBinnacle)));
             return responses;
         })
 

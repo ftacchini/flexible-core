@@ -1,3 +1,3 @@
 export interface FlexibleActivationContext { 
-    activate(...params: any[]): Promise<any>;
+    activate(contextBinnacle: { [key: string]: string }, ...params: any[]): Promise<any>;
 }

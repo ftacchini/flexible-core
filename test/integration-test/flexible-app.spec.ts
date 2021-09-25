@@ -85,7 +85,7 @@ describe("FlexibleApp", () => {
             }],
             middlewareStack: [{
                 activationContext: {
-                    activate: async (eventType: string, eventData: any) => {
+                    activate: async (contextBinnacle: { [key: string]: string }, eventType: string, eventData: any) => {
                         return { eventType: eventType, eventData: eventData };
                     }
                 },
@@ -130,7 +130,7 @@ describe("FlexibleApp", () => {
             }],
             middlewareStack: [{
                 activationContext: {
-                    activate: async (eventType: string) => {
+                    activate: async (contextBinnacle: { [key: string]: string }, eventType: string) => {
                         return { eventType: eventType };
                     }
                 },
@@ -142,7 +142,7 @@ describe("FlexibleApp", () => {
                 }
             }, {
                 activationContext: {
-                    activate: async (eventData: any) => {
+                    activate: async (contextBinnacle: { [key: string]: string }, eventData: any) => {
                         return { eventData: eventData };
                     }
                 },
@@ -161,6 +161,61 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{ eventType: event.eventType }, { eventData: event.data }])
+        done();
+    });
+
+    it("Should use the same object as context binnacle throughout the middleware stack", async (done) => {
+        //Arrange
+        var event: FlexibleEvent = {
+            eventType: "testEvent",
+            data: {
+                key: "value"
+            },
+            routeData: {}
+        }
+
+        framework.addPipelineDefinition({
+            filterStack: [{
+                type: IfEventIs,
+                configuration: {
+                    eventType: event.eventType
+                }
+            }],
+            middlewareStack: [{
+                activationContext: {
+                    activate: async (contextBinnacle: { [key: string]: string }, eventType: string) => {
+                        contextBinnacle.first = "first";
+                        return {};
+                    }
+                },
+                extractorRecipes: {
+                    0: {
+                        configuration: {},
+                        type: EventType
+                    }
+                }
+            }, {
+                activationContext: {
+                    activate: async (contextBinnacle: { [key: string]: string }, eventData: any) => {
+                        contextBinnacle.second = "second";
+                        return { contextBinnacle: contextBinnacle };
+                    }
+                },
+                extractorRecipes: {
+                    0: {
+                        configuration: {},
+                        type: EventData
+                    }
+                }
+            }]
+        });
+
+        //Act
+        await app.run();
+        var result = await eventSource.generateEvent(event);
+
+        //Assert
+        expect(result[0].responseStack).toEqual([{}, { contextBinnacle: { first: "first", second: "second" } }])
         done();
     });
 })

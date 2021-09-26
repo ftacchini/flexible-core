@@ -11,6 +11,7 @@ import { IfEventIs } from "../../src/flexible/filter/if-event-is";
 import { EventType } from "../../src/flexible/extractor/event-type";
 import { EventData } from "../../src/flexible/extractor/event-data";
 import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
+import { FlexibleFilterRecipe } from "../../src";
 
 describe("FlexibleApp", () => {
 
@@ -75,11 +76,11 @@ describe("FlexibleApp", () => {
             },
             routeData: {}
         }
-
+        
         framework.addPipelineDefinition({
             filterStack: [{
                 type: IfEventIs,
-                configuration: {
+                configuration: <any>{
                     eventType: event.eventType
                 }
             }],
@@ -124,7 +125,7 @@ describe("FlexibleApp", () => {
         framework.addPipelineDefinition({
             filterStack: [{
                 type: IfEventIs,
-                configuration: {
+                configuration: <any>{
                     eventType: event.eventType
                 }
             }],
@@ -177,7 +178,7 @@ describe("FlexibleApp", () => {
         framework.addPipelineDefinition({
             filterStack: [{
                 type: IfEventIs,
-                configuration: {
+                configuration: <any>{
                     eventType: event.eventType
                 }
             }],

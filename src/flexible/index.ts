@@ -7,3 +7,4 @@ export * from "./extractor";
 export * from "./type";
 export * from "./flexible-app-types";
 export * from "./setup/flexible-recipe-factory"
+export * from "./logging"

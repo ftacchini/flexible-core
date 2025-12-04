@@ -129,8 +129,8 @@ export class FlexibleApp {
      */
     private async runEventSource(router: FlexibleRouter<FlexiblePipeline>, eventSource: FlexibleEventSource): Promise<boolean> {
         eventSource.onEvent(async event => {
-            // Generate unique request ID for tracking
-            const requestId = this.requestIdGenerator.generate();
+            // Use request ID from event if available (e.g., from X-Request-ID header), otherwise generate one
+            const requestId = event.requestId || this.requestIdGenerator.generate();
 
             this.logger.debug(`[${requestId}] Request received - Type: ${event.eventType}`);
 

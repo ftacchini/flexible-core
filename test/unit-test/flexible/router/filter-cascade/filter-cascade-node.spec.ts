@@ -106,9 +106,9 @@ describe("FilterCascadeNode", () => {
 
             //ACT
             var result = node[0].routeData;
-            (<any>result.a).sort();
-            (<any>result.b).sort();
-            (<any>result.c).sort();
+            (<any>result!.a).sort();
+            (<any>result!.b).sort();
+            (<any>result!.c).sort();
 
             //ASSERT
             expect(result).toEqual({
@@ -262,7 +262,7 @@ describe("FilterCascadeNode", () => {
 
         describe("ignoreStaticRouting is false", () => {
 
-            it("should return pipeline if there is a single node in the cascade with static routing", async (next) => {
+            it("should return pipeline if there is a single node in the cascade with static routing", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -296,10 +296,9 @@ describe("FilterCascadeNode", () => {
 
                 //ASSERT
                 expect(result).toEqual(pipeline);
-                next()
             });
 
-            it("should return pipeline if there are multiple nodes in the cascade with static routing", async (next) => {
+            it("should return pipeline if there are multiple nodes in the cascade with static routing", async () => {
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
                 var filter1: FlexibleFilter = {
@@ -340,10 +339,10 @@ describe("FilterCascadeNode", () => {
 
                 //ASSERT
                 expect(result).toEqual(pipeline);
-                next();
+
             });
 
-            it("should return null if there is no static routing match", async (next) => {
+            it("should return null if there is no static routing match", async () => {
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
                 var filter1: FlexibleFilter = {
@@ -383,10 +382,10 @@ describe("FilterCascadeNode", () => {
 
                 //ASSERT
                 expect(result).toBeNull();
-                next();
+
             })
 
-            it("should return pipeline if there is a single node in the cascade with static and dynamic routing", async (next) => {
+            it("should return pipeline if there is a single node in the cascade with static and dynamic routing", async () => {
                  //ARRANGE
                  var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -399,12 +398,12 @@ describe("FilterCascadeNode", () => {
                      },
                      filterEvent: jasmine.createSpy("filter").and.returnValue(true)
                  };
- 
+
                  var node = builder
                      .addFlexibleFilters(filter)
                      .withResource(pipeline)
                      .build();
- 
+
                  var event: FlexibleEvent = {
                      routeData: {
                          a: "a",
@@ -415,17 +414,17 @@ describe("FilterCascadeNode", () => {
                      data: {},
                      eventType: "event"
                  }
- 
+
                  //ACT
                  var result = await node[0].getEventResources(event, {});
- 
+
                  //ASSERT
                  expect(filter.filterEvent).toHaveBeenCalledWith(event, {});
                  expect(result).toEqual(pipeline);
-                 next();
+
             });
 
-            it("should return pipeline if there are multiple nodes in the cascade with static and dynamic routing", async (next) => {
+            it("should return pipeline if there are multiple nodes in the cascade with static and dynamic routing", async () => {
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
                 var filter1: FlexibleFilter = {
@@ -470,10 +469,10 @@ describe("FilterCascadeNode", () => {
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toEqual(pipeline);
-                next();
+
             });
 
-            it("should return null if there is no dynamic routing match", async (next) => {
+            it("should return null if there is no dynamic routing match", async () => {
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
                 var filter1: FlexibleFilter = {
@@ -518,14 +517,14 @@ describe("FilterCascadeNode", () => {
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toBeNull();
-                next();
+
             })
 
         })
 
         describe("ignoreStaticRouting is true", () => {
 
-            it("should return pipeline if there is a single node in the cascade with dynamic routing ignoring static routing", async (next) => {
+            it("should return pipeline if there is a single node in the cascade with dynamic routing ignoring static routing", async () => {
                  //ARRANGE
                  var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -538,29 +537,29 @@ describe("FilterCascadeNode", () => {
                      },
                      filterEvent: jasmine.createSpy("filter").and.returnValue(true)
                  };
- 
+
                  var node = builder
                      .addFlexibleFilters(filter)
                      .withResource(pipeline)
                      .build();
- 
+
                  var event: FlexibleEvent = {
                      routeData: {
                      },
                      data: {},
                      eventType: "event"
                  }
- 
+
                  //ACT
                  var result = await node[0].getEventResources(event, {}, true);
- 
+
                  //ASSERT
                  expect(filter.filterEvent).toHaveBeenCalledWith(event, {});
                  expect(result).toEqual(pipeline);
-                 next();
+
             });
 
-            it("should return pipeline if there are multiple nodes in the cascade with dynamic routing ignoring static routing", async (next) => {
+            it("should return pipeline if there are multiple nodes in the cascade with dynamic routing ignoring static routing", async () => {
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
                 var filter1: FlexibleFilter = {
@@ -601,10 +600,10 @@ describe("FilterCascadeNode", () => {
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toEqual(pipeline);
-                next();
+
             });
 
-            it("should return null if there is no dynamic routing match", async (next) => {
+            it("should return null if there is no dynamic routing match", async () => {
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
                 var filter1: FlexibleFilter = {
@@ -645,7 +644,7 @@ describe("FilterCascadeNode", () => {
                 expect(filter1.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(filter2.filterEvent).toHaveBeenCalledWith(event, {});
                 expect(result).toBeNull();
-                next();
+
             })
         })
 

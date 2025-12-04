@@ -4,9 +4,9 @@ import { PlainRouteData } from "./plain-route-data";
 
 export class DecisionTreeNode<LeafType> {
 
-    private valueMatcher: RouteValueMatcher;
-    private allLink: DecisionTreeNode<LeafType>;
-    private matchLink: DecisionTreeNode<LeafType>;
+    private valueMatcher!: RouteValueMatcher;
+    private allLink!: DecisionTreeNode<LeafType>;
+    private matchLink!: DecisionTreeNode<LeafType>;
 
     private leaves: LeafType[] = [];
 
@@ -32,8 +32,8 @@ export class DecisionTreeNode<LeafType> {
     public getRouteLeaves(routeData: PlainRouteData): LeafType[] {
         var filters: LeafType[] = this.leaves;
 
-        if (this.valueMatcher && 
-            this.valueMatcher.isMatch(routeData) && 
+        if (this.valueMatcher &&
+            this.valueMatcher.isMatch(routeData) &&
             this.matchLink) {
             filters = [...filters, ...this.matchLink.getRouteLeaves(routeData)];
         }

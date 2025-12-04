@@ -10,7 +10,7 @@ export class FilterCascadeNode<Resource> {
     constructor(
         private routeDataHelper: RouteDataHelper,
         private filter: FlexibleFilter,
-        private parentNode: FilterCascadeNode<Resource> = null) {
+        private parentNode: FilterCascadeNode<Resource> | null = null) {
 
     }
 
@@ -24,15 +24,20 @@ export class FilterCascadeNode<Resource> {
     }
 
     public get isValid(): boolean {
-        return this.routeDataHelper.isRouteData(this.routeData);
+        const data = this.routeData;
+        return data !== null && this.routeDataHelper.isRouteData(data);
     }
 
-    public get routeData(): RouteData<string> {
+    public get routeData(): RouteData<string> | null {
 
         var routeData: RouteData<string> = {};
 
         if (this.parentNode) {
-            routeData = this.parentNode.routeData;
+            const parentData = this.parentNode.routeData;
+            if (parentData === null) {
+                return null;
+            }
+            routeData = parentData;
 
             if (!this.routeDataHelper.isRouteData(routeData)) {
                 return null;
@@ -65,20 +70,21 @@ export class FilterCascadeNode<Resource> {
     public async getEventResources(
         event: FlexibleEvent,
         filterBinnacle: { [key: string]: string },
-        ignoreStaticRouting: boolean = false): Promise<Resource> {
+        ignoreStaticRouting: boolean = false): Promise<Resource | null> {
 
-        var pipeline = this._resource;
+        var pipeline: Resource | undefined = this._resource;
 
         if (!this.parentNode && !this._resource) {
             throw "Parent Node without Pipeline";
         }
 
         if (this.parentNode) {
-            pipeline = await this.parentNode.getEventResources(event, filterBinnacle, ignoreStaticRouting);
+            const parentResult = await this.parentNode.getEventResources(event, filterBinnacle, ignoreStaticRouting);
 
-            if (pipeline === null) {
+            if (parentResult === null) {
                 return null;
             }
+            pipeline = parentResult;
         }
 
         var isMatch = ignoreStaticRouting || this.isRouteMatch(this.filter.staticRouting, event.routeData);
@@ -91,7 +97,7 @@ export class FilterCascadeNode<Resource> {
             return null;
         }
 
-        return pipeline;
+        return pipeline!;
     }
 
     private isRouteMatch(ownRoute: RouteData<string>, routeData: RouteData<string>): boolean {

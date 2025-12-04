@@ -8,11 +8,11 @@ import { RouteDataHelper } from "../route-data-helper";
 @injectable()
 export class FilterCascadeBuilder<Resource> {
 
-    private filterNodes: FilterCascadeNode<Resource>[];
-    private resource: Resource;
+    private filterNodes!: FilterCascadeNode<Resource>[];
+    private resource!: Resource;
 
     constructor(
-        @inject(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER) 
+        @inject(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)
         private routeDataHelper: RouteDataHelper) {
         this.reset();
     }
@@ -25,7 +25,7 @@ export class FilterCascadeBuilder<Resource> {
     public addFlexibleFilters(flexibleFilters: FlexibleFilter | FlexibleFilter[]): this {
 
         var filterNodes: FilterCascadeNode<Resource>[] = [];
-        var filters = isArray(flexibleFilters) ? flexibleFilters : [flexibleFilters];  
+        var filters = isArray(flexibleFilters) ? flexibleFilters : [flexibleFilters];
 
         filters.forEach((flexibleFilter)=> {
             if(this.filterNodes.length) {
@@ -40,7 +40,7 @@ export class FilterCascadeBuilder<Resource> {
         })
 
         this.filterNodes = filterNodes;
-        
+
         return this;
     }
 
@@ -62,7 +62,7 @@ export class FilterCascadeBuilder<Resource> {
 
     public reset(): this {
         this.filterNodes = [];
-        this.resource = null;
+        this.resource = null!;
         return this;
     }
 }

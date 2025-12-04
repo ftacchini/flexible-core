@@ -34,7 +34,7 @@ describe("ContainerSystem", () => {
     let frameworkIsolatedContainer: Container;;
     let eventSourceIsolatedContainer: Container;
 
-    beforeEach(async (done) => {
+    beforeEach(async () => {
         let eventSource = new DummyEventSource();
         let framework = new DummyFramework();
 
@@ -81,7 +81,7 @@ describe("ContainerSystem", () => {
         await app.run();
         container.bind(CONTAINER_DEPENDENCY).toConstantValue(CONTAINER_DEPENDENCY);
 
-        done();
+        
     })
 
 

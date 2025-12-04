@@ -4,20 +4,57 @@ import { FlexibleRouter } from "../router/flexible-router";
 import { FlexibleLogger } from "../logging/flexible-logger";
 import { SetupManager } from "./setup/setup-manager";
 
+/**
+ * The main application class that orchestrates event sources, routing, and request handling.
+ *
+ * FlexibleApp is the core runtime that:
+ * 1. Initializes all configured frameworks, event sources, and modules
+ * 2. Sets up routing between events and handlers
+ * 3. Manages the lifecycle of event sources (start/stop)
+ * 4. Coordinates the processing of events through middleware pipelines
+ *
+ * @example
+ * ```typescript
+ * const app = FlexibleAppBuilder.instance
+ *   .addFramework(decoratorsFramework)
+ *   .addEventSource(httpSource)
+ *   .createApp();
+ *
+ * // Initialize and start the app
+ * await app.run();
+ *
+ * // Later, gracefully shut down
+ * await app.stop();
+ * ```
+ *
+ * The app follows this lifecycle:
+ * 1. setUp() - Initializes all components and builds the routing table
+ * 2. run() - Starts all event sources and begins processing events
+ * 3. stop() - Gracefully shuts down all event sources
+ */
 export class FlexibleApp {
 
-    private logger: FlexibleLogger;
-    private eventSources: FlexibleEventSource[];
-    private router: FlexibleRouter<FlexiblePipeline>;
-    private initialized: boolean;
+    private logger!: FlexibleLogger;
+    private eventSources!: FlexibleEventSource[];
+    private router!: FlexibleRouter<FlexiblePipeline>;
+    private initialized!: boolean;
 
     public constructor(private setupManager: SetupManager) {
     }
 
+    /**
+     * Initializes the application by setting up all frameworks, event sources, and routing.
+     *
+     * This method is idempotent - calling it multiple times will only initialize once.
+     * It's automatically called by run() if not already initialized.
+     *
+     * @returns The configured router for pipelines
+     * @throws Error if initialization fails
+     */
     public async setUp(): Promise<FlexibleRouter<FlexiblePipeline>> {
 
         if (!this.initialized) {
-            
+
             try {
                 var that = this;
 
@@ -54,6 +91,17 @@ export class FlexibleApp {
         return this.router;
     }
 
+    /**
+     * Starts the application by initializing (if needed) and running all event sources.
+     *
+     * This method:
+     * 1. Calls setUp() to ensure initialization
+     * 2. Starts all configured event sources
+     * 3. Begins processing events through the routing and middleware pipeline
+     *
+     * @returns Array of results from starting each event source
+     * @throws Error if initialization or startup fails
+     */
     public async run(): Promise<any[]> {
         var router = await this.setUp();
         this.logger.debug("STARTING EVENT SOURCES\n")
@@ -64,6 +112,18 @@ export class FlexibleApp {
         return results;
     }
 
+    /**
+     * Connects an event source to the routing system.
+     *
+     * When an event is received:
+     * 1. The event type is added to route data
+     * 2. The router finds matching pipelines
+     * 3. Each pipeline processes the event through its middleware stack
+     *
+     * @param router - The router to use for finding matching pipelines
+     * @param eventSource - The event source to connect
+     * @returns Result of starting the event source
+     */
     private async runEventSource(router: FlexibleRouter<FlexiblePipeline>, eventSource: FlexibleEventSource): Promise<boolean> {
         eventSource.onEvent(async event => {
             //Events should be routable by event type.
@@ -72,8 +132,8 @@ export class FlexibleApp {
             var contextBinnacle = {};
             var pipelines = await router.getEventResources(event, filterBinnacle);
             var responses = await Promise.all(pipelines.map(pipeline => pipeline.processEvent(
-                event, 
-                filterBinnacle, 
+                event,
+                filterBinnacle,
                 contextBinnacle)));
             return responses;
         })
@@ -81,6 +141,11 @@ export class FlexibleApp {
         return eventSource.run();
     }
 
+    /**
+     * Gracefully stops the application by shutting down all event sources.
+     *
+     * @returns Array of results from stopping each event source
+     */
     public async stop(): Promise<any[]> {
         this.logger.debug("STOPPING EVENT SOURCES\n")
         var promises = this.initialized ? this.eventSources.map(s => {

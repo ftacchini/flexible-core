@@ -15,7 +15,7 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
         describe("with single filter", () => {
 
-            it("should return pipelines for event with empty static filter", async (next) => {
+            it("should return pipelines for event with empty static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -37,10 +37,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should return pipelines for event with plain static filter", async (next) => {
+            it("should return pipelines for event with plain static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -68,10 +68,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should not return pipelines for event with plain static filter that do not match event", async (next) => {
+            it("should not return pipelines for event with plain static filter that do not match event", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -98,10 +98,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([]);
-                next();
+
             });
 
-            it("should return pipelines for event with array static filter", async (next) => {
+            it("should return pipelines for event with array static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -125,10 +125,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should return pipelines for event with sub array static filter", async (next) => {
+            it("should return pipelines for event with sub array static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -152,10 +152,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should return pipelines for event with plain array member static filter", async (next) => {
+            it("should return pipelines for event with plain array member static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -179,10 +179,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should  not return pipelines return pipelines for event with array static filter that do not match event", async (next) => {
+            it("should  not return pipelines return pipelines for event with array static filter that do not match event", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -206,10 +206,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([]);
-                next();
+
             });
 
-            it("should return pipelines for event with nested object static filter", async (next) => {
+            it("should return pipelines for event with nested object static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -233,10 +233,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should return pipelines for event with nested object and array static filter", async (next) => {
+            it("should return pipelines for event with nested object and array static filter", async () => {
                 //ARRANGE
                 var pipeline = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
 
@@ -270,10 +270,10 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline]);
-                next();
+
             });
 
-            it("should return pipelines for event with dynamic filter", async (next) => {
+            it("should return pipelines for event with dynamic filter", async () => {
                 //ARRANGE
                 var pipeline1 = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
                 var pipeline2 = jasmine.createSpyObj<FlexiblePipeline>("pipeline", ["processEvent"]);
@@ -303,13 +303,14 @@ export function flexibleRouterTests(initializeRouter: () => FlexibleRouter<any>)
 
                 //ASSERT
                 expect(result).toEqual([pipeline1]);
-                next();
+
             });
         })
-            
 
-        describe("with multiple filters", () => {
 
-        })
+        // TODO: Add tests for multiple filters
+        // describe("with multiple filters", () => {
+
+        // })
     }
 }

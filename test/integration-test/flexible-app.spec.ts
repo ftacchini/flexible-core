@@ -41,7 +41,7 @@ describe("FlexibleApp", () => {
             .createApp();
     })
 
-    it("Should run correctly", async (done) => {
+    it("Should run correctly", async () => {
         //Arrange
 
         //Act
@@ -50,10 +50,10 @@ describe("FlexibleApp", () => {
         //Assert
         expect(eventSource.running).toBeTruthy();
         expect(result[0]).toBeTruthy();
-        done();
+        
     });
 
-    it("Should stop correctly", async (done) => {
+    it("Should stop correctly", async () => {
         //Arrange
         await app.run();
 
@@ -63,11 +63,11 @@ describe("FlexibleApp", () => {
         //Assert
         expect(eventSource.running).toBeFalsy();
         expect(result[0]).toBeFalsy();
-        done();
+        
 
     });
 
-    it("Should route events correctly through flexible router", async (done) => {
+    it("Should route events correctly through flexible router", async () => {
         //Arrange
         var event: FlexibleEvent = {
             eventType: "testEvent",
@@ -109,10 +109,10 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{ eventType: event.eventType, eventData: event.data }])
-        done();
+        
     });
 
-    it("Should process an event through a middleware stack", async (done) => {
+    it("Should process an event through a middleware stack", async () => {
         //Arrange
         var event: FlexibleEvent = {
             eventType: "testEvent",
@@ -162,10 +162,10 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{ eventType: event.eventType }, { eventData: event.data }])
-        done();
+        
     });
 
-    it("Should use the same object as context binnacle throughout the middleware stack", async (done) => {
+    it("Should use the same object as context binnacle throughout the middleware stack", async () => {
         //Arrange
         var event: FlexibleEvent = {
             eventType: "testEvent",
@@ -217,6 +217,6 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{}, { contextBinnacle: { first: "first", second: "second" } }])
-        done();
+        
     });
 })

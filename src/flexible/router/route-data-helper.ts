@@ -11,11 +11,11 @@ export class RouteDataHelper {
     public isBoolean(object: RouteValue<string>): object is boolean {
         return isBoolean(object);
     }
-    
+
     public isNumber(object: RouteValue<string>): object is number {
         return isNumber(object);
     }
-    
+
     public isString(object: RouteValue<string>): object is string {
         return isString(object);
     }
@@ -25,11 +25,11 @@ export class RouteDataHelper {
     }
 
     public isArrayString(object: RouteValue<string>) : object is string[] {
-        return isArray(object) && object.length && isString(object[0]);
+        return isArray(object) && !!object.length && isString(object[0]);
     }
 
     public isArrayNumber(object: RouteValue<string>) : object is number[] {
-        return isArray(object) && object.length && isNumber(object[0]);
+        return isArray(object) && !!object.length && isNumber(object[0]);
     }
 
     public isRouteDataArray(object: RouteValue<string>) : object is (number[] | string[]) {

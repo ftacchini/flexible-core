@@ -5,16 +5,16 @@ import { FlexibleParametersExtractor } from "./flexible-parameters-extractor";
 
 export class FlexibleMiddleware {
 
-    private readonly isErrorMiddleware: boolean;
+    private readonly isErrorMiddleware: boolean = false;
 
     constructor(
-        private activationContext: FlexibleActivationContext, 
+        private activationContext: FlexibleActivationContext,
         private paramsExtractor: FlexibleParametersExtractor) {
     }
 
     public async processEvent(
-        event: FlexibleEvent, 
-        response: FlexibleResponse, 
+        event: FlexibleEvent,
+        response: FlexibleResponse,
         filterBinnacle: { [key: string]: string },
         contextBinnacle: { [key: string]: string }): Promise<any> {
 

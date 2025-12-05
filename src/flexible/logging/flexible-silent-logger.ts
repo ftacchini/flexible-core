@@ -1,17 +1,17 @@
-import { FlexibleLogger } from "../../logging/flexible-logger";
+import { FlexibleLogger, LogContext } from "../../logging/flexible-logger";
 import { injectable } from "inversify";
 
 @injectable()
 export class FlexibleSilentLogger implements FlexibleLogger {
 
     public static readonly TYPE: symbol = Symbol("FlexibleSilentLogger");
-    
-    public emergency(log: String): void {}
-    public alert(log: String): void {}
-    public crit(log: String): void {}
-    public error(log: String): void {}
-    public warning(log: String): void {}
-    public notice(log: String): void {}
-    public info(log: String): void {}
-    public debug(log: String): void {}
+
+    public emergency(message: string, context?: LogContext): void {}
+    public alert(message: string, context?: LogContext): void {}
+    public crit(message: string, context?: LogContext): void {}
+    public error(message: string, context?: LogContext): void {}
+    public warning(message: string, context?: LogContext): void {}
+    public notice(message: string, context?: LogContext): void {}
+    public info(message: string, context?: LogContext): void {}
+    public debug(message: string, context?: LogContext): void {}
 }

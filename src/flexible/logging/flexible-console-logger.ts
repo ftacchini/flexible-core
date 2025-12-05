@@ -1,4 +1,4 @@
-import { FlexibleLogger } from "../../logging/flexible-logger";
+import { FlexibleLogger, LogContext } from "../../logging/flexible-logger";
 import { injectable, inject } from "inversify";
 import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 
@@ -20,33 +20,34 @@ export class FlexibleConsoleLogger implements FlexibleLogger {
     constructor(@inject(FLEXIBLE_LOGGER_TYPES.CONSOLE) private consoleInstance: Console = console) {
     }
 
-    
-    private logToConsole(prefix: string, log: String): void {
-        this.consoleInstance.log(prefix + FlexibleConsoleLogger.SEPARATOR + log);
+
+    private logToConsole(prefix: string, message: string, context?: LogContext): void {
+        const contextStr = context ? ` ${JSON.stringify(context)}` : '';
+        this.consoleInstance.log(prefix + FlexibleConsoleLogger.SEPARATOR + message + contextStr);
     }
 
-    public emergency(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.EMERGENCY_PREFIX, log);
+    public emergency(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.EMERGENCY_PREFIX, message, context);
     }
-    public alert(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.ALERT_PREFIX, log);
+    public alert(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.ALERT_PREFIX, message, context);
     }
-    public crit(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.CRITICAL_PREFIX, log);
+    public crit(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.CRITICAL_PREFIX, message, context);
     }
-    public error(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.ERROR_PREFIX, log);
+    public error(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.ERROR_PREFIX, message, context);
     }
-    public warning(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.WARNING_PREFIX, log);
+    public warning(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.WARNING_PREFIX, message, context);
     }
-    public notice(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.NOTICE_PREFIX, log);
+    public notice(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.NOTICE_PREFIX, message, context);
     }
-    public info(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.INFO_PREFIX, log);
+    public info(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.INFO_PREFIX, message, context);
     }
-    public debug(log: String): void {
-        this.logToConsole(FlexibleConsoleLogger.DEBUG_PREFIX, log);
+    public debug(message: string, context?: LogContext): void {
+        this.logToConsole(FlexibleConsoleLogger.DEBUG_PREFIX, message, context);
     }
 }

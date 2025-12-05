@@ -1,5 +1,5 @@
-import { AsyncContainerModule } from "inversify";
+import { ContainerModule } from "inversify";
 
 export interface FlexibleModule {
-    readonly container: AsyncContainerModule;
+    readonly container: ContainerModule;
 }

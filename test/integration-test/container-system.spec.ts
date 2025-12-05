@@ -3,25 +3,24 @@ import "jasmine";
 import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
 import { FlexibleFrameworkModule } from "../../src/framework/flexible-framework-module";
-import { DummyEventSource } from "flexible-dummy-source";
-import { DummyFramework } from "flexible-dummy-framework";
-import { AsyncContainerModule, Container } from "inversify";
+import { DummyEventSource, DummyFramework } from "../../src";
+import { ContainerModule, Container } from "inversify";
 import { FlexibleEventSourceModule } from "../../src/event";
 import { FlexibleModule } from "../../src";
 import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
 
-const [ 
+const [
     CONTAINER_DEPENDENCY,
-    MODULE_DEPENDENCY, 
-    F_DEPENDENCY, 
-    IF_DEPENDENCY,  
+    MODULE_DEPENDENCY,
+    F_DEPENDENCY,
+    IF_DEPENDENCY,
     ES_DEPENDENCY,
-    IES_DEPENDENCY 
+    IES_DEPENDENCY
 ] = [
     "CONTAINER_DEPENDENCY",
     "MODULE_DEPENDENCY",
     "F_DEPENDENCY",
-    "IF_DEPENDENCY", 
+    "IF_DEPENDENCY",
     "ES_DEPENDENCY",
     "IES_DEPENDENCY"
 ]
@@ -41,31 +40,31 @@ describe("ContainerSystem", () => {
         container = new Container();
 
         let dependenciesModule: FlexibleModule = {
-            container: new AsyncContainerModule(async (bind) => { 
+            container: new ContainerModule(({ bind }) => {
                 bind(MODULE_DEPENDENCY).toConstantValue(MODULE_DEPENDENCY);
             })
         };
         let frameworkModule: FlexibleFrameworkModule = {
-            getInstance: (container) => { 
+            getInstance: (container) => {
                 frameworkIsolatedContainer = container;
-                return framework 
+                return framework
             },
-            container: new AsyncContainerModule(async (bind) => { 
+            container: new ContainerModule(({ bind }) => {
                 bind(F_DEPENDENCY).toConstantValue(F_DEPENDENCY);
             }),
-            isolatedContainer: new AsyncContainerModule(async (bind) => { 
+            isolatedContainer: new ContainerModule(({ bind }) => {
                 bind(IF_DEPENDENCY).toConstantValue(IF_DEPENDENCY);
             })
         };
         let eventSourceModule: FlexibleEventSourceModule = {
-            getInstance: (container) => { 
+            getInstance: (container) => {
                 eventSourceIsolatedContainer = container;
-                return eventSource 
+                return eventSource
             },
-            container: new AsyncContainerModule(async (bind) => { 
+            container: new ContainerModule(({ bind }) => {
                 bind(ES_DEPENDENCY).toConstantValue(ES_DEPENDENCY);
             }),
-            isolatedContainer: new AsyncContainerModule(async (bind) => { 
+            isolatedContainer: new ContainerModule(({ bind }) => {
                 bind(IES_DEPENDENCY).toConstantValue(IES_DEPENDENCY);
             })
         };
@@ -81,7 +80,7 @@ describe("ContainerSystem", () => {
         await app.run();
         container.bind(CONTAINER_DEPENDENCY).toConstantValue(CONTAINER_DEPENDENCY);
 
-        
+
     })
 
 
@@ -131,7 +130,7 @@ describe("ContainerSystem", () => {
         catch(ex) {
             exception = true;
         }
-        
+
 
         //ASSERT
         expect(exception).toBeTruthy();
@@ -147,7 +146,7 @@ describe("ContainerSystem", () => {
         catch(ex) {
             exception = true;
         }
-        
+
 
         //ASSERT
         expect(exception).toBeTruthy();

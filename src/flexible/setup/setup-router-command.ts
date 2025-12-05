@@ -36,7 +36,7 @@ export class SetupRouterCommand {
 
         var pipelineDefinitions = flatten(await Promise.all(frameworks.map(framework => framework.createPipelineDefinitions())));
         this.logger.debug(`Generating pipelines from ${pipelineDefinitions.length || 0} pipeline definitions...`);
-        
+
         var pipelines = pipelineDefinitions.map(definition => {
             try {
                 var filters = definition.filterStack.map((filterRecipes, index, array) => {
@@ -47,7 +47,7 @@ export class SetupRouterCommand {
                     var filters = filterRecipes
                         .map(filterRecipe => this.recipeFactory.craftRecipe<FlexibleFilter>(filterRecipe))
 
-                    filters.forEach((filter) => filter.isLastFilter = (array.length - 1 == index)) 
+                    filters.forEach((filter) => filter.isLastFilter = (array.length - 1 == index))
 
                     return filters;
                 })

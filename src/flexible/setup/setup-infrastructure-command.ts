@@ -4,7 +4,7 @@ import { FlexibleFrameworkModule } from "../../framework";
 import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
 
 export class SetupInfrastructureCommand {
-    
+
     public constructor(
         private eventSourceModules: FlexibleEventSourceModule[],
         private frameworkModules: FlexibleFrameworkModule[],
@@ -18,15 +18,18 @@ export class SetupInfrastructureCommand {
     }
 
     private async bindProviders(modules: (FlexibleEventSourceModule | FlexibleFrameworkModule)[], type: symbol) {
-        var providers = await Promise.all(modules.map(async m => {
-            var isolatedContainer =  this.container.createChild();
+        const mainContainer = this.container;
 
-            return isolatedContainer.loadAsync(m.isolatedContainer).then(() => {{
-                return () => m.getInstance(isolatedContainer);
-            }});
-        }));
+        var providers = modules.map(m => {
+            // In Inversify 7, we can't use child containers
+            // Instead, we pass the main container directly to getInstance
+            // The isolated module is loaded into the main container
+            mainContainer.loadSync(m.isolatedContainer);
 
-        this.container.bind(type).toFactory(() => {
+            return () => m.getInstance(mainContainer);
+        });
+
+        this.container.bind(type).toDynamicValue(() => {
             return () => providers.map(x => x());
         });
     }

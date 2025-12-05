@@ -3,9 +3,8 @@ import "jasmine";
 import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
 import { FlexibleFrameworkModule } from "../../src/framework/flexible-framework-module";
-import { DummyEventSource } from "flexible-dummy-source";
-import { DummyFramework } from "flexible-dummy-framework";
-import { AsyncContainerModule } from "inversify";
+import { DummyEventSource, DummyFramework } from "../../src";
+import { ContainerModule } from "inversify";
 import { FlexibleEventSourceModule, FlexibleEvent } from "../../src/event";
 import { IfEventIs } from "../../src/flexible/filter/if-event-is";
 import { EventType } from "../../src/flexible/extractor/event-type";
@@ -25,13 +24,13 @@ describe("FlexibleApp", () => {
 
         let frameworkModule: FlexibleFrameworkModule = {
             getInstance: () => framework,
-            container: new AsyncContainerModule(async () => { }),
-            isolatedContainer: new AsyncContainerModule(async () => { })
+            container: new ContainerModule(() => { }),
+            isolatedContainer: new ContainerModule(() => { })
         };
         let eventSourceModule: FlexibleEventSourceModule = {
             getInstance: () => eventSource,
-            container: new AsyncContainerModule(async () => { }),
-            isolatedContainer: new AsyncContainerModule(async () => { })
+            container: new ContainerModule(() => { }),
+            isolatedContainer: new ContainerModule(() => { })
         };
 
         app = FlexibleAppBuilder.instance
@@ -50,7 +49,7 @@ describe("FlexibleApp", () => {
         //Assert
         expect(eventSource.running).toBeTruthy();
         expect(result[0]).toBeTruthy();
-        
+
     });
 
     it("Should stop correctly", async () => {
@@ -63,7 +62,7 @@ describe("FlexibleApp", () => {
         //Assert
         expect(eventSource.running).toBeFalsy();
         expect(result[0]).toBeFalsy();
-        
+
 
     });
 
@@ -76,7 +75,7 @@ describe("FlexibleApp", () => {
             },
             routeData: {}
         }
-        
+
         framework.addPipelineDefinition({
             filterStack: [{
                 type: IfEventIs,
@@ -109,7 +108,7 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{ eventType: event.eventType, eventData: event.data }])
-        
+
     });
 
     it("Should process an event through a middleware stack", async () => {
@@ -162,7 +161,7 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{ eventType: event.eventType }, { eventData: event.data }])
-        
+
     });
 
     it("Should use the same object as context binnacle throughout the middleware stack", async () => {
@@ -217,6 +216,6 @@ describe("FlexibleApp", () => {
 
         //Assert
         expect(result[0].responseStack).toEqual([{}, { contextBinnacle: { first: "first", second: "second" } }])
-        
+
     });
 })

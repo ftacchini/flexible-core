@@ -3,6 +3,7 @@ import { FlexiblePipeline } from "./pipeline/flexible-pipeline";
 import { FlexibleRouter } from "../router/flexible-router";
 import { FlexibleLogger } from "../logging/flexible-logger";
 import { SetupManager } from "./setup/setup-manager";
+import { RequestIdGenerator } from "./utils/request-id-generator";
 
 /**
  * The main application class that orchestrates event sources, routing, and request handling.
@@ -38,8 +39,10 @@ export class FlexibleApp {
     private eventSources!: FlexibleEventSource[];
     private router!: FlexibleRouter<FlexiblePipeline>;
     private initialized!: boolean;
+    private requestIdGenerator: RequestIdGenerator;
 
     public constructor(private setupManager: SetupManager) {
+        this.requestIdGenerator = new RequestIdGenerator();
     }
 
     /**
@@ -126,15 +129,26 @@ export class FlexibleApp {
      */
     private async runEventSource(router: FlexibleRouter<FlexiblePipeline>, eventSource: FlexibleEventSource): Promise<boolean> {
         eventSource.onEvent(async event => {
+            // Use request ID from event if available (e.g., from X-Request-ID header), otherwise generate one
+            const requestId = event.requestId || this.requestIdGenerator.generate();
+
+            this.logger.debug(`[${requestId}] Request received - Type: ${event.eventType}`);
+
             //Events should be routable by event type.
             event.routeData.eventType = event.eventType;
             var filterBinnacle = {};
             var contextBinnacle = {};
+
+            this.logger.debug(`[${requestId}] Routing request - Finding matching pipelines`);
             var pipelines = await router.getEventResources(event, filterBinnacle);
-            var responses = await Promise.all(pipelines.map(pipeline => pipeline.processEvent(
-                event,
-                filterBinnacle,
-                contextBinnacle)));
+            this.logger.debug(`[${requestId}] Found ${pipelines.length} matching pipeline(s)`);
+
+            var responses = await Promise.all(pipelines.map((pipeline, index) => {
+                this.logger.debug(`[${requestId}] Processing pipeline ${index + 1}/${pipelines.length}`);
+                return pipeline.processEvent(event, filterBinnacle, contextBinnacle);
+            }));
+
+            this.logger.debug(`[${requestId}] Request completed - ${responses.length} response(s) generated`);
             return responses;
         })
 

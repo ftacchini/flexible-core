@@ -25,7 +25,7 @@ export class SetupFlexibleContainerCommand {
             this.routerModule.container,
             this.extractorsRouterModule.container];
 
-        await Promise.all(dependencies.map(x => this.container.loadAsync(x)));
+        this.container.loadSync(...dependencies);
 
         this.container.bind(FLEXIBLE_APP_TYPES.ROUTER_FACTORY).toConstantValue(new FlexibleRouterFactory(
             this.container,

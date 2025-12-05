@@ -1,4 +1,4 @@
-import { AsyncContainerModule, interfaces, Container } from "inversify";
+import { ContainerModule, Container } from "inversify";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { FlexibleTreeRouter } from "./flexible-tree-router";
 import { FlexibleRouterModule } from "../../../router/flexible-router-module";
@@ -8,21 +8,15 @@ import { FlexibleRouter } from "../../../router";
 
 export class FlexibleTreeRouterModule<Resource> implements FlexibleRouterModule<Resource> {
 
-    private _container: AsyncContainerModule;
+    private _container: ContainerModule;
 
     public constructor() {
-        this._container = new AsyncContainerModule(async (
-            bind: interfaces.Bind,
-            unbind: interfaces.Unbind,
-            isBound: interfaces.IsBound,
-            rebind: interfaces.Rebind) => {
-
-                
+        this._container = new ContainerModule(({ bind, unbind, isBound, rebind }) => {
             isBound(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER) ||
             bind(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)
                 .to(RouteDataHelper)
                 .inSingletonScope();
-                
+
             isBound(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER) ||
                 bind(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER)
                     .to(FilterCascadeBuilder)
@@ -34,7 +28,7 @@ export class FlexibleTreeRouterModule<Resource> implements FlexibleRouterModule<
         });
     }
 
-    public get container(): AsyncContainerModule {
+    public get container(): ContainerModule {
         return this._container;
     }
 

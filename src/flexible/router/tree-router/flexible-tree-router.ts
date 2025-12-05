@@ -3,10 +3,12 @@ import { FlexibleRouter } from "../../../router/flexible-router";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { DecisionTreeNode } from "./decision-tree-node";
 import { RouteDataIterator } from "./route-data-iterator";
-import { injectable, inject } from "inversify";
+import { injectable, inject, optional } from "inversify";
 import { TREE_ROUTER_TYPES } from "./tree-router-types";
 import { FilterCascadeNode } from "../filter-cascade/filter-cascade-node";
 import { RouteDataHelper } from "../route-data-helper";
+import { FlexibleLogger } from "../../../logging/flexible-logger";
+import { FLEXIBLE_APP_TYPES } from "../../flexible-app-types";
 
 /**
  * A high-performance router implementation using a decision tree data structure.
@@ -39,12 +41,15 @@ import { RouteDataHelper } from "../route-data-helper";
 export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
 
     private baseNode: DecisionTreeNode<FilterCascadeNode<Resource>>;
+    private routeCount: number = 0;
 
     constructor(
         @inject(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER)
         private filterCascadeBuilder: FilterCascadeBuilder<Resource>,
         @inject(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)
-        private routeDataHelper: RouteDataHelper) {
+        private routeDataHelper: RouteDataHelper,
+        @inject(FLEXIBLE_APP_TYPES.LOGGER) @optional()
+        private logger?: FlexibleLogger) {
 
         this.baseNode = new DecisionTreeNode();
     }
@@ -64,10 +69,27 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
      */
     public async getEventResources(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): Promise<Resource[]> {
         var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(event.routeData);
+
+        this.logger?.debug("Tree router: Finding matching routes", {
+            eventType: event.eventType,
+            routeDataKeys: Object.keys(plainRouteData),
+            totalRoutes: this.routeCount
+        });
+
         var filters = this.baseNode.getRouteLeaves(plainRouteData);
 
+        this.logger?.debug("Tree router: Found candidate filters", {
+            candidateCount: filters.length
+        });
+
         const results = await Promise.all(filters.map(filter => filter.getEventResources(event, filterBinnacle, true)));
-        return results.filter((resource): resource is Awaited<Resource> => resource !== null) as Resource[];
+        const matchedResources = results.filter((resource): resource is Awaited<Resource> => resource !== null) as Resource[];
+
+        this.logger?.debug("Tree router: Matched resources", {
+            matchedCount: matchedResources.length
+        });
+
+        return matchedResources;
     }
 
     /**
@@ -84,6 +106,11 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
      * @param resource - The resource (pipeline or extractor) to associate with these filters
      */
     public addResource(filters: (FlexibleFilter | FlexibleFilter[])[], resource: Resource): void {
+        this.logger?.debug("Tree router: Adding resource", {
+            filterCount: filters.length,
+            resourceType: (resource as any).constructor?.name || 'Unknown'
+        });
+
         this.filterCascadeBuilder.reset()
             .withResource(resource);
 
@@ -91,18 +118,33 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
             this.filterCascadeBuilder.addFlexibleFilters(filter);
         });
 
-        this.filterCascadeBuilder
-            .build()
-            .forEach(filterCascade => {
-                const routeData = filterCascade.routeData;
-                if (routeData !== null) {
-                    var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(routeData);
+        const cascades = this.filterCascadeBuilder.build();
 
-                    this.baseNode.addRouteData(
-                        new RouteDataIterator(this.routeDataHelper, plainRouteData),
-                        filterCascade);
-                }
-            });
+        this.logger?.debug("Tree router: Built filter cascades", {
+            cascadeCount: cascades.length
+        });
+
+        cascades.forEach(filterCascade => {
+            const routeData = filterCascade.routeData;
+            if (routeData !== null) {
+                var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(routeData);
+
+                this.logger?.debug("Tree router: Inserting route into tree", {
+                    routeProperties: Object.keys(plainRouteData),
+                    routeData: plainRouteData
+                });
+
+                this.baseNode.addRouteData(
+                    new RouteDataIterator(this.routeDataHelper, plainRouteData),
+                    filterCascade);
+
+                this.routeCount++;
+            }
+        });
+
+        this.logger?.debug("Tree router: Resource added", {
+            totalRoutes: this.routeCount
+        });
     }
 
 

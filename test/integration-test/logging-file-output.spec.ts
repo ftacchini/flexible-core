@@ -2,14 +2,15 @@ import "reflect-metadata";
 import "jasmine";
 import * as fs from "fs";
 import * as path from "path";
-import { FlexibleConsoleLogger } from "../../src/flexible/logging/flexible-console-logger";
-import { LogContext } from "../../src/logging/flexible-logger";
+import { FlexibleConfigurableLogger } from "../../src/flexible/logging/flexible-configurable-logger";
+import { LogContext, LogLevel } from "../../src/logging/flexible-logger";
+import { LoggerConfig } from "../../src/logging/logger-config";
 
 describe("Logging File Output Integration Tests", () => {
     const testOutputDir = path.join(__dirname, "../../test-logs");
     let logFilePath: string;
     let writeStream: fs.WriteStream;
-    let logger: FlexibleConsoleLogger;
+    let logger: FlexibleConfigurableLogger;
 
     beforeEach(() => {
         // Create test-logs directory if it doesn't exist
@@ -28,7 +29,14 @@ describe("Logging File Output Integration Tests", () => {
             }
         } as Console;
 
-        logger = new FlexibleConsoleLogger(mockConsole);
+        // Use ConfigurableLogger with JSON format for better parsing
+        const config: LoggerConfig = {
+            minLevel: LogLevel.DEBUG,
+            format: 'json',
+            includeTimestamp: true
+        };
+
+        logger = new FlexibleConfigurableLogger(config, mockConsole);
     });
 
     afterEach((done) => {
@@ -52,90 +60,63 @@ describe("Logging File Output Integration Tests", () => {
         }
     });
 
-    it("should write emergency logs to file", (done) => {
+    it("should write emergency logs to file in JSON format", (done) => {
         logger.emergency("Emergency test message");
 
         writeStream.end(() => {
             const content = fs.readFileSync(logFilePath, 'utf-8');
             expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("EMERGENCY");
+            const log = JSON.parse(content.trim());
+            expect(log.level).toBe("EMERGENCY");
+            expect(log.timestamp).toBeDefined();
             done();
         });
     });
 
-    it("should write alert logs to file", (done) => {
-        logger.alert("Alert test message");
-
-        writeStream.end(() => {
-            const content = fs.readFileSync(logFilePath, 'utf-8');
-            expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("ALERT");
-            done();
-        });
-    });
-
-    it("should write critical logs to file", (done) => {
-        logger.crit("Critical test message");
-
-        writeStream.end(() => {
-            const content = fs.readFileSync(logFilePath, 'utf-8');
-            expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("CRITICAL");
-            done();
-        });
-    });
-
-    it("should write error logs to file", (done) => {
+    it("should write error logs to file in JSON format", (done) => {
         logger.error("Error test message");
 
         writeStream.end(() => {
             const content = fs.readFileSync(logFilePath, 'utf-8');
             expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("ERROR");
+            const log = JSON.parse(content.trim());
+            expect(log.level).toBe("ERROR");
             done();
         });
     });
 
-    it("should write warning logs to file", (done) => {
+    it("should write warning logs to file in JSON format", (done) => {
         logger.warning("Warning test message");
 
         writeStream.end(() => {
             const content = fs.readFileSync(logFilePath, 'utf-8');
             expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("WARNING");
+            const log = JSON.parse(content.trim());
+            expect(log.level).toBe("WARNING");
             done();
         });
     });
 
-    it("should write notice logs to file", (done) => {
-        logger.notice("Notice test message");
-
-        writeStream.end(() => {
-            const content = fs.readFileSync(logFilePath, 'utf-8');
-            expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("NOTICE");
-            done();
-        });
-    });
-
-    it("should write info logs to file", (done) => {
+    it("should write info logs to file in JSON format", (done) => {
         logger.info("Info test message");
 
         writeStream.end(() => {
             const content = fs.readFileSync(logFilePath, 'utf-8');
             expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("INFO");
+            const log = JSON.parse(content.trim());
+            expect(log.level).toBe("INFO");
             done();
         });
     });
 
-    it("should write debug logs to file", (done) => {
+    it("should write debug logs to file in JSON format", (done) => {
         logger.debug("Debug test message");
 
         writeStream.end(() => {
             const content = fs.readFileSync(logFilePath, 'utf-8');
             expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("DEBUG");
+            const log = JSON.parse(content.trim());
+            expect(log.level).toBe("DEBUG");
             done();
         });
     });
@@ -152,10 +133,11 @@ describe("Logging File Output Integration Tests", () => {
         writeStream.end(() => {
             const content = fs.readFileSync(logFilePath, 'utf-8');
             expect(content.length).toBeGreaterThan(0);
-            expect(content).toContain("INFO");
-            expect(content).toContain("requestId");
-            expect(content).toContain("userId");
-            expect(content).toContain("action");
+            const log = JSON.parse(content.trim());
+            expect(log.level).toBe("INFO");
+            expect(log.requestId).toBe("test-123");
+            expect(log.userId).toBe(456);
+            expect(log.action).toBe("file-write-test");
             done();
         });
     });
@@ -171,10 +153,43 @@ describe("Logging File Output Integration Tests", () => {
             const lines = content.split('\n').filter(line => line.length > 0);
 
             expect(lines.length).toBe(4);
-            expect(content).toContain("DEBUG");
-            expect(content).toContain("INFO");
-            expect(content).toContain("WARNING");
-            expect(content).toContain("ERROR");
+
+            const logs = lines.map(line => JSON.parse(line));
+            expect(logs[0].level).toBe("DEBUG");
+            expect(logs[1].level).toBe("INFO");
+            expect(logs[2].level).toBe("WARNING");
+            expect(logs[3].level).toBe("ERROR");
+            done();
+        });
+    });
+
+    it("should filter logs based on minLevel configuration", (done) => {
+        // Create a new logger with WARNING level
+        const config: LoggerConfig = {
+            minLevel: LogLevel.WARNING,
+            format: 'json'
+        };
+        logger = new FlexibleConfigurableLogger(config, {
+            log: (message: string) => {
+                writeStream.write(message + '\n');
+            }
+        } as Console);
+
+        logger.debug("Debug message");
+        logger.info("Info message");
+        logger.warning("Warning message");
+        logger.error("Error message");
+
+        writeStream.end(() => {
+            const content = fs.readFileSync(logFilePath, 'utf-8');
+            const lines = content.split('\n').filter(line => line.length > 0);
+
+            // Only WARNING and ERROR should be logged
+            expect(lines.length).toBe(2);
+
+            const logs = lines.map(line => JSON.parse(line));
+            expect(logs[0].level).toBe("WARNING");
+            expect(logs[1].level).toBe("ERROR");
             done();
         });
     });

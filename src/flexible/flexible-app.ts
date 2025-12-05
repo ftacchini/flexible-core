@@ -132,23 +132,23 @@ export class FlexibleApp {
             // Use request ID from event if available (e.g., from X-Request-ID header), otherwise generate one
             const requestId = event.requestId || this.requestIdGenerator.generate();
 
-            this.logger.debug(`[${requestId}] Request received - Type: ${event.eventType}`);
+            this.logger.debug("Request received", { requestId, eventType: event.eventType });
 
             //Events should be routable by event type.
             event.routeData.eventType = event.eventType;
             var filterBinnacle = {};
             var contextBinnacle = {};
 
-            this.logger.debug(`[${requestId}] Routing request - Finding matching pipelines`);
+            this.logger.debug("Routing request - Finding matching pipelines", { requestId });
             var pipelines = await router.getEventResources(event, filterBinnacle);
-            this.logger.debug(`[${requestId}] Found ${pipelines.length} matching pipeline(s)`);
+            this.logger.debug("Found matching pipelines", { requestId, pipelineCount: pipelines.length });
 
             var responses = await Promise.all(pipelines.map((pipeline, index) => {
-                this.logger.debug(`[${requestId}] Processing pipeline ${index + 1}/${pipelines.length}`);
+                this.logger.debug("Processing pipeline", { requestId, pipelineIndex: index + 1, totalPipelines: pipelines.length });
                 return pipeline.processEvent(event, filterBinnacle, contextBinnacle);
             }));
 
-            this.logger.debug(`[${requestId}] Request completed - ${responses.length} response(s) generated`);
+            this.logger.debug("Request completed", { requestId, responseCount: responses.length });
             return responses;
         })
 

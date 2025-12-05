@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { FlexibleLogger } from "../../logging";
+import { FlexibleLogger, LogContext } from "../../logging";
 import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 
 @injectable()
@@ -7,34 +7,34 @@ export class FlexibleLoggerProxy implements FlexibleLogger {
 
     constructor (@inject(FLEXIBLE_LOGGER_TYPES.LOGGER_PROVIDER) private loggerProvider: () => FlexibleLogger) {
         console.log("loggerProvider is " + loggerProvider)
-    } 
-
-    private logUsingLogger(log: String, method: keyof FlexibleLogger) {
-        this.loggerProvider()[method](log);
     }
 
-    public emergency(log: String): void {
-        this.logUsingLogger(log, "emergency");
+    private logUsingLogger(message: string, method: keyof FlexibleLogger, context?: LogContext) {
+        this.loggerProvider()[method](message, context);
     }
-    public alert(log: String): void {
-        this.logUsingLogger(log, "alert");
+
+    public emergency(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "emergency", context);
     }
-    public crit(log: String): void {
-        this.logUsingLogger(log, "crit");
+    public alert(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "alert", context);
     }
-    public error(log: String): void {
-        this.logUsingLogger(log, "error");
+    public crit(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "crit", context);
     }
-    public warning(log: String): void {
-        this.logUsingLogger(log, "warning");
+    public error(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "error", context);
     }
-    public notice(log: String): void {
-        this.logUsingLogger(log, "notice");
+    public warning(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "warning", context);
     }
-    public info(log: String): void {
-        this.logUsingLogger(log, "info");
+    public notice(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "notice", context);
     }
-    public debug(log: String): void {
-        this.logUsingLogger(log, "debug");
+    public info(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "info", context);
+    }
+    public debug(message: string, context?: LogContext): void {
+        this.logUsingLogger(message, "debug", context);
     }
 }

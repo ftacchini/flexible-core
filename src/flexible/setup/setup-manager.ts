@@ -12,6 +12,7 @@ import { SetupFlexibleContainerCommand } from "./setup-flexible-container-comman
 import { SetupEventSourcesCommand } from "./setup-event-sources-command";
 import { SetupLoggerCommand } from "./setup-logger-command";
 import { SetupInfrastructureCommand } from "./setup-infrastructure-command";
+import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
 
 const NO_FRAMEWORK_DEFINED = "Cannot build a flexible app without any framework";
 const NO_SERVER_DEFINED = "Cannot build a flexible app without any server";
@@ -33,23 +34,23 @@ export class SetupManager {
             if (!loggerModule) {
                 throw NO_LOGGER_DEFINED;
             }
-    
+
             if (!routerModule) {
                 throw NO_ROUTER_DEFINED;
             }
-    
+
             if (!extractorsRouterModule) {
                 throw NO_EXTRACTORS_ROUTER_DEFINED;
             }
-    
+
             if (!frameworkModules || !frameworkModules.length) {
                 throw NO_FRAMEWORK_DEFINED;
             }
-    
+
             if (!eventSourceModules || !eventSourceModules.length) {
                 throw NO_SERVER_DEFINED;
             }
-    
+
             if (!container) {
                 throw NO_CONTAINER_DEFINED;
             }
@@ -61,8 +62,6 @@ export class SetupManager {
     }
 
     private async setupContainers(): Promise<Container> {
-
-        var setupContainer = this.container.createChild();
 
         let setupContainerCommand = new SetupContainerCommand(
             this.loggerModule,
@@ -83,6 +82,9 @@ export class SetupManager {
 
         await setupInfrastructureCommand.execute();
 
+        // Create setup container
+        var setupContainer = new Container();
+
         let setupFlexibleContainerCommand = new SetupFlexibleContainerCommand(
             this.routerModule,
             this.extractorsRouterModule,
@@ -90,6 +92,22 @@ export class SetupManager {
         )
 
         await setupFlexibleContainerCommand.execute();
+
+        // Bind dependencies from main container AFTER setupFlexibleContainerCommand (which calls unbindAll)
+        setupContainer.bind(FLEXIBLE_APP_TYPES.LOGGER).toDynamicValue(() => {
+            return this.container.get(FLEXIBLE_APP_TYPES.LOGGER);
+        });
+
+        setupContainer.bind(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER).toDynamicValue(() => {
+            return this.container.get(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER);
+        });
+
+        setupContainer.bind(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER).toDynamicValue(() => {
+            return this.container.get(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER);
+        });
+
+        // Bind the main container so that recipe factory can access module bindings
+        setupContainer.bind(FLEXIBLE_APP_TYPES.CONTAINER).toConstantValue(this.container);
 
         return setupContainer;
     }
@@ -101,7 +119,7 @@ export class SetupManager {
         container.bind(SetupEventSourcesCommand).to(SetupEventSourcesCommand);
 
         await container.get<SetupLoggerCommand>(SetupLoggerCommand).execute(app);
-        
+
         let setupCommands = [
             container.get<SetupEventSourcesCommand>(SetupEventSourcesCommand),
             container.get<SetupRouterCommand>(SetupRouterCommand)

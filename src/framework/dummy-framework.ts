@@ -1,17 +1,17 @@
 import { FlexibleFramework } from "../framework/flexible-framework";
 import { FlexiblePipelineDocument } from "../framework/flexible-pipeline-document";
-import { AsyncContainerModule } from "inversify";
+import { ContainerModule } from "inversify";
 
 /**
  * A simple test framework implementation for testing purposes.
  * Allows manual addition of pipeline definitions without decorator scanning.
  */
 export class DummyFramework implements FlexibleFramework {
-    public readonly container: AsyncContainerModule;
+    public readonly container: ContainerModule;
     private definitions: FlexiblePipelineDocument[] = [];
 
     constructor() {
-        this.container = new AsyncContainerModule(async (module) => {
+        this.container = new ContainerModule(() => {
             return;
         });
     }

@@ -3,14 +3,14 @@ import { FlexibleExtractor } from "../event/flexible-extractor";
 import { FlexibleFilter } from "../event/flexible-filter";
 import { FlexibleEvent } from "../event/flexible-event";
 import { Type } from "../flexible/type";
-import { AsyncContainerModule } from "inversify";
+import { ContainerModule } from "inversify";
 
 /**
- * A simple test event source implementation for testing purposes.
+ * A simple test framework implementation for testing purposes.
  * Allows manual triggering of events without external dependencies.
  */
 export class DummyEventSource implements FlexibleEventSource {
-    readonly container!: AsyncContainerModule;
+    readonly container!: ContainerModule;
     readonly availableExtractors: Type<FlexibleExtractor>[] = [];
     readonly availableFilters: Type<FlexibleFilter>[] = [];
 

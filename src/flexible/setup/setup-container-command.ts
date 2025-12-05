@@ -19,7 +19,7 @@ export class SetupContainerCommand {
             this.loggerModule.container,
             ...this.modules.map(x => x.container)];
 
-        await Promise.all(dependencies.map(x => this.container.loadAsync(x)));
+        this.container.loadSync(...dependencies);
         this.container.bind(FLEXIBLE_APP_TYPES.LOGGER).toDynamicValue(() => {
             return this.loggerModule.getInstance(this.container);
         });

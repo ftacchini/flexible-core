@@ -63,8 +63,10 @@ app.run();
 
 ### Guides
 - **[Logging](docs/guides/logging.md)** - Structured logging guide
+- **[Composable Architecture](docs/guides/composable-architecture.md)** - Build layered security and middleware
 - **[Creating Event Sources](docs/guides/creating-event-source.md)** - Build custom sources
 - **[Creating Frameworks](docs/guides/creating-framework.md)** - Build custom frameworks
+- **[Creating Routers](docs/guides/creating-router.md)** - Build custom routers
 - **[Testing](docs/guides/testing.md)** - Testing strategies
 
 ### API Reference

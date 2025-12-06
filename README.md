@@ -1,186 +1,122 @@
-# Table of Contents
+# Flexible Core
 
-1. [Introduction](#flexible)
-1. [Getting started](#getting-started)
-1. [Available Frameworks and Event Sources](#available-frameworks-and-event-sources)
-1. [Architecture](#architecture)
-1. [How-tos](#how-tos)
-    1. [How-to build an event source](#architecture)
-    1. [How-to build a framework](#architecture)
-    1. [How-to create your logger](#architecture)
-    1. [How-to create your router](#architecture)
-1. [FAQ](#architecture)
-1. [Contacts](#architecture)
-1. [Issues](#architecture)
-1. [License](#architecture)
+[![npm version](https://badge.fury.io/js/flexible-core.svg)](https://www.npmjs.com/package/flexible-core)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+Event processing framework for Node.js that connects Event Sources to Frameworks through a flexible routing system.
 
+## Quick Start
 
-## Flexible
+```bash
+npm install flexible-core flexible-http flexible-decorators
+```
 
-Flexible is a library that helps you build event processing pipelines by connecting Event Sources to Frameworks. Event Sources provide events
-as javascript objects and flexible routes them through middleware structured according to the Frameworks of your choice.
+```typescript
+import "reflect-metadata";
+import { FlexibleAppBuilder } from "flexible-core";
+import { DecoratorsFrameworkModuleBuilder, ExplicitControllerLoader } from "flexible-decorators";
+import { HttpModuleBuilder } from "flexible-http";
 
-## Getting started
-
-To start using flexible you need to install flexible's core package, one or more event sources and one or more frameworks.
-
-````
-npm install flexible-core
-npm install flexible-http #or any other
-npm install flexible-decorators #or any other
-````
-
-Once that's done, you need to initialize your app and you are good to go!
-
-
-`````
-----------------------
-./index.ts:
-----------------------
-
-const httpEventSource = HttpModuleBuilder.instance
-    .build();
-
-const decoratorsFramework = DecoratorsFrameworkModuleBuilder.instance
-    .withControllerLoader(new ExplicitControllerLoader([
-        HelloController
-    ]))
-    .build();
-
-const application = FlexibleAppBuilder.instance
-    .addEventSource(httpEventSource)
-    .addFramework(decoratorsFramework)
-    .createApp();
-
-application.run().then(status => {
-    console.log(JSON.stringify(status));
-});
-
-----------------------
-./hello-controller.ts:
-----------------------
-
-@Controller({ filter: HttpMethod })
+@Controller()
 export class HelloController {
-
     @Route(HttpGet)
     public world(): any {
-        return "hello world";
+        return { message: "Hello, World!" };
     }
-
 }
-`````
 
-## Available Frameworks and Event Sources
+const app = FlexibleAppBuilder.instance
+    .addEventSource(HttpModuleBuilder.instance.withPort(3000).build())
+    .addFramework(DecoratorsFrameworkModuleBuilder.instance
+        .withControllerLoader(new ExplicitControllerLoader([HelloController]))
+        .build())
+    .createApp();
 
-### Frameworks
+app.run();
+```
 
-1. [flexible-decorators](https://github.com/ftacchini/flexible-decorators): a framework that uses typescript decorators to create controllers that shape your pipelines.
-1. [flexible-dummy-framework](https://github.com/ftacchini/flexible-dummy-framework): a framework that helps you to easily create integration tests for newly created event sources.
+**[→ Full Getting Started Guide](docs/getting-started.md)**
+
+## Features
+
+- 🚀 **High Performance** - O(log n) routing with decision tree
+- 📦 **Modular** - Compose event sources, frameworks, and middleware
+- 🔍 **Structured Logging** - Built-in support with JSON output
+- 💉 **Dependency Injection** - Powered by InversifyJS
+- 🧪 **Testable** - Built-in test utilities
+- 🔌 **Extensible** - Create custom event sources, frameworks, and loggers
+- 📝 **TypeScript** - Full type safety
+
+## Documentation
+
+### Getting Started
+- **[Getting Started Guide](docs/getting-started.md)** - Create your first app
+- **[Installation](docs/getting-started.md#installation)** - Setup instructions
+- **[Quick Start](docs/getting-started.md#your-first-application)** - Hello World example
+
+### Architecture
+- **[Overview](docs/architecture/overview.md)** - System design and concepts
+- **[Event Sources](docs/architecture/event-sources.md)** - How event sources work
+- **[Frameworks](docs/architecture/frameworks.md)** - Framework system
+- **[Routing](docs/architecture/routing.md)** - Decision tree router
+- **[Request Lifecycle](docs/architecture/request-lifecycle.md)** - Request flow
+
+### Guides
+- **[Logging](docs/guides/logging.md)** - Structured logging guide
+- **[Creating Event Sources](docs/guides/creating-event-source.md)** - Build custom sources
+- **[Creating Frameworks](docs/guides/creating-framework.md)** - Build custom frameworks
+- **[Testing](docs/guides/testing.md)** - Testing strategies
+
+### API Reference
+- **[FlexibleApp](docs/api/flexible-app.md)** - Main application class
+- **[FlexibleRouter](docs/api/flexible-router.md)** - Routing interface
+- **[FlexibleLogger](docs/api/flexible-logger.md)** - Logging interface
+- **[Full API Reference](docs/api/)** - Complete API documentation
+
+## Available Packages
 
 ### Event Sources
+- **[flexible-http](https://github.com/ftacchini/flexible-http)** - HTTP/HTTPS server
+- Create your own by implementing `FlexibleEventSource`
 
-1. [flexible-http](https://github.com/ftacchini/flexible-http): an event source that allows you to feed and filter http and https events into pipelines.
-1. [flexible-dummy-source](https://github.com/ftacchini/flexible-dummy-source): an event sources that helps you easily create integration tests for newly created frameworks.
+### Frameworks
+- **[flexible-decorators](https://github.com/ftacchini/flexible-decorators)** - Decorator-based controllers
+- Create your own by implementing `FlexibleFramework`
 
-## Architecture
+### Examples
+- **[flexible-example-app](https://github.com/ftacchini/flexible-example-app)** - Complete example with Winston logging
 
-A simplified schema of Flexible can be seen below:
+## Core Concepts
 
-![Flexible's architecture](docs/img/flexible-core_31-7-21.png)
-
-- Flexible Core:
-- Frameworks:
-- Event Sources:
-- User Code:
-
-## Logging
-
-Flexible provides a flexible logging system with structured logging support, multiple logger implementations, and easy integration with popular logging libraries.
-
-### Built-in Loggers
-
-#### 1. ConsoleLoggerModule (Development)
-
-Simple text-based logging for development:
-
-```typescript
-import { FlexibleAppBuilder, ConsoleLoggerModule } from "flexible-core";
-
-const application = FlexibleAppBuilder.instance
-    .withLogger(new ConsoleLoggerModule())
-    .addEventSource(httpEventSource)
-    .addFramework(decoratorsFramework)
-    .createApp();
+```
+┌─────────────────┐
+│  Event Source   │  HTTP, WebSocket, Queue, etc.
+└────────┬────────┘
+         │ Events
+         ▼
+┌─────────────────┐
+│     Router      │  Decision Tree (O(log n))
+└────────┬────────┘
+         │ Matched Routes
+         ▼
+┌─────────────────┐
+│   Framework     │  Decorators, Express-like, etc.
+└────────┬────────┘
+         │ Middleware Pipeline
+         ▼
+┌─────────────────┐
+│  Your Handler   │  Controller, Function, etc.
+└─────────────────┘
 ```
 
-#### 2. SilentLoggerModule (Testing)
+**[→ Learn More About Architecture](docs/architecture/overview.md)**
 
-No output - perfect for tests:
-
-```typescript
-import { SilentLoggerModule } from "flexible-core";
-
-const application = FlexibleAppBuilder.instance
-    .withLogger(new SilentLoggerModule())
-    .createApp();
-```
-
-#### 3. ConfigurableLoggerModule (Production)
-
-Advanced logging with level filtering, JSON output, and sampling:
-
-```typescript
-import { ConfigurableLoggerModule, LogLevel } from "flexible-core";
-
-const application = FlexibleAppBuilder.instance
-    .withLogger(new ConfigurableLoggerModule({
-        minLevel: LogLevel.INFO,
-        format: 'json',
-        includeTimestamp: true,
-        includeHostname: true,
-        sampling: {
-            rate: 0.1,  // Sample 10% of debug logs
-            levels: [LogLevel.DEBUG]
-        }
-    }))
-    .createApp();
-```
+## Key Features
 
 ### Structured Logging
 
-All loggers support structured logging with optional context:
-
-```typescript
-// Simple message
-logger.info("User logged in");
-
-// With structured context
-logger.info("User logged in", {
-    userId: 123,
-    username: "john",
-    ip: "192.168.1.1"
-});
-```
-
-**Output (ConsoleLoggerModule):**
-```
-INFO: User logged in {"userId":123,"username":"john","ip":"192.168.1.1"}
-```
-
-**Output (ConfigurableLoggerModule with JSON):**
-```json
-{"level":"INFO","message":"User logged in","userId":123,"username":"john","ip":"192.168.1.1","timestamp":"2025-12-05T10:30:00.000Z"}
-```
-
-### Using Logger in Your Code
-
-Inject the logger into your controllers or services:
-
 ```typescript
 import { FlexibleLogger, FLEXIBLE_APP_TYPES } from "flexible-core";
-import { inject } from "inversify";
 
 @Controller()
 export class UserController {
@@ -192,115 +128,109 @@ export class UserController {
             username: user.username,
             timestamp: new Date().toISOString()
         });
-
-        // ... your logic
-
         return { success: true };
     }
 }
 ```
 
-### Request Lifecycle Logging
+**[→ Logging Guide](docs/guides/logging.md)**
 
-Flexible automatically logs request lifecycle with unique request IDs:
+### High-Performance Routing
 
-```
-DEBUG: HTTP request received {"requestId":"1764974867385-x09e","method":"GET","path":"/world","clientIp":"127.0.0.1"}
-DEBUG: Request received {"requestId":"1764974867385-x09e","eventType":"HttpEvent"}
-DEBUG: Routing request - Finding matching pipelines {"requestId":"1764974867385-x09e"}
-DEBUG: Found matching pipelines {"requestId":"1764974867385-x09e","pipelineCount":1}
-INFO: World endpoint called {"endpoint":"/world"}
-DEBUG: Request completed {"requestId":"1764974867385-x09e","responseCount":1}
-DEBUG: Response sent {"requestId":"1764974867385-x09e","statusCode":200}
-```
-
-### X-Request-ID Header Support
-
-If a client sends an `X-Request-ID` header, that ID will be used throughout the request lifecycle:
-
-```bash
-curl -H "X-Request-ID: my-custom-id" http://localhost:8080/api
-```
-
-### Log Levels
-
-Flexible supports 8 log levels (from highest to lowest priority):
-
-1. `EMERGENCY` - System is unusable
-2. `ALERT` - Action must be taken immediately
-3. `CRITICAL` - Critical conditions
-4. `ERROR` - Error conditions
-5. `WARNING` - Warning conditions
-6. `NOTICE` - Normal but significant condition
-7. `INFO` - Informational messages
-8. `DEBUG` - Debug-level messages
-
-### Integrating Third-Party Loggers
-
-You can integrate any logging library by implementing the `FlexibleLogger` interface. See the [flexible-example-app](https://github.com/ftacchini/flexible-example-app) for a complete Winston integration example.
+Decision tree-based router with O(log n) lookup:
 
 ```typescript
-import { FlexibleLogger, LogContext } from "flexible-core";
+// Automatically routes to the right handler
+GET /users/123    → UserController.getUser()
+POST /users       → UserController.createUser()
+GET /posts/456    → PostController.getPost()
+```
 
-export class MyCustomLogger implements FlexibleLogger {
-    debug(message: string, context?: LogContext): void {
-        // Your implementation
-    }
+**[→ Routing Guide](docs/architecture/routing.md)**
 
-    info(message: string, context?: LogContext): void {
-        // Your implementation
-    }
+### Dependency Injection
 
-    // ... other methods
+Built on InversifyJS for powerful DI:
+
+```typescript
+@Controller()
+export class UserController {
+    constructor(
+        @inject(FLEXIBLE_APP_TYPES.LOGGER) private logger: FlexibleLogger,
+        @inject(UserService.TYPE) private userService: UserService
+    ) {}
 }
 ```
 
-### What's Logged
+### Modular Design
 
-✅ **Safe metadata:**
-- Request ID
-- HTTP method and path
-- Client IP address
-- Status code
-- Processing duration
-- Pipeline count
-- Custom context data
-
-❌ **NOT logged (security):**
-- Request/response bodies
-- Query parameters
-- Headers (except X-Request-ID)
-- Cookies or tokens
-- Passwords or secrets
-
-### Environment-Based Configuration
+Everything is a module that can be composed:
 
 ```typescript
-const logger = process.env.NODE_ENV === 'production'
-    ? new ConfigurableLoggerModule({
-        minLevel: LogLevel.INFO,
-        format: 'json',
-        includeTimestamp: true
-      })
-    : new ConsoleLoggerModule();
-
 const app = FlexibleAppBuilder.instance
-    .withLogger(logger)
+    .withLogger(loggerModule)      // Optional logging
+    .addEventSource(httpModule)    // HTTP events
+    .addEventSource(wsModule)      // WebSocket events
+    .addFramework(decoratorModule) // Decorator framework
     .createApp();
 ```
 
-## Test Utilities
+## Examples
 
-Flexible Core now includes test utilities (previously separate packages):
+### Basic HTTP Server
+
+```typescript
+const app = FlexibleAppBuilder.instance
+    .addEventSource(HttpModuleBuilder.instance.withPort(3000).build())
+    .addFramework(DecoratorsFrameworkModuleBuilder.instance
+        .withControllerLoader(new ExplicitControllerLoader([HelloController]))
+        .build())
+    .createApp();
+
+await app.run();
+```
+
+### With Logging
+
+```typescript
+import { ConsoleLoggerModule } from "flexible-core";
+
+const app = FlexibleAppBuilder.instance
+    .withLogger(new ConsoleLoggerModule())
+    .addEventSource(httpEventSource)
+    .addFramework(decoratorsFramework)
+    .createApp();
+```
+
+### Production Configuration
+
+```typescript
+import { ConfigurableLoggerModule, LogLevel } from "flexible-core";
+
+const app = FlexibleAppBuilder.instance
+    .withLogger(new ConfigurableLoggerModule({
+        minLevel: LogLevel.INFO,
+        format: 'json',
+        includeTimestamp: true
+    }))
+    .addEventSource(httpEventSource)
+    .addFramework(decoratorsFramework)
+    .createApp();
+```
+
+**[→ More Examples](https://github.com/ftacchini/flexible-example-app)**
+
+## Testing
+
+Flexible includes built-in test utilities:
 
 ```typescript
 import { DummyFramework, DummyEventSource } from "flexible-core";
 
-// Use in tests
 const framework = new DummyFramework();
 framework.addPipelineDefinition({
-  filterStack: [/* ... */],
-  middlewareStack: [/* ... */]
+    filterStack: [/* ... */],
+    middlewareStack: [/* ... */]
 });
 
 const eventSource = new DummyEventSource();
@@ -308,28 +238,24 @@ await eventSource.run();
 await eventSource.generateEvent(myEvent);
 ```
 
-## How do I create an Event Source?
+**[→ Testing Guide](docs/guides/testing.md)**
 
-Event sources should implement the `FlexibleEventSource` interface:
+## Contributing
 
-```typescript
-export interface FlexibleEventSource {
-  run(): Promise<any>;
-  stop(): Promise<any>;
-  onEvent(handler: (event: FlexibleEvent) => Promise<any>): void;
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
-  // Optional: for health checks
-  healthCheck?(): Promise<HealthStatus>;
-}
-```
+## License
 
-## How do I create a Framework?
+MIT © [Francisco Tacchini](https://github.com/ftacchini)
 
-Frameworks should implement the `FlexibleFramework` interface:
+## Links
 
-```typescript
-export interface FlexibleFramework {
-  readonly container: AsyncContainerModule;
-  createPipelineDefinitions(): Promise<FlexiblePipelineDocument[]>;
-}
-```
+- [GitHub Repository](https://github.com/ftacchini/flexible-core)
+- [npm Package](https://www.npmjs.com/package/flexible-core)
+- [Documentation](docs/)
+- [Examples](https://github.com/ftacchini/flexible-example-app)
+- [Issues](https://github.com/ftacchini/flexible-core/issues)
+
+---
+
+**Made with ❤️ by the Flexible team**

@@ -435,6 +435,8 @@ describe("MyEventSource", () => {
 });
 ```
 
+> **Real tests:** See [flexible-example-app/integ-test.spec.ts](../../../flexible-example-app/test/integration-test/integ-test.spec.ts) for integration tests that verify HTTP event source behavior.
+
 ### Integration Tests
 
 Test with DummyFramework:
@@ -482,6 +484,8 @@ describe("MyEventSource Integration", () => {
     });
 });
 ```
+
+> **Real tests:** See [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) for examples of testing event sources with DummyFramework. The test "Should route events correctly through flexible router" demonstrates the complete event flow.
 
 ## Best Practices
 
@@ -768,6 +772,22 @@ const app = FlexibleAppBuilder.instance
 
 await app.run();
 ```
+
+## Working Code Examples
+
+The concepts in this guide are proven by real working code:
+
+**HTTP Event Source Implementation:**
+- [HttpSource](../../../flexible-http/src/http-source.ts) - Complete HTTP event source with Express integration
+- [HttpEvent](../../../flexible-http/src/http-event.ts) - Event class implementation
+- [HttpModuleBuilder](../../../flexible-http/src/http-module-builder.ts) - Builder pattern for configuration
+
+**Integration Tests:**
+- [flexible-example-app/integ-test.spec.ts](../../../flexible-example-app/test/integration-test/integ-test.spec.ts) - Real HTTP endpoint testing showing event source in action
+- [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) - Tests using DummyEventSource to demonstrate event source interface
+
+**Dummy Event Source (for testing):**
+- [DummyEventSource](../../src/test-util/dummy-event-source.ts) - Simple event source implementation for testing
 
 ## See Also
 

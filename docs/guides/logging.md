@@ -151,6 +151,8 @@ DEBUG: Request completed {"requestId":"1764974867385-x09e","responseCount":1}
 DEBUG: Response sent {"requestId":"1764974867385-x09e","statusCode":200}
 ```
 
+> **See it in action:** Run the tests in [flexible-example-app/integ-test.spec.ts](../../../flexible-example-app/test/integration-test/integ-test.spec.ts) with ConsoleLoggerModule to see the complete request lifecycle logging.
+
 ### X-Request-ID Header Support
 
 If a client sends an `X-Request-ID` header, that ID will be used throughout the request lifecycle:
@@ -188,6 +190,8 @@ new ConfigurableLoggerModule({
 })
 ```
 
+> **Tested behavior:** See [flexible-configurable-logger.spec.ts](../../test/unit-test/flexible/logging/flexible-configurable-logger.spec.ts) for tests demonstrating log level filtering. The test "should filter out logs below minimum level" proves this functionality.
+
 ## Integrating Third-Party Loggers
 
 You can integrate any logging library by implementing the `FlexibleLogger` interface.
@@ -222,6 +226,8 @@ export class WinstonLogger implements FlexibleLogger {
     // ... other methods
 }
 ```
+
+> **Complete implementation:** See [WinstonLogger](../../../flexible-example-app/src/winston-logger.ts) for the full Winston integration code, and [winston-logging.spec.ts](../../../flexible-example-app/test/integration-test/winston-logging.spec.ts) for integration tests that verify file logging works correctly.
 
 ### Creating a Custom Logger
 
@@ -347,6 +353,31 @@ LOG_LEVEL=debug npm start
 LOG_LEVEL=warn LOG_FORMAT=text npm start
 NODE_ENV=production LOG_LEVEL=info npm start
 ```
+
+## Working Code Examples
+
+The logging system is implemented and tested in real code:
+
+**Logger Implementations:**
+- [FlexibleLogger Interface](../../src/logging/flexible-logger.ts) - Logger interface with 8 log levels
+- [FlexibleConsoleLogger](../../src/flexible/logging/flexible-console-logger.ts) - Simple console logger
+- [FlexibleConfigurableLogger](../../src/flexible/logging/flexible-configurable-logger.ts) - Advanced logger with filtering and JSON output
+- [FlexibleSilentLogger](../../src/flexible/logging/flexible-silent-logger.ts) - Silent logger for testing
+
+**Logger Modules:**
+- [ConsoleLoggerModule](../../src/flexible/logging/console-logger-module.ts) - Console logger module
+- [ConfigurableLoggerModule](../../src/flexible/logging/configurable-logger-module.ts) - Configurable logger module
+- [SilentLoggerModule](../../src/flexible/logging/silent-logger-module.ts) - Silent logger module
+
+**Winston Integration Example:**
+- [WinstonLogger](../../../flexible-example-app/src/winston-logger.ts) - Winston logger implementation
+- [WinstonLoggerModule](../../../flexible-example-app/src/winston-logger-module.ts) - Winston logger module
+- [WINSTON_LOGGER.md](../../../flexible-example-app/WINSTON_LOGGER.md) - Complete Winston integration guide
+
+**Tests:**
+- [flexible-configurable-logger.spec.ts](../../test/unit-test/flexible/logging/flexible-configurable-logger.spec.ts) - Unit tests for configurable logger
+- [logging-file-output.spec.ts](../../test/integration-test/logging-file-output.spec.ts) - Integration tests for file logging
+- [winston-logging.spec.ts](../../../flexible-example-app/test/integration-test/winston-logging.spec.ts) - Winston integration tests
 
 ## See Also
 

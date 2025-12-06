@@ -478,6 +478,21 @@ return routeMap.get(key);
 - More complex implementation
 - Slightly slower than hash for exact matches
 
+## Working Code Examples
+
+The tree router architecture is implemented and tested in real code:
+
+**Implementation:**
+- [FlexibleTreeRouter](../../src/flexible/router/tree-router/flexible-tree-router.ts) - Main tree router implementation with structured logging
+- [DecisionTreeNode](../../src/flexible/router/tree-router/decision-tree-node.ts) - Tree node structure with match/all links
+- [RouteValueMatcher](../../src/flexible/router/tree-router/route-value-matcher.ts) - Property value matching logic
+- [RouteDataIterator](../../src/flexible/router/tree-router/route-data-iterator.ts) - Iterator for traversing route properties
+- [FilterCascadeBuilder](../../src/flexible/router/filter-cascade/filter-cascade-builder.ts) - Builds filter chains for AND logic
+
+**Tests:**
+- [flexible-tree-router.spec.ts](../../test/unit-test/flexible/router/tree-router/flexible-tree-router.spec.ts) - Comprehensive unit tests for tree router
+- [flexible-router-tests.ts](../../test/unit-test/flexible/router/flexible-router-tests.ts) - Shared test suite for all router implementations
+
 ## See Also
 
 - [Architecture: Overview](overview.md)

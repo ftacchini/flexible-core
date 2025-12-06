@@ -83,6 +83,8 @@ curl http://localhost:3000/world
 # {"message":"Hello, World!"}
 ```
 
+> **See it in action:** Check out [flexible-example-app/integ-test.spec.ts](../../../flexible-example-app/test/integration-test/integ-test.spec.ts) for a complete integration test that starts the application and tests the `/world` endpoint.
+
 ## Adding More Features
 
 ### Add Logging
@@ -160,6 +162,8 @@ export class UserController {
     }
 }
 ```
+
+> **Real example:** See [HelloController](../../../flexible-example-app/src/hello-controller.ts) for a working controller with logger injection.
 
 ### Configure Different Ports
 
@@ -293,6 +297,18 @@ Check out the [flexible-example-app](https://github.com/ftacchini/flexible-examp
 - Multiple controllers
 - Integration tests
 - Production configuration
+
+### Working Code Examples
+
+The concepts in this guide are proven by real working code:
+
+**Integration Tests:**
+- [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) - Complete application lifecycle tests showing how to build, run, and route events through a Flexible app
+- [flexible-example-app/integ-test.spec.ts](../../../flexible-example-app/test/integration-test/integ-test.spec.ts) - Real HTTP endpoint testing with the decorators framework
+
+**Source Code:**
+- [FlexibleAppBuilder](../../src/flexible/flexible-app-builder.ts) - The builder pattern implementation for creating applications
+- [HelloController](../../../flexible-example-app/src/hello-controller.ts) - Example controller with dependency injection
 
 ## Getting Help
 

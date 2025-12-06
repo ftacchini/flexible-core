@@ -528,6 +528,8 @@ describe("MyRouter", () => {
 });
 ```
 
+> **Real tests:** See [flexible-tree-router.spec.ts](../../test/unit-test/flexible/router/tree-router/flexible-tree-router.spec.ts) and [flexible-router-tests.ts](../../test/unit-test/flexible/router/flexible-router-tests.ts) for comprehensive router tests that all router implementations must pass.
+
 ### Integration Tests
 
 ```typescript
@@ -560,6 +562,8 @@ describe("MyRouter Integration", () => {
     });
 });
 ```
+
+> **Real tests:** See [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) for integration tests showing how routers work within the complete application. The test "Should route events correctly through flexible router" demonstrates the full routing flow.
 
 ## Best Practices
 
@@ -662,6 +666,22 @@ export class MyRouter<Resource> implements FlexibleRouter<Resource> {
     }
 }
 ```
+
+## Working Code Examples
+
+The router interface and implementations are proven by real working code:
+
+**Tree Router Implementation:**
+- [FlexibleTreeRouter](../../src/flexible/router/tree-router/flexible-tree-router.ts) - Production tree router (O(log n))
+- [FlexibleRouter Interface](../../src/router/flexible-router.ts) - Router interface that all routers must implement
+
+**Tests:**
+- [flexible-tree-router.spec.ts](../../test/unit-test/flexible/router/tree-router/flexible-tree-router.spec.ts) - Tree router tests
+- [flexible-router-tests.ts](../../test/unit-test/flexible/router/flexible-router-tests.ts) - Shared test suite for router implementations
+- [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) - Integration tests showing router in action
+
+**Test Utilities:**
+- [DummyFramework](../../src/test-util/dummy-framework.ts) - Framework for testing routers
 
 ## See Also
 

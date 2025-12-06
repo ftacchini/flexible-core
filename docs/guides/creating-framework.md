@@ -352,6 +352,8 @@ describe("MyFramework", () => {
 });
 ```
 
+> **Real tests:** See [decorated-app.spec.ts](../../../flexible-decorators/test/integration-test/decorated-app.spec.ts) for comprehensive tests of the decorators framework.
+
 ### Integration Tests
 
 Test with DummyEventSource:
@@ -381,6 +383,8 @@ describe("MyFramework Integration", () => {
     });
 });
 ```
+
+> **Real tests:** See [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) for examples of testing frameworks with DummyEventSource and DummyFramework.
 
 ## Best Practices
 
@@ -625,6 +629,22 @@ class MyController {
 
 const framework = new SimpleFramework([MyController]);
 ```
+
+## Working Code Examples
+
+The concepts in this guide are proven by real working code:
+
+**Decorators Framework Implementation:**
+- [DecoratorsFramework](../../../flexible-decorators/src/framework/decorators-framework.ts) - Complete framework implementation using decorators
+- [Controller Decorator](../../../flexible-decorators/src/decorator/controller.ts) - Metadata storage using decorators
+- [Route Decorator](../../../flexible-decorators/src/decorator/route.ts) - Route registration with decorators
+
+**Integration Tests:**
+- [decorated-app.spec.ts](../../../flexible-decorators/test/integration-test/decorated-app.spec.ts) - Full integration tests showing decorators framework in action
+- [test-controllers.ts](../../../flexible-decorators/test/integration-test/test-controllers.ts) - Example controllers used in tests
+
+**Core Framework Tests:**
+- [flexible-app.spec.ts](../../test/integration-test/flexible-app.spec.ts) - Tests showing how frameworks integrate with the core system
 
 ## See Also
 

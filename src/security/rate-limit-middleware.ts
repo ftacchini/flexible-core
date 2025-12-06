@@ -73,9 +73,10 @@ export class RateLimitMiddleware {
      * Checks rate limit for the current request.
      *
      * This method is called by the @BeforeExecution decorator.
-     * It uses the @Param(EventData) decorator to receive the event.
+     * When using with @BeforeExecution, the event parameter must be decorated
+     * with @Param(EventData) in the calling context.
      *
-     * @param event - The event to check (injected via @Param(EventData))
+     * @param event - The event to check
      * @throws SecurityError if rate limit is exceeded
      */
     public async check(event: FlexibleEvent): Promise<void> {

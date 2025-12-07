@@ -22,7 +22,7 @@ describe("RateLimitMiddleware Integration Tests", () => {
         framework = new DummyFramework();
         rateLimitStore = new MemoryRateLimitStore();
 
-        app = FlexibleAppBuilder.instance
+        app = FlexibleApp.builder()
             .withLogger(new SilentLoggerModule())
             .addEventSource({
                 getInstance: () => eventSource,

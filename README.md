@@ -56,24 +56,18 @@ app.run();
 
 ### Architecture
 - **[Overview](docs/architecture/overview.md)** - System design and concepts
-- **[Event Sources](docs/architecture/event-sources.md)** - How event sources work
-- **[Frameworks](docs/architecture/frameworks.md)** - Framework system
-- **[Routing](docs/architecture/routing.md)** - Decision tree router
-- **[Request Lifecycle](docs/architecture/request-lifecycle.md)** - Request flow
+- **[Components](docs/architecture/components.md)** - Event sources, routers, frameworks, and pipelines
+- **[Modules](docs/architecture/modules.md)** - Module system and dependency injection
+- **[Request Flow](docs/architecture/request-flow.md)** - How requests are processed
+- **[Design Patterns](docs/architecture/design-patterns.md)** - Patterns used throughout
+- **[Tree Router](docs/architecture/tree-router.md)** - Decision tree routing algorithm
 
 ### Guides
 - **[Logging](docs/guides/logging.md)** - Structured logging guide
-- **[Composable Architecture](docs/guides/composable-architecture.md)** - Build layered security and middleware
+- **[Composable Architecture](docs/guides/composable-apps.md)** - Build layered security and middleware
 - **[Creating Event Sources](docs/guides/creating-event-source.md)** - Build custom sources
 - **[Creating Frameworks](docs/guides/creating-framework.md)** - Build custom frameworks
 - **[Creating Routers](docs/guides/creating-router.md)** - Build custom routers
-- **[Testing](docs/guides/testing.md)** - Testing strategies
-
-### API Reference
-- **[FlexibleApp](docs/api/flexible-app.md)** - Main application class
-- **[FlexibleRouter](docs/api/flexible-router.md)** - Routing interface
-- **[FlexibleLogger](docs/api/flexible-logger.md)** - Logging interface
-- **[Full API Reference](docs/api/)** - Complete API documentation
 
 ## Available Packages
 
@@ -148,7 +142,7 @@ POST /users       → UserController.createUser()
 GET /posts/456    → PostController.getPost()
 ```
 
-**[→ Routing Guide](docs/architecture/routing.md)**
+**[→ Routing Guide](docs/architecture/tree-router.md)**
 
 ### Dependency Injection
 

@@ -4,6 +4,7 @@ import { FlexibleRouter } from "../router/flexible-router";
 import { FlexibleLogger } from "../logging/flexible-logger";
 import { SetupManager } from "./setup/setup-manager";
 import { RequestIdGenerator } from "./utils/request-id-generator";
+import { FlexibleAppBuilder } from "./flexible-app-builder";
 
 /**
  * The main application class that orchestrates event sources, routing, and request handling.
@@ -16,7 +17,7 @@ import { RequestIdGenerator } from "./utils/request-id-generator";
  *
  * @example
  * ```typescript
- * const app = FlexibleAppBuilder.instance
+ * const app = FlexibleApp.builder()
  *   .addFramework(decoratorsFramework)
  *   .addEventSource(httpSource)
  *   .createApp();
@@ -34,6 +35,14 @@ import { RequestIdGenerator } from "./utils/request-id-generator";
  * 3. stop() - Gracefully shuts down all event sources
  */
 export class FlexibleApp {
+
+    /**
+     * Creates a new builder for constructing FlexibleApp instances.
+     * @returns A new FlexibleAppBuilder instance
+     */
+    public static builder(): FlexibleAppBuilder {
+        return new FlexibleAppBuilder();
+    }
 
     private logger!: FlexibleLogger;
     private eventSources!: FlexibleEventSource[];

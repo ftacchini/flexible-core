@@ -29,7 +29,7 @@ import { ContainerModule } from "inversify";
  *
  * ```typescript
  * // Business logic app
- * const businessApp = FlexibleAppBuilder.instance
+ * const businessApp = FlexibleApp.builder()
  *     .addFramework(decoratorsFramework)
  *     .addEventSource(new DelegateEventSource())
  *     .createApp();
@@ -50,7 +50,7 @@ import { ContainerModule } from "inversify";
  *     }
  * }
  *
- * const securityApp = FlexibleAppBuilder.instance
+ * const securityApp = FlexibleApp.builder()
  *     .addFramework(new DecoratorsFramework([SecurityMiddlewareController]))
  *     .addEventSource(new HttpModule(3000))  // Real HTTP source
  *     .createApp();

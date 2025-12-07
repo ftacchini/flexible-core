@@ -69,7 +69,7 @@ describe("ContainerSystem", () => {
             })
         };
 
-        app = FlexibleAppBuilder.instance
+        app = FlexibleApp.builder()
             .withLogger(new SilentLoggerModule())
             .withContainer(container)
             .addModule(dependenciesModule)

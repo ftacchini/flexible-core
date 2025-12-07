@@ -15,12 +15,12 @@ import { SetupManager } from "./setup/setup-manager";
  * Builder class for creating FlexibleApp instances with a fluent API.
  *
  * This is the main entry point for configuring and creating a Flexible application.
- * It follows the Builder pattern and Singleton pattern to provide a clean API for
+ * It follows the Builder pattern to provide a clean API for
  * assembling the various components of a Flexible application.
  *
  * @example
  * ```typescript
- * const app = FlexibleAppBuilder.instance
+ * const app = FlexibleApp.builder()
  *   .addFramework(myFramework)
  *   .addEventSource(httpSource)
  *   .withLogger(customLogger)
@@ -45,12 +45,7 @@ export class FlexibleAppBuilder {
     protected extractorsRouter!: FlexibleRouterModule<FlexibleExtractor>;
     protected container!: Container;
 
-    private static _instance: FlexibleAppBuilder;
-    public static get instance() {
-        return this._instance || (this._instance = new FlexibleAppBuilder());
-    }
-
-    private constructor() {
+    constructor() {
         this.reset();
     }
 

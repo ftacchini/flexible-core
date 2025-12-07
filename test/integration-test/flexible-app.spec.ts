@@ -33,7 +33,7 @@ describe("FlexibleApp", () => {
             isolatedContainer: new ContainerModule(() => { })
         };
 
-        app = FlexibleAppBuilder.instance
+        app = FlexibleApp.builder()
             .withLogger(new SilentLoggerModule())
             .addEventSource(eventSourceModule)
             .addFramework(frameworkModule)

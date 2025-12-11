@@ -4,7 +4,7 @@ import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
 import { FlexibleFrameworkModule } from "../../src/framework/flexible-framework-module";
 import { DummyEventSource, DummyFramework } from "../../src";
-import { ContainerModule } from "inversify";
+import { DependencyContainer } from "tsyringe";
 import { FlexibleEventSourceModule, FlexibleEvent } from "../../src/event";
 import { IfEventIs } from "../../src/flexible/filter/if-event-is";
 import { EventType } from "../../src/flexible/extractor/event-type";
@@ -24,13 +24,13 @@ describe("FlexibleApp", () => {
 
         let frameworkModule: FlexibleFrameworkModule = {
             getInstance: () => framework,
-            container: new ContainerModule(() => { }),
-            isolatedContainer: new ContainerModule(() => { })
+            register: (container: DependencyContainer) => { },
+            registerIsolated: (container: DependencyContainer) => { }
         };
         let eventSourceModule: FlexibleEventSourceModule = {
             getInstance: () => eventSource,
-            container: new ContainerModule(() => { }),
-            isolatedContainer: new ContainerModule(() => { })
+            register: (container: DependencyContainer) => { },
+            registerIsolated: (container: DependencyContainer) => { }
         };
 
         app = FlexibleApp.builder()

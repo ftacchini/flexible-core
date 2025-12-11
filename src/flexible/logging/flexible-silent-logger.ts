@@ -1,5 +1,5 @@
 import { FlexibleLogger, LogContext } from "../../logging/flexible-logger";
-import { injectable } from "inversify";
+import { injectable } from "tsyringe";
 
 @injectable()
 export class FlexibleSilentLogger implements FlexibleLogger {

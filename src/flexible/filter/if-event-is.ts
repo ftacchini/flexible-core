@@ -1,6 +1,6 @@
 import { FlexibleFilter } from "../../event";
 import { RouteData } from "../../router";
-import { injectable } from "inversify";
+import { injectable } from "tsyringe";
 
 @injectable()
 export class IfEventIs implements FlexibleFilter {

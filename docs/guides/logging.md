@@ -102,7 +102,7 @@ Inject the logger into your controllers or services:
 
 ```typescript
 import { FlexibleLogger, FLEXIBLE_APP_TYPES } from "flexible-core";
-import { inject } from "inversify";
+import { inject } from "tsyringe";
 import { Controller, Route } from "flexible-decorators";
 import { HttpPost } from "flexible-http";
 

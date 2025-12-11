@@ -1,6 +1,6 @@
 import { FlexibleExtractor, FlexibleEvent } from "../../event";
 import { RouteData } from "../../router";
-import { injectable } from "inversify";
+import { injectable } from "tsyringe";
 
 @injectable()
 export class UndefinedValue implements FlexibleExtractor {

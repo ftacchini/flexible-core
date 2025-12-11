@@ -1,4 +1,4 @@
-import { Container } from "inversify";
+import { FlexibleContainer } from "../../container/flexible-container";
 import { FlexibleModule } from "../../module/flexible-module";
 import { FlexibleExtractor, FlexibleEventSourceModule } from "../../event";
 import { FlexibleRouterModule } from "../../router/flexible-router-module";
@@ -30,7 +30,7 @@ export class SetupManager {
         private routerModule: FlexibleRouterModule<FlexiblePipeline>,
         private extractorsRouterModule: FlexibleRouterModule<FlexibleExtractor>,
         private modules: FlexibleModule[],
-        private container: Container) {
+        private container: FlexibleContainer) {
             if (!loggerModule) {
                 throw NO_LOGGER_DEFINED;
             }
@@ -61,7 +61,7 @@ export class SetupManager {
         await this.setupApp(setupContainer, app);
     }
 
-    private async setupContainers(): Promise<Container> {
+    private async setupContainers(): Promise<FlexibleContainer> {
 
         let setupContainerCommand = new SetupContainerCommand(
             this.loggerModule,
@@ -82,8 +82,8 @@ export class SetupManager {
 
         await setupInfrastructureCommand.execute();
 
-        // Create setup container
-        var setupContainer = new Container();
+        // Create setup container as a child of the main container
+        var setupContainer = this.container.createChild();
 
         let setupFlexibleContainerCommand = new SetupFlexibleContainerCommand(
             this.routerModule,
@@ -93,36 +93,36 @@ export class SetupManager {
 
         await setupFlexibleContainerCommand.execute();
 
-        // Bind dependencies from main container AFTER setupFlexibleContainerCommand (which calls unbindAll)
-        setupContainer.bind(FLEXIBLE_APP_TYPES.LOGGER).toDynamicValue(() => {
-            return this.container.get(FLEXIBLE_APP_TYPES.LOGGER);
+        // Bind dependencies from main container using factory functions
+        setupContainer.registerFactory(FLEXIBLE_APP_TYPES.LOGGER, () => {
+            return this.container.resolve(FLEXIBLE_APP_TYPES.LOGGER);
         });
 
-        setupContainer.bind(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER).toDynamicValue(() => {
-            return this.container.get(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER);
+        setupContainer.registerFactory(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER, () => {
+            return this.container.resolve(FLEXIBLE_APP_TYPES.EVENT_SOURCES_PROVIDER);
         });
 
-        setupContainer.bind(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER).toDynamicValue(() => {
-            return this.container.get(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER);
+        setupContainer.registerFactory(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER, () => {
+            return this.container.resolve(FLEXIBLE_APP_TYPES.FRAMEWORKS_PROVIDER);
         });
 
         // Bind the main container so that recipe factory can access module bindings
-        setupContainer.bind(FLEXIBLE_APP_TYPES.CONTAINER).toConstantValue(this.container);
+        setupContainer.registerValue(FLEXIBLE_APP_TYPES.CONTAINER, this.container);
 
         return setupContainer;
     }
 
-    private async setupApp(container: Container, app: FlexibleAppState): Promise<void> {
+    private async setupApp(container: FlexibleContainer, app: FlexibleAppState): Promise<void> {
 
-        container.bind(SetupLoggerCommand).to(SetupLoggerCommand);
-        container.bind(SetupRouterCommand).to(SetupRouterCommand);
-        container.bind(SetupEventSourcesCommand).to(SetupEventSourcesCommand);
+        container.registerClass(SetupLoggerCommand, SetupLoggerCommand);
+        container.registerClass(SetupRouterCommand, SetupRouterCommand);
+        container.registerClass(SetupEventSourcesCommand, SetupEventSourcesCommand);
 
-        await container.get<SetupLoggerCommand>(SetupLoggerCommand).execute(app);
+        await container.resolve<SetupLoggerCommand>(SetupLoggerCommand).execute(app);
 
         let setupCommands = [
-            container.get<SetupEventSourcesCommand>(SetupEventSourcesCommand),
-            container.get<SetupRouterCommand>(SetupRouterCommand)
+            container.resolve<SetupEventSourcesCommand>(SetupEventSourcesCommand),
+            container.resolve<SetupRouterCommand>(SetupRouterCommand)
         ]
 
         await Promise.all(setupCommands.map(command => command.execute(app)));

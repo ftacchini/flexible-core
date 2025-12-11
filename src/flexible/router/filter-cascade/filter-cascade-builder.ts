@@ -1,6 +1,6 @@
 import { FilterCascadeNode } from "./filter-cascade-node";
 import { FlexibleFilter } from "../../../event";
-import { injectable, inject } from "inversify";
+import { injectable, inject } from "tsyringe";
 import { TREE_ROUTER_TYPES } from "../tree-router/tree-router-types";
 import { RouteDataHelper } from "../route-data-helper";
 

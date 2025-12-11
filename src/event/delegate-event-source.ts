@@ -4,7 +4,7 @@ import { FlexibleFilter } from "./flexible-filter";
 import { FlexibleEvent } from "./flexible-event";
 import { FlexibleResponse } from "../flexible/flexible-response";
 import { Type } from "../flexible/type";
-import { ContainerModule } from "inversify";
+import { DependencyContainer } from "tsyringe";
 
 /**
  * A production-ready event source for composable controller architectures.
@@ -69,7 +69,7 @@ import { ContainerModule } from "inversify";
  * @see DummyEventSource for testing purposes
  */
 export class DelegateEventSource implements FlexibleEventSource {
-    readonly container!: ContainerModule;
+    readonly container!: DependencyContainer;
     readonly availableExtractors: Type<FlexibleExtractor>[] = [];
     readonly availableFilters: Type<FlexibleFilter>[] = [];
 

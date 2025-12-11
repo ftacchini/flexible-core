@@ -1,4 +1,4 @@
-import { injectable } from 'inversify';
+import { injectable } from 'tsyringe';
 import { FlexibleEvent } from '../event';
 import { RateLimitStore, MemoryRateLimitStore } from './rate-limit-store';
 import { SecurityError, SecurityErrorCodes } from './security-error';

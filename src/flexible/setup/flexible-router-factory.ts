@@ -1,11 +1,11 @@
 import { FlexibleRouter } from "../../router";
-import { Container } from "inversify";
 import { FlexibleProvider } from "../../module/flexible-provider";
+import { FlexibleContainer } from "../../container/flexible-container";
 
 export class FlexibleRouterFactory<Resource> {
 
     constructor(
-        private container: Container,
+        private container: FlexibleContainer,
         private routerProvider: FlexibleProvider<FlexibleRouter<Resource>>) {
 
         }

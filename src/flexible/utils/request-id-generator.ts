@@ -1,4 +1,4 @@
-import { injectable } from "inversify";
+import { injectable } from "tsyringe";
 
 /**
  * Generates unique request IDs for tracking request lifecycle.

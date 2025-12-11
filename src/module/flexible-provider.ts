@@ -1,5 +1,5 @@
-import { Container } from "inversify";
+import { FlexibleContainer } from "../container/flexible-container";
 
 export interface FlexibleProvider<T> {
-    getInstance(container: Container): T;
+    getInstance(container: FlexibleContainer): T;
 }

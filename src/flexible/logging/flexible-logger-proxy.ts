@@ -1,4 +1,4 @@
-import { inject, injectable } from "inversify";
+import { inject, injectable } from "tsyringe";
 import { FlexibleLogger, LogContext } from "../../logging";
 import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 

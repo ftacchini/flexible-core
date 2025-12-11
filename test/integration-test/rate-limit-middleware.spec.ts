@@ -3,7 +3,7 @@ import "jasmine";
 import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
 import { DummyEventSource, DummyFramework } from "../../src";
-import { ContainerModule } from "inversify";
+import { DependencyContainer } from "tsyringe";
 import { FlexibleEvent } from "../../src/event";
 import { IfEventIs } from "../../src/flexible/filter/if-event-is";
 import { EventData } from "../../src/flexible/extractor/event-data";
@@ -26,13 +26,13 @@ describe("RateLimitMiddleware Integration Tests", () => {
             .withLogger(new SilentLoggerModule())
             .addEventSource({
                 getInstance: () => eventSource,
-                container: new ContainerModule(() => { }),
-                isolatedContainer: new ContainerModule(() => { })
+                register: (container: DependencyContainer) => { },
+                registerIsolated: (container: DependencyContainer) => { }
             })
             .addFramework({
                 getInstance: () => framework,
-                container: new ContainerModule(() => { }),
-                isolatedContainer: new ContainerModule(() => { })
+                register: (container: DependencyContainer) => { },
+                registerIsolated: (container: DependencyContainer) => { }
             })
             .createApp();
     });

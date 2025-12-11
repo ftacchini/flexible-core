@@ -4,7 +4,7 @@ import { FlexibleMiddleware } from "../pipeline/flexible-middleware";
 import { isArray } from "util";
 import { FlexibleExtractor } from "../../event";
 import { FlexibleParametersExtractor } from "../pipeline/flexible-parameters-extractor";
-import { injectable, inject } from "inversify";
+import { injectable, inject } from "tsyringe";
 import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
 import { FlexibleRouterFactory } from "./flexible-router-factory";
 
@@ -18,7 +18,7 @@ export class FlexibleMiddlewareFactory {
 
     public createMiddlewareStack(middlewareDocuments: FlexibleMiddlewareDocument[]): FlexibleMiddleware[] {
         let middlewareStack = middlewareDocuments.map(m => {
-            
+
             let extractorRoutersMap: any = {};
 
             Object.keys(m.extractorRecipes).forEach(key => {
@@ -28,12 +28,12 @@ export class FlexibleMiddlewareFactory {
                 if(!isArray(recipes)) {
                     recipes = [recipes];
                 }
-                
+
                 let extractors = recipes.map(recipe => this.recipeFactory.craftRecipe<FlexibleExtractor>(recipe));
                 let router = this.routerFactory.createRouter();
                 extractors.forEach(extractor => router.addResource([extractor], extractor));
                 extractorRoutersMap[index] = router;
-                
+
             })
 
             let paramsExtractor = new FlexibleParametersExtractor(extractorRoutersMap);

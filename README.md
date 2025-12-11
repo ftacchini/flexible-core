@@ -13,10 +13,12 @@ npm install flexible-core flexible-http flexible-decorators
 
 ```typescript
 import "reflect-metadata";
-import { FlexibleAppBuilder } from "flexible-core";
-import { DecoratorsFrameworkModuleBuilder, ExplicitControllerLoader } from "flexible-decorators";
-import { HttpModuleBuilder } from "flexible-http";
+import { FlexibleApp } from "flexible-core";
+import { DecoratorsFrameworkModule, ExplicitControllerLoader } from "flexible-decorators";
+import { HttpModule } from "flexible-http";
+import { injectable } from "tsyringe";
 
+@injectable()
 @Controller()
 export class HelloController {
     @Route(HttpGet)
@@ -25,9 +27,9 @@ export class HelloController {
     }
 }
 
-const app = FlexibleAppBuilder.instance
-    .addEventSource(HttpModuleBuilder.instance.withPort(3000).build())
-    .addFramework(DecoratorsFrameworkModuleBuilder.instance
+const app = FlexibleApp.builder()
+    .addEventSource(HttpModule.builder().withPort(3000).build())
+    .addFramework(DecoratorsFrameworkModule.builder()
         .withControllerLoader(new ExplicitControllerLoader([HelloController]))
         .build())
     .createApp();
@@ -42,7 +44,7 @@ app.run();
 - 🚀 **High Performance** - O(log n) routing with decision tree
 - 📦 **Modular** - Compose event sources, frameworks, and middleware
 - 🔍 **Structured Logging** - Built-in support with JSON output
-- 💉 **Dependency Injection** - Powered by InversifyJS
+- 💉 **Dependency Injection** - Powered by TSyringe with child container support
 - 🧪 **Testable** - Built-in test utilities
 - 🔌 **Extensible** - Create custom event sources, frameworks, and loggers
 - 📝 **TypeScript** - Full type safety
@@ -53,6 +55,7 @@ app.run();
 - **[Getting Started Guide](docs/getting-started.md)** - Create your first app
 - **[Installation](docs/getting-started.md#installation)** - Setup instructions
 - **[Quick Start](docs/getting-started.md#your-first-application)** - Hello World example
+- **[Migration Guide](docs/MIGRATION-TSYRINGE.md)** - Upgrading from InversifyJS (v0.1.x → v0.2.0+)
 
 ### Architecture
 - **[Overview](docs/architecture/overview.md)** - System design and concepts
@@ -113,7 +116,9 @@ app.run();
 
 ```typescript
 import { FlexibleLogger, FLEXIBLE_APP_TYPES } from "flexible-core";
+import { inject, injectable } from "tsyringe";
 
+@injectable()
 @Controller()
 export class UserController {
     constructor(@inject(FLEXIBLE_APP_TYPES.LOGGER) private logger: FlexibleLogger) {}
@@ -146,9 +151,12 @@ GET /posts/456    → PostController.getPost()
 
 ### Dependency Injection
 
-Built on InversifyJS for powerful DI:
+Built on TSyringe for powerful DI with child container support:
 
 ```typescript
+import { inject, injectable } from "tsyringe";
+
+@injectable()
 @Controller()
 export class UserController {
     constructor(
@@ -158,16 +166,73 @@ export class UserController {
 }
 ```
 
+#### Child Containers for Composable Architecture
+
+Create isolated layers with shared dependencies:
+
+```typescript
+import { FlexibleContainer } from "flexible-core";
+
+// Main container with shared bindings
+const mainContainer = new FlexibleContainer();
+mainContainer.registerValue(FLEXIBLE_APP_TYPES.LOGGER, logger);
+
+// Security layer with child container
+const securityContainer = mainContainer.createChild();
+securityContainer.registerValue("NextLayer", businessEventSource);
+
+const securityApp = FlexibleApp.builder()
+    .withContainer(securityContainer)
+    .addEventSource(httpModule)
+    .addFramework(securityFramework)
+    .createApp();
+
+// Business layer with child container
+const businessContainer = mainContainer.createChild();
+
+const businessApp = FlexibleApp.builder()
+    .withContainer(businessContainer)
+    .addEventSource(businessEventSource)
+    .addFramework(businessFramework)
+    .createApp();
+```
+
+**Benefits:**
+- Each layer can override shared bindings
+- True isolation between layers
+- Shared bindings automatically available
+- No pollution of parent container
+
 ### Modular Design
 
 Everything is a module that can be composed:
 
 ```typescript
-const app = FlexibleAppBuilder.instance
+const app = FlexibleApp.builder()
     .withLogger(loggerModule)      // Optional logging
     .addEventSource(httpModule)    // HTTP events
     .addEventSource(wsModule)      // WebSocket events
     .addFramework(decoratorModule) // Decorator framework
+    .createApp();
+```
+
+### Container Management
+
+Use TSyringe's powerful DI with flexible-core's container wrapper:
+
+```typescript
+import { FlexibleContainer } from "flexible-core";
+
+// Create container with shared services
+const container = new FlexibleContainer();
+container.registerClass(UserService.TYPE, UserService);
+container.registerValue(FLEXIBLE_APP_TYPES.LOGGER, logger);
+
+// Use container in app
+const app = FlexibleApp.builder()
+    .withContainer(container)
+    .addEventSource(httpModule)
+    .addFramework(decoratorModule)
     .createApp();
 ```
 
@@ -176,9 +241,9 @@ const app = FlexibleAppBuilder.instance
 ### Basic HTTP Server
 
 ```typescript
-const app = FlexibleAppBuilder.instance
-    .addEventSource(HttpModuleBuilder.instance.withPort(3000).build())
-    .addFramework(DecoratorsFrameworkModuleBuilder.instance
+const app = FlexibleApp.builder()
+    .addEventSource(HttpModule.builder().withPort(3000).build())
+    .addFramework(DecoratorsFrameworkModule.builder()
         .withControllerLoader(new ExplicitControllerLoader([HelloController]))
         .build())
     .createApp();
@@ -191,7 +256,7 @@ await app.run();
 ```typescript
 import { ConsoleLoggerModule } from "flexible-core";
 
-const app = FlexibleAppBuilder.instance
+const app = FlexibleApp.builder()
     .withLogger(new ConsoleLoggerModule())
     .addEventSource(httpEventSource)
     .addFramework(decoratorsFramework)
@@ -203,7 +268,7 @@ const app = FlexibleAppBuilder.instance
 ```typescript
 import { ConfigurableLoggerModule, LogLevel } from "flexible-core";
 
-const app = FlexibleAppBuilder.instance
+const app = FlexibleApp.builder()
     .withLogger(new ConfigurableLoggerModule({
         minLevel: LogLevel.INFO,
         format: 'json',
@@ -242,7 +307,7 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## License
 
-MIT © [Francisco Tacchini](https://github.com/ftacchini)
+MIT © [Federico Tacchini](https://github.com/ftacchini)
 
 ## Links
 

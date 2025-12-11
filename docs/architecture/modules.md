@@ -1,6 +1,6 @@
 # Modules
 
-Flexible uses a modular architecture where all components are packaged as modules. Modules encapsulate dependencies and provide instances through dependency injection using InversifyJS.
+Flexible uses a modular architecture where all components are packaged as modules. Modules encapsulate dependencies and provide instances through dependency injection using TSyringe.
 
 ## Module Structure
 
@@ -8,7 +8,7 @@ Every module implements the `FlexibleModule` interface:
 
 ```typescript
 interface FlexibleModule {
-    readonly container: ContainerModule;  // InversifyJS container module
+    register(container: DependencyContainer): void;  // TSyringe registration
 }
 ```
 
@@ -154,25 +154,24 @@ const app = FlexibleAppBuilder.instance
 
 ## Dependency Injection Flow
 
-1. **Module Registration**: Each module's `container` is loaded into the main InversifyJS container
-2. **Isolated Containers**: Framework and event source modules also load their `isolatedContainer` bindings
+1. **Module Registration**: Each module's `register()` method is called to register bindings in the TSyringe container
+2. **Isolated Containers**: Framework and event source modules use child containers via `registerIsolated()` for isolation
 3. **Instance Creation**: When needed, `getInstance(container)` is called to retrieve the module's main instance
-4. **Dependency Resolution**: InversifyJS resolves all dependencies automatically
+4. **Dependency Resolution**: TSyringe resolves all dependencies automatically, with child containers inheriting parent bindings
 
 ## Creating Custom Modules
 
 To create a custom module:
 
 ```typescript
-import { ContainerModule, Container } from "inversify";
+import { DependencyContainer } from "tsyringe";
 import { FlexibleModule } from "flexible-core";
 
 export class MyCustomModule implements FlexibleModule {
-    public get container(): ContainerModule {
-        return new ContainerModule(({ bind, isBound }) => {
-            // Register your dependencies
-            isBound(MyService.TYPE) ||
-                bind(MyService.TYPE).to(MyService).inSingletonScope();
+    public register(container: DependencyContainer): void {
+        // Register your dependencies
+        if (!container.isRegistered(MyService.TYPE)) {
+            container.register(MyService.TYPE, { useClass: MyService });
 
             isBound(MyRepository.TYPE) ||
                 bind(MyRepository.TYPE).to(MyRepository);

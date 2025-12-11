@@ -1,6 +1,6 @@
 import { FlexiblePipeline } from "../pipeline/flexible-pipeline";
 import { FlexibleMiddleware } from "../pipeline/flexible-middleware";
-import { injectable } from "inversify";
+import { injectable } from "tsyringe";
 
 @injectable()
 export class FlexiblePipelineFactory {

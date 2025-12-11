@@ -4,7 +4,8 @@ import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
 import { FlexibleApp } from "../../src/flexible/flexible-app";
 import { FlexibleFrameworkModule } from "../../src/framework/flexible-framework-module";
 import { DummyEventSource, DummyFramework } from "../../src";
-import { ContainerModule, Container } from "inversify";
+import { DependencyContainer } from "tsyringe";
+import { FlexibleContainer } from "../../src/container/flexible-container";
 import { FlexibleEventSourceModule } from "../../src/event";
 import { FlexibleModule } from "../../src";
 import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
@@ -29,44 +30,44 @@ describe("ContainerSystem", () => {
 
     let app: FlexibleApp;
 
-    let container: Container;
-    let frameworkIsolatedContainer: Container;;
-    let eventSourceIsolatedContainer: Container;
+    let container: FlexibleContainer;
+    let frameworkIsolatedContainer: FlexibleContainer;
+    let eventSourceIsolatedContainer: FlexibleContainer;
 
     beforeEach(async () => {
         let eventSource = new DummyEventSource();
         let framework = new DummyFramework();
 
-        container = new Container();
+        container = new FlexibleContainer();
 
         let dependenciesModule: FlexibleModule = {
-            container: new ContainerModule(({ bind }) => {
-                bind(MODULE_DEPENDENCY).toConstantValue(MODULE_DEPENDENCY);
-            })
+            register: (container: DependencyContainer) => {
+                container.register(MODULE_DEPENDENCY, { useValue: MODULE_DEPENDENCY });
+            }
         };
         let frameworkModule: FlexibleFrameworkModule = {
             getInstance: (container) => {
                 frameworkIsolatedContainer = container;
                 return framework
             },
-            container: new ContainerModule(({ bind }) => {
-                bind(F_DEPENDENCY).toConstantValue(F_DEPENDENCY);
-            }),
-            isolatedContainer: new ContainerModule(({ bind }) => {
-                bind(IF_DEPENDENCY).toConstantValue(IF_DEPENDENCY);
-            })
+            register: (container: DependencyContainer) => {
+                container.register(F_DEPENDENCY, { useValue: F_DEPENDENCY });
+            },
+            registerIsolated: (container: DependencyContainer) => {
+                container.register(IF_DEPENDENCY, { useValue: IF_DEPENDENCY });
+            }
         };
         let eventSourceModule: FlexibleEventSourceModule = {
             getInstance: (container) => {
                 eventSourceIsolatedContainer = container;
                 return eventSource
             },
-            container: new ContainerModule(({ bind }) => {
-                bind(ES_DEPENDENCY).toConstantValue(ES_DEPENDENCY);
-            }),
-            isolatedContainer: new ContainerModule(({ bind }) => {
-                bind(IES_DEPENDENCY).toConstantValue(IES_DEPENDENCY);
-            })
+            register: (container: DependencyContainer) => {
+                container.register(ES_DEPENDENCY, { useValue: ES_DEPENDENCY });
+            },
+            registerIsolated: (container: DependencyContainer) => {
+                container.register(IES_DEPENDENCY, { useValue: IES_DEPENDENCY });
+            }
         };
 
         app = FlexibleApp.builder()
@@ -78,7 +79,7 @@ describe("ContainerSystem", () => {
             .createApp();
 
         await app.run();
-        container.bind(CONTAINER_DEPENDENCY).toConstantValue(CONTAINER_DEPENDENCY);
+        container.registerValue(CONTAINER_DEPENDENCY, CONTAINER_DEPENDENCY);
 
 
     })
@@ -87,7 +88,7 @@ describe("ContainerSystem", () => {
     it("should resolve container dependencies from main container correctly", () => {
         //ARRANGE
         //ACT
-        const result = container.get(CONTAINER_DEPENDENCY)
+        const result = container.resolve(CONTAINER_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(CONTAINER_DEPENDENCY);
@@ -96,7 +97,7 @@ describe("ContainerSystem", () => {
     it("should resolve module dependencies from main container correctly", () => {
         //ARRANGE
         //ACT
-        const result = container.get(MODULE_DEPENDENCY)
+        const result = container.resolve(MODULE_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(MODULE_DEPENDENCY);
@@ -105,7 +106,7 @@ describe("ContainerSystem", () => {
     it("should resolve framework regular dependencies from main container correctly", () => {
         //ARRANGE
         //ACT
-        const result = container.get(F_DEPENDENCY)
+        const result = container.resolve(F_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(F_DEPENDENCY);
@@ -114,7 +115,7 @@ describe("ContainerSystem", () => {
     it("should resolve event source regular dependencies from main container correctly", () => {
         //ARRANGE
         //ACT
-        const result = container.get(ES_DEPENDENCY)
+        const result = container.resolve(ES_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(ES_DEPENDENCY);
@@ -125,7 +126,7 @@ describe("ContainerSystem", () => {
         let exception = true;
         //ACT
         try {
-            container.get(IF_DEPENDENCY)
+            container.resolve(IF_DEPENDENCY)
         }
         catch(ex) {
             exception = true;
@@ -141,7 +142,7 @@ describe("ContainerSystem", () => {
         let exception = true;
         //ACT
         try {
-            container.get(IES_DEPENDENCY)
+            container.resolve(IES_DEPENDENCY)
         }
         catch(ex) {
             exception = true;
@@ -155,7 +156,7 @@ describe("ContainerSystem", () => {
     it("should resolve container dependencies from framework container correctly", () => {
         //ARRANGE
         //ACT
-        const result = frameworkIsolatedContainer.get(CONTAINER_DEPENDENCY)
+        const result = frameworkIsolatedContainer.resolve(CONTAINER_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(CONTAINER_DEPENDENCY);
@@ -164,7 +165,7 @@ describe("ContainerSystem", () => {
     it("should resolve module dependencies from framework container correctly", () => {
         //ARRANGE
         //ACT
-        const result = frameworkIsolatedContainer.get(CONTAINER_DEPENDENCY)
+        const result = frameworkIsolatedContainer.resolve(CONTAINER_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(CONTAINER_DEPENDENCY);
@@ -173,7 +174,7 @@ describe("ContainerSystem", () => {
     it("should resolve container dependencies from event source container correctly", () => {
         //ARRANGE
         //ACT
-        const result = eventSourceIsolatedContainer.get(CONTAINER_DEPENDENCY)
+        const result = eventSourceIsolatedContainer.resolve(CONTAINER_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(CONTAINER_DEPENDENCY);
@@ -182,7 +183,7 @@ describe("ContainerSystem", () => {
     it("should resolve module dependencies from event source container correctly", () => {
         //ARRANGE
         //ACT
-        const result = eventSourceIsolatedContainer.get(CONTAINER_DEPENDENCY)
+        const result = eventSourceIsolatedContainer.resolve(CONTAINER_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(CONTAINER_DEPENDENCY);
@@ -191,7 +192,7 @@ describe("ContainerSystem", () => {
     it("should resolve event source dependencies from event source container correctly", () => {
         //ARRANGE
         //ACT
-        const result = eventSourceIsolatedContainer.get(IES_DEPENDENCY)
+        const result = eventSourceIsolatedContainer.resolve(IES_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(IES_DEPENDENCY);
@@ -200,7 +201,7 @@ describe("ContainerSystem", () => {
     it("should resolve framework dependencies from framework container correctly", () => {
         //ARRANGE
         //ACT
-        const result = frameworkIsolatedContainer.get(IF_DEPENDENCY)
+        const result = frameworkIsolatedContainer.resolve(IF_DEPENDENCY)
 
         //ASSERT
         expect(result).toBe(IF_DEPENDENCY);

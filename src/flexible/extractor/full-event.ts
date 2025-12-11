@@ -1,6 +1,6 @@
 import { FlexibleExtractor, FlexibleEvent } from "../../event";
 import { RouteData } from "../../router";
-import { injectable } from "inversify";
+import { injectable } from "tsyringe";
 
 /**
  * Extractor that returns the full FlexibleEvent object.

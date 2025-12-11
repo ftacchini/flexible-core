@@ -3,7 +3,7 @@ import { FlexibleRouter } from "../../../router/flexible-router";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { DecisionTreeNode } from "./decision-tree-node";
 import { RouteDataIterator } from "./route-data-iterator";
-import { injectable, inject, optional } from "inversify";
+import { injectable, inject } from "tsyringe";
 import { TREE_ROUTER_TYPES } from "./tree-router-types";
 import { FilterCascadeNode } from "../filter-cascade/filter-cascade-node";
 import { RouteDataHelper } from "../route-data-helper";
@@ -48,7 +48,7 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
         private filterCascadeBuilder: FilterCascadeBuilder<Resource>,
         @inject(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)
         private routeDataHelper: RouteDataHelper,
-        @inject(FLEXIBLE_APP_TYPES.LOGGER) @optional()
+        @inject(FLEXIBLE_APP_TYPES.LOGGER)
         private logger?: FlexibleLogger) {
 
         this.baseNode = new DecisionTreeNode();

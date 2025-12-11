@@ -164,7 +164,7 @@ export class SecurityController {
 Connect the layers using dependency injection:
 
 ```typescript
-import { ContainerModule } from 'inversify';
+import { DependencyContainer } from 'tsyringe';
 import { FlexibleModule } from 'flexible-core';
 
 // Define DI token
@@ -172,11 +172,11 @@ export const BUSINESS_APP_EVENT_SOURCE = Symbol('BusinessAppEventSource');
 
 // Create module that binds the business app's event source
 const securityModule: FlexibleModule = {
-    container: new ContainerModule((bind) => {
-        bind(BUSINESS_APP_EVENT_SOURCE).toConstantValue(
-            businessApp.eventSource
-        );
-    })
+    register(container: DependencyContainer): void {
+        container.register(BUSINESS_APP_EVENT_SOURCE, {
+            useValue: businessApp.eventSource
+        });
+    }
 };
 
 // Create security app with the module
@@ -227,8 +227,8 @@ import {
     Param
 } from "flexible-decorators";
 import { HttpModuleBuilder, HttpGet } from "flexible-http";
-import { ContainerModule } from "inversify";
-import { inject } from "inversify";
+import { DependencyContainer } from "tsyringe";
+import { inject } from "tsyringe";
 
 // DI Tokens
 const BUSINESS_LAYER = Symbol('BusinessLayer');

@@ -1,4 +1,5 @@
-import { ContainerModule, Container } from "inversify";
+import { DependencyContainer } from "tsyringe";
+import { FlexibleContainer } from "../../../container/flexible-container";
 import { FilterCascadeBuilder } from "../filter-cascade/filter-cascade-builder";
 import { FlexibleTreeRouter } from "./flexible-tree-router";
 import { FlexibleRouterModule } from "../../../router/flexible-router-module";
@@ -8,31 +9,24 @@ import { FlexibleRouter } from "../../../router";
 
 export class FlexibleTreeRouterModule<Resource> implements FlexibleRouterModule<Resource> {
 
-    private _container: ContainerModule;
-
     public constructor() {
-        this._container = new ContainerModule(({ bind, unbind, isBound, rebind }) => {
-            isBound(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER) ||
-            bind(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)
-                .to(RouteDataHelper)
-                .inSingletonScope();
-
-            isBound(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER) ||
-                bind(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER)
-                    .to(FilterCascadeBuilder)
-                    .inSingletonScope();
-
-            isBound(TREE_ROUTER_TYPES.FLEXIBLE_TREE_ROUTER) ||
-                bind(TREE_ROUTER_TYPES.FLEXIBLE_TREE_ROUTER)
-                    .to(FlexibleTreeRouter);
-        });
     }
 
-    public get container(): ContainerModule {
-        return this._container;
+    public register(container: DependencyContainer): void {
+        if (!container.isRegistered(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER)) {
+            container.register(TREE_ROUTER_TYPES.ROUTE_DATA_HELPER, { useClass: RouteDataHelper });
+        }
+
+        if (!container.isRegistered(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER)) {
+            container.register(TREE_ROUTER_TYPES.FILTER_CASCADE_BUILDER, { useClass: FilterCascadeBuilder });
+        }
+
+        if (!container.isRegistered(TREE_ROUTER_TYPES.FLEXIBLE_TREE_ROUTER)) {
+            container.register(TREE_ROUTER_TYPES.FLEXIBLE_TREE_ROUTER, { useClass: FlexibleTreeRouter });
+        }
     }
 
-    public getInstance(container: Container): FlexibleRouter<Resource> {
-        return container.get(TREE_ROUTER_TYPES.FLEXIBLE_TREE_ROUTER)
+    public getInstance(container: FlexibleContainer): FlexibleRouter<Resource> {
+        return container.resolve(TREE_ROUTER_TYPES.FLEXIBLE_TREE_ROUTER);
     }
 }

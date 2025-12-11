@@ -9,7 +9,7 @@ import { FlexibleFilter } from "../../event";
 import { FlexiblePipelineFactory } from "./flexible-pipeline-factory";
 import { FlexibleRouterFactory } from "./flexible-router-factory";
 import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
-import { inject, injectable } from "inversify";
+import { inject, injectable } from "tsyringe";
 import { FlexibleLogger } from "../../logging";
 
 const PIPELINE_SETUP_ERROR = "One of your pipelines could not be setup, there might be a problem with one of your filters/extractors/middleware"

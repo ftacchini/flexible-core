@@ -51,7 +51,7 @@ Follow a request through the system:
 
 ### [Design Patterns](design-patterns.md)
 Explore the patterns used throughout:
-- Dependency Injection with InversifyJS
+- Dependency Injection with TSyringe
 - Module composition system
 - Filter cascade for routing
 - Binnacle pattern for context

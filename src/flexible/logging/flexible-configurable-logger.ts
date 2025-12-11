@@ -1,6 +1,6 @@
 import { FlexibleLogger, LogContext, LogLevel } from "../../logging/flexible-logger";
 import { LoggerConfig } from "../../logging/logger-config";
-import { injectable, inject } from "inversify";
+import { injectable, inject } from "tsyringe";
 import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 import * as os from "os";
 

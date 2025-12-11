@@ -1,19 +1,17 @@
 import { FlexibleFramework } from "../framework/flexible-framework";
 import { FlexiblePipelineDocument } from "../framework/flexible-pipeline-document";
-import { ContainerModule } from "inversify";
+import { DependencyContainer } from "tsyringe";
 
 /**
  * A simple test framework implementation for testing purposes.
  * Allows manual addition of pipeline definitions without decorator scanning.
  */
 export class DummyFramework implements FlexibleFramework {
-    public readonly container: ContainerModule;
+    public readonly container: DependencyContainer;
     private definitions: FlexiblePipelineDocument[] = [];
 
     constructor() {
-        this.container = new ContainerModule(() => {
-            return;
-        });
+        this.container = {} as DependencyContainer;
     }
 
     public async createPipelineDefinitions(): Promise<FlexiblePipelineDocument[]> {

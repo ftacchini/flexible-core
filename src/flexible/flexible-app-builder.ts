@@ -1,5 +1,5 @@
 import { FlexibleApp } from "./flexible-app";
-import { Container } from "inversify";
+import { FlexibleContainer } from "../container/flexible-container";
 import { FlexibleFrameworkModule } from "../framework/flexible-framework-module";
 import { FlexibleEventSourceModule } from "../event/flexible-event-source-module";
 import { FlexibleLoggerModule } from "../logging/flexible-logger-module";
@@ -32,7 +32,7 @@ import { SetupManager } from "./setup/setup-manager";
  * The builder automatically provides sensible defaults:
  * - ConsoleLoggerModule for logging
  * - FlexibleTreeRouterModule for routing
- * - New Inversify Container for dependency injection
+ * - New FlexibleContainer (TSyringe-based) for dependency injection
  */
 export class FlexibleAppBuilder {
 
@@ -43,7 +43,7 @@ export class FlexibleAppBuilder {
     protected logger!: FlexibleLoggerModule;
     protected router!: FlexibleRouterModule<FlexiblePipeline>;
     protected extractorsRouter!: FlexibleRouterModule<FlexibleExtractor>;
-    protected container!: Container;
+    protected container!: FlexibleContainer;
 
     constructor() {
         this.reset();
@@ -59,7 +59,7 @@ export class FlexibleAppBuilder {
      */
     createApp(): FlexibleApp {
 
-        this.container || (this.container = new Container());
+        this.container || (this.container = new FlexibleContainer());
         this.logger || (this.logger = new ConsoleLoggerModule());
         this.router || (this.router = new FlexibleTreeRouterModule());
         this.extractorsRouter || (this.extractorsRouter = new FlexibleTreeRouterModule());
@@ -138,12 +138,12 @@ export class FlexibleAppBuilder {
     }
 
     /**
-     * Sets a custom Inversify container for dependency injection.
+     * Sets a custom FlexibleContainer for dependency injection.
      *
-     * @param container - The Inversify container to use
+     * @param container - The FlexibleContainer to use
      * @returns This builder instance for method chaining
      */
-    withContainer(container: Container): this {
+    withContainer(container: FlexibleContainer): this {
         this.container = container;
         return this;
     }

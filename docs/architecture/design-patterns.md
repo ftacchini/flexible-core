@@ -4,7 +4,7 @@ Flexible uses several key design patterns to achieve its goals of modularity, pe
 
 ## 1. Dependency Injection
 
-Flexible uses [InversifyJS](https://inversify.io/) for dependency injection throughout the framework.
+Flexible uses [TSyringe](https://github.com/microsoft/tsyringe) for dependency injection throughout the framework.
 
 ### Pattern
 
@@ -33,7 +33,7 @@ export class UserController {
 ### Usage in Flexible
 
 - All framework components use DI
-- Modules register bindings in InversifyJS containers
+- Modules register bindings in TSyringe containers
 - Controllers and services receive dependencies via constructor injection
 
 **See:** [Modules](modules.md)

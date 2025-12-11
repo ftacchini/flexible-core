@@ -1,5 +1,5 @@
 import { FlexibleLogger, LogContext } from "../../logging/flexible-logger";
-import { injectable, inject } from "inversify";
+import { injectable, inject } from "tsyringe";
 import { FLEXIBLE_LOGGER_TYPES } from "./flexible-logger-types";
 
 @injectable()

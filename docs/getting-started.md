@@ -2,6 +2,8 @@
 
 This guide will help you create your first Flexible application in minutes.
 
+> **📦 Upgrading from v0.1.x?** See the [TSyringe Migration Guide](MIGRATION-TSYRINGE.md) for breaking changes.
+
 ## Installation
 
 Install flexible-core and the packages you need:
@@ -146,7 +148,7 @@ const decoratorsFramework = DecoratorsFrameworkModuleBuilder.instance
 
 ```typescript
 import { FlexibleLogger, FLEXIBLE_APP_TYPES } from "flexible-core";
-import { inject } from "inversify";
+import { inject } from "tsyringe";
 
 @Controller()
 export class UserController {

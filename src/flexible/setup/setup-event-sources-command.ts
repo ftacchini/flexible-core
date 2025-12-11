@@ -2,7 +2,7 @@ import { FlexibleAppState } from "../flexible-app-state";
 import { FlexibleLogger } from "../../logging/flexible-logger";
 import { FlexibleEventSource } from "../../event";
 import { flatten, filter, includes } from "lodash";
-import { injectable, inject } from "inversify";
+import { injectable, inject } from "tsyringe";
 import { FLEXIBLE_APP_TYPES } from "../flexible-app-types";
 
 const DUPLICATE_EVENT_TYPES = (types: String[]) => `There is more than one eventSource that emits events with the same type: ${types}`;

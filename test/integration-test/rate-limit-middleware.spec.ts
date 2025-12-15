@@ -8,7 +8,7 @@ import { FlexibleEvent } from "../../src/event";
 import { IfEventIs } from "../../src/flexible/filter/if-event-is";
 import { EventData } from "../../src/flexible/extractor/event-data";
 import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
-import { RateLimitMiddleware, MemoryRateLimitStore, SecurityError } from "../../src/security";
+import { RateLimitMiddleware, MemoryRateLimitStore, SecurityError, RateLimitConfig, RATE_LIMIT_TYPES } from "../../src/security";
 
 describe("RateLimitMiddleware Integration Tests", () => {
 
@@ -42,11 +42,20 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should allow requests within rate limit", async () => {
-        // Arrange
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 5;
-        rateLimitMiddleware.windowMs = 60000;
-        rateLimitMiddleware.store = rateLimitStore;
+        // Arrange - Configure via DI container
+        const config = new RateLimitConfig({
+            max: 5,
+            windowMs: 60000
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const event: any = {
             eventType: "testEvent",
@@ -102,11 +111,20 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should block requests exceeding rate limit", async () => {
-        // Arrange
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 3;
-        rateLimitMiddleware.windowMs = 60000;
-        rateLimitMiddleware.store = rateLimitStore;
+        // Arrange - Configure via DI container
+        const config = new RateLimitConfig({
+            max: 3,
+            windowMs: 60000
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const event: any = {
             eventType: "testEvent",
@@ -164,11 +182,20 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should track different clients separately", async () => {
-        // Arrange
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 2;
-        rateLimitMiddleware.windowMs = 60000;
-        rateLimitMiddleware.store = rateLimitStore;
+        // Arrange - Configure via DI container
+        const config = new RateLimitConfig({
+            max: 2,
+            windowMs: 60000
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const event1: any = {
             eventType: "testEvent",
@@ -241,14 +268,23 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should use custom key generator", async () => {
-        // Arrange
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 2;
-        rateLimitMiddleware.windowMs = 60000;
-        rateLimitMiddleware.store = rateLimitStore;
-        rateLimitMiddleware.keyGenerator = (event: FlexibleEvent) => {
-            return (event as any).userId || 'anonymous';
-        };
+        // Arrange - Configure via DI container with custom key generator
+        const config = new RateLimitConfig({
+            max: 2,
+            windowMs: 60000,
+            keyGenerator: (event: FlexibleEvent) => {
+                return (event as any).userId || 'anonymous';
+            }
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const event1: any = {
             eventType: "testEvent",
@@ -313,14 +349,23 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should skip rate limiting when skip function returns true", async () => {
-        // Arrange
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 1;
-        rateLimitMiddleware.windowMs = 60000;
-        rateLimitMiddleware.store = rateLimitStore;
-        rateLimitMiddleware.skip = (event: FlexibleEvent) => {
-            return (event as any).skipRateLimit === true;
-        };
+        // Arrange - Configure via DI container with custom skip function
+        const config = new RateLimitConfig({
+            max: 1,
+            windowMs: 60000,
+            skip: (event: FlexibleEvent) => {
+                return (event as any).skipRateLimit === true;
+            }
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const normalEvent: any = {
             eventType: "testEvent",
@@ -386,13 +431,22 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should use custom error message", async () => {
-        // Arrange
+        // Arrange - Configure via DI container with custom message
         const customMessage = "Custom rate limit message";
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 1;
-        rateLimitMiddleware.windowMs = 60000;
-        rateLimitMiddleware.store = rateLimitStore;
-        rateLimitMiddleware.message = customMessage;
+        const config = new RateLimitConfig({
+            max: 1,
+            windowMs: 60000,
+            message: customMessage
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const event: any = {
             eventType: "testEvent",
@@ -445,11 +499,20 @@ describe("RateLimitMiddleware Integration Tests", () => {
     });
 
     it("should reset rate limit after window expires", async () => {
-        // Arrange
-        const rateLimitMiddleware = new RateLimitMiddleware();
-        rateLimitMiddleware.max = 2;
-        rateLimitMiddleware.windowMs = 100; // 100ms window for fast test
-        rateLimitMiddleware.store = rateLimitStore;
+        // Arrange - Configure via DI container with short window for testing
+        const config = new RateLimitConfig({
+            max: 2,
+            windowMs: 100 // 100ms window for fast test
+        });
+
+        app.getContainer().register(RATE_LIMIT_TYPES.CONFIG, {
+            useValue: config
+        });
+        app.getContainer().register(RATE_LIMIT_TYPES.STORE, {
+            useValue: rateLimitStore
+        });
+
+        const rateLimitMiddleware = app.getContainer().resolve(RateLimitMiddleware);
 
         const event: any = {
             eventType: "testEvent",

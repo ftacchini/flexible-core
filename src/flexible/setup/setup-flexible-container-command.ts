@@ -52,9 +52,8 @@ export class SetupFlexibleContainerCommand {
         const middlewareFactory = new FlexibleMiddlewareFactory(extractorRouterFactory, recipeFactory);
         this.container.registerValue(FLEXIBLE_APP_TYPES.MIDDLEWARE_FACTORY, middlewareFactory);
 
-        // Pipeline factory has no dependencies
-        const pipelineFactory = new FlexiblePipelineFactory();
-        this.container.registerValue(FLEXIBLE_APP_TYPES.PIPELINE_FACTORY, pipelineFactory);
+        // Register pipeline factory as a class so it can be resolved with DI
+        this.container.registerClass(FLEXIBLE_APP_TYPES.PIPELINE_FACTORY, FlexiblePipelineFactory);
     }
 
 }

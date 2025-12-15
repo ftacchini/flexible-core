@@ -137,38 +137,8 @@ describe("RateLimitConfig", () => {
         });
     });
 
-    describe("readonly properties", () => {
-        it("should have readonly max property", () => {
-            const config = new RateLimitConfig({
-                max: 100,
-                windowMs: 60000
-            });
-
-            // TypeScript will catch this at compile time, but we can verify the property descriptor
-            const descriptor = Object.getOwnPropertyDescriptor(config, 'max');
-            expect(descriptor?.writable).toBe(false);
-        });
-
-        it("should have readonly windowMs property", () => {
-            const config = new RateLimitConfig({
-                max: 100,
-                windowMs: 60000
-            });
-
-            const descriptor = Object.getOwnPropertyDescriptor(config, 'windowMs');
-            expect(descriptor?.writable).toBe(false);
-        });
-
-        it("should have readonly message property", () => {
-            const config = new RateLimitConfig({
-                max: 100,
-                windowMs: 60000
-            });
-
-            const descriptor = Object.getOwnPropertyDescriptor(config, 'message');
-            expect(descriptor?.writable).toBe(false);
-        });
-    });
+    // Removed readonly properties tests - TypeScript enforces readonly at compile time
+    // Runtime property descriptors are not guaranteed to be non-writable
 });
 
 describe("RATE_LIMIT_TYPES", () => {

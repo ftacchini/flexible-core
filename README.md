@@ -43,6 +43,7 @@ app.run();
 
 - 🚀 **High Performance** - O(log n) routing with decision tree
 - 📦 **Modular** - Compose event sources, frameworks, and middleware
+- ⏱️ **Timeout & Cancellation** - Built-in support for request timeouts and client disconnections
 - 🔍 **Structured Logging** - Built-in support with JSON output
 - 💉 **Dependency Injection** - Powered by TSyringe with child container support
 - 🧪 **Testable** - Built-in test utilities
@@ -66,6 +67,7 @@ app.run();
 - **[Tree Router](docs/architecture/tree-router.md)** - Decision tree routing algorithm
 
 ### Guides
+- **[Timeout and Cancellation](docs/guides/timeout-cancellation.md)** - Handle timeouts and client disconnections
 - **[Logging](docs/guides/logging.md)** - Structured logging guide
 - **[Composable Architecture](docs/guides/composable-apps.md)** - Build layered security and middleware
 - **[Creating Event Sources](docs/guides/creating-event-source.md)** - Build custom sources
@@ -111,6 +113,37 @@ app.run();
 **[→ Learn More About Architecture](docs/architecture/overview.md)**
 
 ## Key Features
+
+### Timeout and Cancellation Support
+
+Protect your application from long-running operations and handle client disconnections gracefully:
+
+```typescript
+import { TimeoutMiddleware, CancellationMiddleware } from "flexible-core";
+import { Controller, Route, BeforeExecution } from "flexible-decorators";
+import { HttpGet } from "flexible-http";
+
+@Controller()
+export class UserController {
+    @BeforeExecution(TimeoutMiddleware, 'processEvent', {
+        config: { timeout: 5000 }  // 5 second timeout
+    })
+    @BeforeExecution(CancellationMiddleware, 'processEvent')
+    @Route(HttpGet)
+    public async getUsers() {
+        // Protected by timeout and cancellation
+        return await this.userService.fetchUsers();
+    }
+}
+```
+
+**Features:**
+- Composable timeout layers with different durations
+- Automatic cancellation on client disconnect
+- Built-in error types for consistent handling
+- Structured logging for timeout and cancellation events
+
+**[→ Timeout and Cancellation Guide](docs/guides/timeout-cancellation.md)**
 
 ### Structured Logging
 

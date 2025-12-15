@@ -29,7 +29,9 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
                 async (max, windowMs, message) => {
                     const iterationContainer = container.createChildContainer();
                     const config = new RateLimitConfig({ max, windowMs, message });
+                    const store = new MemoryRateLimitStore();
                     iterationContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: config });
+                    iterationContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: store });
                     const middleware = iterationContainer.resolve(RateLimitMiddleware);
                     const mockEvent = { sourceIp: '192.168.1.1' } as any as FlexibleEvent;
 
@@ -43,6 +45,7 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
                     } catch (error: any) {
                         return error.message === message && error.statusCode === 429;
                     } finally {
+                        store.destroy();
                         iterationContainer.clearInstances();
                     }
                 }

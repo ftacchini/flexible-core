@@ -5,4 +5,5 @@ export interface FlexibleEvent {
     readonly routeData: RouteData<string>;
     readonly eventType: string;
     readonly requestId?: string;
+    readonly cancellationToken?: AbortSignal;
 }

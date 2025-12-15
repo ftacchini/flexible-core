@@ -56,7 +56,7 @@ Pipelines are chains of middleware that process events:
 Pipeline = {
   filters: [HttpGet, PathFilter('/users')],
   extractors: [BodyExtractor, ParamsExtractor],
-  middleware: [AuthMiddleware, ValidationMiddleware, UserHandler]
+  middleware: [TimeoutMiddleware, AuthMiddleware, ValidationMiddleware, UserHandler]
 }
 ```
 
@@ -82,12 +82,23 @@ Each pipeline consists of three stages:
     HeadersExtractor            // Extract headers
   ],
   middleware: [
+    TimeoutMiddleware,          // Enforce timeout
+    CancellationMiddleware,     // Check for cancellation
     AuthMiddleware,             // Verify authentication
     ValidationMiddleware,       // Validate input
     UserController.getUser      // Handle request
   ]
 }
 ```
+
+### Built-in Middleware
+
+**Security Middleware:**
+- `TimeoutMiddleware` - Enforces time limits on request processing
+- `CancellationMiddleware` - Monitors cancellation tokens and stops processing when signaled
+- `RateLimitMiddleware` - Limits request rate per client
+
+**See:** [Timeout and Cancellation Guide](../guides/timeout-cancellation.md)
 
 ## Component Interaction
 

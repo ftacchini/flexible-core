@@ -1,6 +1,9 @@
 import { FlexibleEvent } from "../../event";
 import { FlexibleMiddleware } from "./flexible-middleware";
 import { FlexibleResponse } from "../flexible-response";
+import { TimeoutError } from "../../event/timeout-error";
+import { TIMEOUT_CONTEXT_KEYS } from "../../security/timeout-middleware";
+import { FlexibleLogger } from "../../logging/flexible-logger";
 
 /**
  * A pipeline that processes events through a stack of middleware functions.
@@ -29,7 +32,10 @@ import { FlexibleResponse } from "../flexible-response";
  */
 export class FlexiblePipeline {
 
-    constructor(private middlewareStack: FlexibleMiddleware[]) {
+    constructor(
+        private middlewareStack: FlexibleMiddleware[],
+        private logger?: FlexibleLogger
+    ) {
 
     }
 
@@ -39,9 +45,10 @@ export class FlexiblePipeline {
      * The processing flow:
      * 1. Creates an empty response object
      * 2. Executes each middleware in order
-     * 3. Collects successful responses in responseStack
-     * 4. Collects errors in errorStack
-     * 5. Returns the complete response with all results
+     * 3. Before each middleware, checks if timeout has been exceeded
+     * 4. Collects successful responses in responseStack
+     * 5. Collects errors in errorStack
+     * 6. Returns the complete response with all results
      *
      * @param event - The event to process
      * @param filterBinnacle - Shared state from filter evaluation (e.g., route parameters)
@@ -59,6 +66,38 @@ export class FlexiblePipeline {
         }
 
         for(var i = 0; i < this.middlewareStack.length; i++) {
+            // Check for timeout before executing each middleware
+            const startTime = contextBinnacle[TIMEOUT_CONTEXT_KEYS.START_TIME];
+            const timeoutMs = contextBinnacle[TIMEOUT_CONTEXT_KEYS.TIMEOUT_MS];
+
+            if (startTime !== undefined && timeoutMs !== undefined) {
+                const startTimeNum = typeof startTime === 'number' ? startTime : parseInt(startTime, 10);
+                const timeoutMsNum = typeof timeoutMs === 'number' ? timeoutMs : parseInt(timeoutMs, 10);
+
+                const elapsed = Date.now() - startTimeNum;
+                if (elapsed >= timeoutMsNum) {
+                    const timeoutError = new TimeoutError(timeoutMsNum, elapsed);
+                    response.errorStack.push(timeoutError);
+
+                    // Log timeout event at warning level
+                    if (this.logger) {
+                        const logData: any = {
+                            timeout: timeoutMsNum,
+                            elapsed
+                        };
+
+                        if (event.requestId) {
+                            logData.requestId = event.requestId;
+                        }
+
+                        this.logger.warning('Request timeout exceeded', logData);
+                    }
+
+                    // Stop pipeline execution
+                    return response;
+                }
+            }
+
             try {
                 var newResponse = await this.middlewareStack[i].processEvent(
                     event,
@@ -71,6 +110,25 @@ export class FlexiblePipeline {
             catch(ex) {
                 response.errorStack.push(ex);
             }
+        }
+
+        // Log successful completion if timeout monitoring was active
+        const startTime = contextBinnacle[TIMEOUT_CONTEXT_KEYS.START_TIME];
+        const timeoutMs = contextBinnacle[TIMEOUT_CONTEXT_KEYS.TIMEOUT_MS];
+
+        if (startTime !== undefined && timeoutMs !== undefined && this.logger) {
+            const startTimeNum = typeof startTime === 'number' ? startTime : parseInt(startTime, 10);
+            const elapsed = Date.now() - startTimeNum;
+
+            const logData: any = {
+                elapsed
+            };
+
+            if (event.requestId) {
+                logData.requestId = event.requestId;
+            }
+
+            this.logger.debug('Request completed before timeout', logData);
         }
 
         return response;

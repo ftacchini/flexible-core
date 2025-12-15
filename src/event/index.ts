@@ -5,3 +5,5 @@ export * from "./flexible-filter";
 export * from "./flexible-event-source-module";
 export * from "./dummy-event-source";
 export * from "./delegate-event-source";
+export * from "./timeout-error";
+export * from "./cancellation-error";

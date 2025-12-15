@@ -22,6 +22,19 @@ describe("SetupFlexibleContainerCommand", () => {
     beforeEach(() => {
         container = new FlexibleContainer();
 
+        // Register mock logger with the correct token
+        const mockLogger = {
+            emergency: jasmine.createSpy('emergency'),
+            alert: jasmine.createSpy('alert'),
+            crit: jasmine.createSpy('crit'),
+            error: jasmine.createSpy('error'),
+            warning: jasmine.createSpy('warning'),
+            notice: jasmine.createSpy('notice'),
+            info: jasmine.createSpy('info'),
+            debug: jasmine.createSpy('debug')
+        };
+        container.registerValue(FLEXIBLE_APP_TYPES.LOGGER, mockLogger);
+
         // Create mock router
         mockRouter = {
             route: jasmine.createSpy("route")

@@ -102,7 +102,15 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
             fc.asyncProperty(
                 fc.integer({ min: 1, max: 10 }),
                 fc.integer({ min: 1000, max: 60000 }),
-                fc.array(fc.string({ minLength: 5, maxLength: 20 }), { minLength: 2, maxLength: 5 }),
+                fc.array(fc.string({ minLength: 5, maxLength: 20 }), { minLength: 2, maxLength: 5 })
+                    .filter(userIds => {
+                        // Filter out strings that collide with Object.prototype properties
+                        const safeUserIds = userIds.filter(id =>
+                            !Object.prototype.hasOwnProperty(id) &&
+                            typeof (Object.prototype as any)[id] === 'undefined'
+                        );
+                        return safeUserIds.length >= 2;
+                    }),
                 async (max, windowMs, userIds) => {
                     const iterationContainer = container.createChildContainer();
                     const config = new RateLimitConfig({

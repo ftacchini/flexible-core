@@ -62,6 +62,8 @@ export class SetupRouterCommand {
 
             } catch(ex) {
                 this.logger.alert(`${PIPELINE_SETUP_ERROR}, exception is: ${JSON.stringify(ex)}`);
+                this.logger.alert(`Exception message: ${(ex as any)?.message || 'no message'}`);
+                this.logger.alert(`Exception stack: ${(ex as any)?.stack || 'no stack'}`);
             }
         }).filter(x => x);
 

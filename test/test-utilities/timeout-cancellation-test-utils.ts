@@ -1,7 +1,7 @@
 import "reflect-metadata";
 import { container, DependencyContainer } from "tsyringe";
-import { TimeoutMiddleware, TIMEOUT_MIDDLEWARE_TYPES, TimeoutMiddlewareConfig } from "../../src/security/timeout-middleware";
-import { CancellationMiddleware, CANCELLATION_MIDDLEWARE_TYPES } from "../../src/security/cancellation-middleware";
+import { TimeoutService, TIMEOUT_SERVICE_TYPES, TimeoutServiceConfig } from "../../src/security/timeout-service";
+import { CancellationService, CANCELLATION_SERVICE_TYPES } from "../../src/security/cancellation-service";
 import { FlexibleLogger } from "../../src/logging/flexible-logger";
 
 /**
@@ -35,90 +35,90 @@ export function createMockLogger(): MockLogger {
 }
 
 /**
- * Test utilities for TimeoutMiddleware.
+ * Test utilities for TimeoutService.
  */
-export class TestTimeoutMiddleware {
+export class TestTimeoutService {
     /**
-     * Creates a TimeoutMiddleware instance with the specified timeout.
+     * Creates a TimeoutService instance with the specified timeout.
      * Uses a silent mock logger by default.
      *
      * @param timeout - Timeout duration in milliseconds
-     * @returns TimeoutMiddleware instance
+     * @returns TimeoutService instance
      */
-    static create(timeout: number): TimeoutMiddleware {
+    static create(timeout: number): TimeoutService {
         const testContainer = container.createChildContainer();
         const mockLogger = createMockLogger();
 
-        testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+        testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
             useValue: { timeout }
         });
-        testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+        testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
             useValue: mockLogger
         });
 
-        return testContainer.resolve(TimeoutMiddleware);
+        return testContainer.resolve(TimeoutService);
     }
 
     /**
-     * Creates a TimeoutMiddleware instance with a mock logger for testing.
+     * Creates a TimeoutService instance with a mock logger for testing.
      * Returns both the middleware and the logger so tests can verify log calls.
      *
      * @param timeout - Timeout duration in milliseconds (default: 5000)
      * @returns Object containing middleware and mock logger
      */
-    static createWithMockLogger(timeout: number = 5000): { middleware: TimeoutMiddleware; logger: MockLogger } {
+    static createWithMockLogger(timeout: number = 5000): { middleware: TimeoutService; logger: MockLogger } {
         const testContainer = container.createChildContainer();
         const mockLogger = createMockLogger();
 
-        testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+        testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
             useValue: { timeout }
         });
-        testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+        testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
             useValue: mockLogger
         });
 
-        const middleware = testContainer.resolve(TimeoutMiddleware);
+        const middleware = testContainer.resolve(TimeoutService);
 
         return { middleware, logger: mockLogger };
     }
 }
 
 /**
- * Test utilities for CancellationMiddleware.
+ * Test utilities for CancellationService.
  */
-export class TestCancellationMiddleware {
+export class TestCancellationService {
     /**
-     * Creates a CancellationMiddleware instance.
+     * Creates a CancellationService instance.
      * Uses a silent mock logger by default.
      *
-     * @returns CancellationMiddleware instance
+     * @returns CancellationService instance
      */
-    static create(): CancellationMiddleware {
+    static create(): CancellationService {
         const testContainer = container.createChildContainer();
         const mockLogger = createMockLogger();
 
-        testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+        testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
             useValue: mockLogger
         });
 
-        return testContainer.resolve(CancellationMiddleware);
+        return testContainer.resolve(CancellationService);
     }
 
     /**
-     * Creates a CancellationMiddleware instance with a mock logger for testing.
+     * Creates a CancellationService instance with a mock logger for testing.
      * Returns both the middleware and the logger so tests can verify log calls.
      *
      * @returns Object containing middleware and mock logger
      */
-    static createWithMockLogger(): { middleware: CancellationMiddleware; logger: MockLogger } {
+    static createWithMockLogger(): { middleware: CancellationService; logger: MockLogger } {
         const testContainer = container.createChildContainer();
         const mockLogger = createMockLogger();
 
-        testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+        testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
             useValue: mockLogger
         });
 
-        const middleware = testContainer.resolve(CancellationMiddleware);
+        const middleware = testContainer.resolve(CancellationService);
 
         return { middleware, logger: mockLogger };
     }

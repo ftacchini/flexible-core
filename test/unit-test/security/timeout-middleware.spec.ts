@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import "jasmine";
 import { container, DependencyContainer } from "tsyringe";
-import { TimeoutMiddleware, TIMEOUT_MIDDLEWARE_TYPES, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-middleware";
+import { TimeoutService, TIMEOUT_SERVICE_TYPES, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-service";
 import { FlexibleLogger } from "../../../src/logging/flexible-logger";
 
-describe("TimeoutMiddleware Unit Tests", () => {
+describe("TimeoutService Unit Tests", () => {
     let testContainer: DependencyContainer;
     let mockLogger: FlexibleLogger;
 
@@ -37,15 +37,15 @@ describe("TimeoutMiddleware Unit Tests", () => {
             const validTimeouts = [1, 100, 1000, 5000, 30000, 60000];
 
             for (const timeout of validTimeouts) {
-                testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+                testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                     useValue: { timeout }
                 });
-                testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+                testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                     useValue: mockLogger
                 });
 
                 expect(() => {
-                    testContainer.resolve(TimeoutMiddleware);
+                    testContainer.resolve(TimeoutService);
                 }).not.toThrow();
 
                 testContainer.clearInstances();
@@ -57,15 +57,15 @@ describe("TimeoutMiddleware Unit Tests", () => {
          * Test invalid timeout rejection (zero)
          */
         it("should reject zero timeout", () => {
-            testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+            testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                 useValue: { timeout: 0 }
             });
-            testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
             expect(() => {
-                testContainer.resolve(TimeoutMiddleware);
+                testContainer.resolve(TimeoutService);
             }).toThrowError(/Invalid timeout configuration.*must be positive.*0ms/);
         });
 
@@ -77,15 +77,15 @@ describe("TimeoutMiddleware Unit Tests", () => {
             const invalidTimeouts = [-1, -100, -1000, -5000];
 
             for (const timeout of invalidTimeouts) {
-                testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+                testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                     useValue: { timeout }
                 });
-                testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+                testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                     useValue: mockLogger
                 });
 
                 expect(() => {
-                    testContainer.resolve(TimeoutMiddleware);
+                    testContainer.resolve(TimeoutService);
                 }).toThrowError(/Invalid timeout configuration.*must be positive/);
 
                 testContainer.clearInstances();
@@ -100,14 +100,14 @@ describe("TimeoutMiddleware Unit Tests", () => {
          */
         it("should store start time and timeout in context binnacle", async () => {
             const timeout = 5000;
-            testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+            testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                 useValue: { timeout }
             });
-            testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(TimeoutMiddleware);
+            const middleware = testContainer.resolve(TimeoutService);
             const contextBinnacle: { [key: string]: any } = {};
 
             const beforeTime = Date.now();
@@ -129,14 +129,14 @@ describe("TimeoutMiddleware Unit Tests", () => {
          */
         it("should log timeout monitoring start at debug level", async () => {
             const timeout = 3000;
-            testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+            testContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                 useValue: { timeout }
             });
-            testContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(TimeoutMiddleware);
+            const middleware = testContainer.resolve(TimeoutService);
             const contextBinnacle: { [key: string]: any } = {};
 
             await middleware.processEvent(contextBinnacle);

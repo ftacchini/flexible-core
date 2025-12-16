@@ -2,7 +2,7 @@ import { FlexibleEvent } from "../../event";
 import { FlexibleMiddleware } from "./flexible-middleware";
 import { FlexibleResponse } from "../flexible-response";
 import { TimeoutError } from "../../event/timeout-error";
-import { TIMEOUT_CONTEXT_KEYS } from "../../security/timeout-middleware";
+import { TIMEOUT_CONTEXT_KEYS } from "../../security/timeout-service";
 import { FlexibleLogger } from "../../logging/flexible-logger";
 
 /**

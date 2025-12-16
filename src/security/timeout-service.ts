@@ -2,9 +2,9 @@ import { injectable, inject } from 'tsyringe';
 import { FlexibleLogger } from '../logging/flexible-logger';
 
 /**
- * Configuration for TimeoutMiddleware.
+ * Configuration for TimeoutService.
  */
-export interface TimeoutMiddlewareConfig {
+export interface TimeoutServiceConfig {
     /**
      * Timeout duration in milliseconds.
      * Must be a positive number.
@@ -13,15 +13,15 @@ export interface TimeoutMiddlewareConfig {
 }
 
 /**
- * Dependency injection types for TimeoutMiddleware.
+ * Dependency injection types for TimeoutService.
  */
-export const TIMEOUT_MIDDLEWARE_TYPES = {
-    CONFIG: Symbol.for('TimeoutMiddlewareConfig'),
+export const TIMEOUT_SERVICE_TYPES = {
+    CONFIG: Symbol.for('TimeoutServiceConfig'),
     LOGGER: Symbol.for('FlexibleLogger')
 } as const;
 
 /**
- * Context binnacle keys used by TimeoutMiddleware.
+ * Context binnacle keys used by TimeoutService.
  */
 export const TIMEOUT_CONTEXT_KEYS = {
     START_TIME: '__timeout_start_time',
@@ -31,24 +31,24 @@ export const TIMEOUT_CONTEXT_KEYS = {
 /**
  * Middleware for enforcing timeout limits on request processing.
  *
- * TimeoutMiddleware monitors execution time and stores timing information
+ * TimeoutService monitors execution time and stores timing information
  * in the context binnacle for use by the pipeline. The actual timeout
  * enforcement is handled by FlexiblePipeline.
  *
  * ## Usage with DI Container
  *
  * ```typescript
- * import { TIMEOUT_MIDDLEWARE_TYPES, TimeoutMiddleware } from 'flexible-core';
+ * import { TIMEOUT_SERVICE_TYPES, TimeoutService } from 'flexible-core';
  * import { Controller, Route, BeforeExecution } from 'flexible-decorators';
  *
  * // Configure in DI container
- * container.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+ * container.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
  *     useValue: { timeout: 5000 } // 5 second timeout
  * });
  *
  * @Controller()
  * export class ApiController {
- *     @BeforeExecution(TimeoutMiddleware, 'processEvent')
+ *     @BeforeExecution(TimeoutService, 'processEvent')
  *     @Route(HttpGet)
  *     public async getData() {
  *         return { data: 'Hello' };
@@ -58,7 +58,7 @@ export const TIMEOUT_CONTEXT_KEYS = {
  *
  * ## Composable Timeout Layers
  *
- * TimeoutMiddleware can be composed at different layers:
+ * TimeoutService can be composed at different layers:
  *
  * ```typescript
  * // Global timeout layer
@@ -76,20 +76,20 @@ export const TIMEOUT_CONTEXT_KEYS = {
  * ```
  */
 @injectable()
-export class TimeoutMiddleware {
-    private readonly config: TimeoutMiddlewareConfig;
+export class TimeoutService {
+    private readonly config: TimeoutServiceConfig;
     private readonly logger: FlexibleLogger;
 
     /**
-     * Creates a new TimeoutMiddleware instance.
+     * Creates a new TimeoutService instance.
      *
      * @param config - Timeout configuration (injected from DI container)
      * @param logger - Logger instance (injected from DI container)
      * @throws Error if timeout is zero or negative
      */
     constructor(
-        @inject(TIMEOUT_MIDDLEWARE_TYPES.CONFIG) config: TimeoutMiddlewareConfig,
-        @inject(TIMEOUT_MIDDLEWARE_TYPES.LOGGER) logger: FlexibleLogger
+        @inject(TIMEOUT_SERVICE_TYPES.CONFIG) config: TimeoutServiceConfig,
+        @inject(TIMEOUT_SERVICE_TYPES.LOGGER) logger: FlexibleLogger
     ) {
         // Validate timeout configuration
         if (config.timeout <= 0) {
@@ -106,31 +106,18 @@ export class TimeoutMiddleware {
      * This method stores timing information in the context binnacle for use
      * by the pipeline. The actual timeout enforcement is handled by FlexiblePipeline.
      *
-     * @param event - The event being processed (optional, used for extracting request ID)
      * @param contextBinnacle - Context storage for request-scoped data
+     * @param event - The event being processed (optional, used for extracting request ID)
      */
     public async processEvent(
-        eventOrContextBinnacle: any,
-        contextBinnacle?: { [key: string]: any }
+        contextBinnacle: { [key: string]: any },
+        event?: any
     ): Promise<void> {
-        // Support both old signature (contextBinnacle only) and new signature (event, contextBinnacle)
-        let event: any = null;
-        let binnacle: { [key: string]: any };
-
-        if (contextBinnacle !== undefined) {
-            // New signature: (event, contextBinnacle)
-            event = eventOrContextBinnacle;
-            binnacle = contextBinnacle;
-        } else {
-            // Old signature: (contextBinnacle)
-            binnacle = eventOrContextBinnacle;
-        }
-
         const startTime = Date.now();
 
         // Store timing information in context binnacle
-        binnacle[TIMEOUT_CONTEXT_KEYS.START_TIME] = startTime;
-        binnacle[TIMEOUT_CONTEXT_KEYS.TIMEOUT_MS] = this.config.timeout;
+        contextBinnacle[TIMEOUT_CONTEXT_KEYS.START_TIME] = startTime;
+        contextBinnacle[TIMEOUT_CONTEXT_KEYS.TIMEOUT_MS] = this.config.timeout;
 
         // Extract request ID if available
         const requestId = event?.requestId;

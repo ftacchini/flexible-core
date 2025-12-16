@@ -1,11 +1,11 @@
 import "reflect-metadata";
 import "jasmine";
 import { container, DependencyContainer } from "tsyringe";
-import { CancellationMiddleware, CANCELLATION_MIDDLEWARE_TYPES, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-middleware";
+import { CancellationService, CANCELLATION_SERVICE_TYPES, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-service";
 import { CancellationError } from "../../../src/event/cancellation-error";
 import { FlexibleLogger } from "../../../src/logging/flexible-logger";
 
-describe("CancellationMiddleware Unit Tests", () => {
+describe("CancellationService Unit Tests", () => {
     let testContainer: DependencyContainer;
     let mockLogger: FlexibleLogger;
 
@@ -35,11 +35,11 @@ describe("CancellationMiddleware Unit Tests", () => {
          * Test token storage in binnacle
          */
         it("should store cancellation token in context binnacle", async () => {
-            testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(CancellationMiddleware);
+            const middleware = testContainer.resolve(CancellationService);
             const contextBinnacle: { [key: string]: any } = {};
 
             // Create a non-aborted token
@@ -49,7 +49,7 @@ describe("CancellationMiddleware Unit Tests", () => {
                 requestId: 'test-123'
             };
 
-            await middleware.processEvent(event, contextBinnacle);
+            await middleware.processEvent(contextBinnacle, event);
 
             // Verify token is stored in binnacle
             expect(contextBinnacle[CANCELLATION_CONTEXT_KEYS.TOKEN]).toBe(abortController.signal);
@@ -60,11 +60,11 @@ describe("CancellationMiddleware Unit Tests", () => {
          * Test CancellationError thrown for aborted tokens
          */
         it("should throw CancellationError for aborted tokens", async () => {
-            testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(CancellationMiddleware);
+            const middleware = testContainer.resolve(CancellationService);
             const contextBinnacle: { [key: string]: any } = {};
 
             // Create an aborted token
@@ -78,7 +78,7 @@ describe("CancellationMiddleware Unit Tests", () => {
 
             // Verify CancellationError is thrown
             try {
-                await middleware.processEvent(event, contextBinnacle);
+                await middleware.processEvent(contextBinnacle, event);
                 fail('Expected CancellationError to be thrown');
             } catch (error) {
                 expect(error).toBeInstanceOf(CancellationError);
@@ -91,11 +91,11 @@ describe("CancellationMiddleware Unit Tests", () => {
          * Test passthrough for non-aborted tokens
          */
         it("should allow processing to continue for non-aborted tokens", async () => {
-            testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(CancellationMiddleware);
+            const middleware = testContainer.resolve(CancellationService);
             const contextBinnacle: { [key: string]: any } = {};
 
             // Create a non-aborted token
@@ -106,7 +106,7 @@ describe("CancellationMiddleware Unit Tests", () => {
             };
 
             // Should not throw
-            await expectAsync(middleware.processEvent(event, contextBinnacle)).toBeResolved();
+            await expectAsync(middleware.processEvent(contextBinnacle, event)).toBeResolved();
 
             // Token should still be stored
             expect(contextBinnacle[CANCELLATION_CONTEXT_KEYS.TOKEN]).toBe(abortController.signal);
@@ -117,11 +117,11 @@ describe("CancellationMiddleware Unit Tests", () => {
          * Test handling of events without tokens
          */
         it("should handle events without cancellation tokens gracefully", async () => {
-            testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(CancellationMiddleware);
+            const middleware = testContainer.resolve(CancellationService);
             const contextBinnacle: { [key: string]: any } = {};
 
             const event = {
@@ -129,7 +129,7 @@ describe("CancellationMiddleware Unit Tests", () => {
             };
 
             // Should not throw
-            await expectAsync(middleware.processEvent(event, contextBinnacle)).toBeResolved();
+            await expectAsync(middleware.processEvent(contextBinnacle, event)).toBeResolved();
 
             // Token should not be in binnacle
             expect(contextBinnacle[CANCELLATION_CONTEXT_KEYS.TOKEN]).toBeUndefined();
@@ -140,11 +140,11 @@ describe("CancellationMiddleware Unit Tests", () => {
          * Test that cancellation detection is logged
          */
         it("should log cancellation detection at warning level", async () => {
-            testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(CancellationMiddleware);
+            const middleware = testContainer.resolve(CancellationService);
             const contextBinnacle: { [key: string]: any } = {};
 
             // Create an aborted token with reason
@@ -157,7 +157,7 @@ describe("CancellationMiddleware Unit Tests", () => {
             };
 
             try {
-                await middleware.processEvent(event, contextBinnacle);
+                await middleware.processEvent(contextBinnacle, event);
             } catch (error) {
                 // Expected
             }
@@ -177,18 +177,18 @@ describe("CancellationMiddleware Unit Tests", () => {
          * Test that no logging occurs for events without tokens
          */
         it("should not log when event has no cancellation token", async () => {
-            testContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+            testContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                 useValue: mockLogger
             });
 
-            const middleware = testContainer.resolve(CancellationMiddleware);
+            const middleware = testContainer.resolve(CancellationService);
             const contextBinnacle: { [key: string]: any } = {};
 
             const event = {
                 requestId: 'test-no-log'
             };
 
-            await middleware.processEvent(event, contextBinnacle);
+            await middleware.processEvent(contextBinnacle, event);
 
             // Verify no log calls were made
             expect(mockLogger.warning).not.toHaveBeenCalled();

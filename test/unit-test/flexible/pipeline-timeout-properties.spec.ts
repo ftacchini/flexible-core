@@ -6,7 +6,7 @@ import { FlexibleMiddleware } from "../../../src/flexible/pipeline/flexible-midd
 import { FlexibleEvent } from "../../../src/event/flexible-event";
 import { FlexibleResponse } from "../../../src/flexible/flexible-response";
 import { TimeoutError } from "../../../src/event/timeout-error";
-import { TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-middleware";
+import { TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-service";
 import { FlexibleLogger } from "../../../src/logging/flexible-logger";
 
 describe("FlexiblePipeline Timeout Property-Based Tests", () => {

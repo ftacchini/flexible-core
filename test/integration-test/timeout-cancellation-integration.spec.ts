@@ -10,8 +10,8 @@ import { FullEvent } from "../../src/flexible/extractor/full-event";
 import { PreviousError } from "../../src/flexible/extractor/previous-error";
 import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
 import { FlexibleContainer } from "../../src/container/flexible-container";
-import { TimeoutMiddleware, TIMEOUT_MIDDLEWARE_TYPES } from "../../src/security/timeout-middleware";
-import { CancellationMiddleware, CANCELLATION_MIDDLEWARE_TYPES } from "../../src/security/cancellation-middleware";
+import { TimeoutService, TIMEOUT_SERVICE_TYPES } from "../../src/security/timeout-service";
+import { CancellationService, CANCELLATION_SERVICE_TYPES } from "../../src/security/cancellation-service";
 import { TimeoutError } from "../../src/event/timeout-error";
 import { CancellationError } from "../../src/event/cancellation-error";
 import { TestAbortController, createMockLogger, MockLogger } from "../test-utilities/timeout-cancellation-test-utils";
@@ -150,8 +150,8 @@ describe("Timeout and Cancellation Integration Tests", () => {
 
         it("should detect cancellation when client disconnects", async () => {
             // Configure cancellation middleware
-            container.registerValue(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, mockLogger);
-            const cancellationMiddleware = container.resolve(CancellationMiddleware);
+            container.registerValue(CANCELLATION_SERVICE_TYPES.LOGGER, mockLogger);
+            const cancellationMiddleware = container.resolve(CancellationService);
 
             // Create aborted signal to simulate client disconnect
             const abortController = TestAbortController.createAborted("Client disconnected");
@@ -173,8 +173,8 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                // Call processEvent with correct parameter order: (event, contextBinnacle)
-                                await cancellationMiddleware.processEvent(eventData, contextBinnacle);
+                                // Call processEvent with correct parameter order: (contextBinnacle, event)
+                                await cancellationMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -216,8 +216,8 @@ describe("Timeout and Cancellation Integration Tests", () => {
         });
 
         it("should allow processing when no cancellation token present", async () => {
-            container.registerValue(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, mockLogger);
-            const cancellationMiddleware = container.resolve(CancellationMiddleware);
+            container.registerValue(CANCELLATION_SERVICE_TYPES.LOGGER, mockLogger);
+            const cancellationMiddleware = container.resolve(CancellationService);
 
             const event: any = {
                 eventType: "testEvent",
@@ -235,7 +235,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await cancellationMiddleware.processEvent(eventData, contextBinnacle);
+                                await cancellationMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -298,9 +298,9 @@ describe("Timeout and Cancellation Integration Tests", () => {
 
         it("should add TimeoutError to errorStack when timeout occurs", async () => {
             // Configure timeout middleware with very short timeout
-            container.registerValue(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, { timeout: 50 });
-            container.registerValue(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, createMockLogger());
-            const timeoutMiddleware = container.resolve(TimeoutMiddleware);
+            container.registerValue(TIMEOUT_SERVICE_TYPES.CONFIG, { timeout: 50 });
+            container.registerValue(TIMEOUT_SERVICE_TYPES.LOGGER, createMockLogger());
+            const timeoutMiddleware = container.resolve(TimeoutService);
 
             const event: any = {
                 eventType: "testEvent",
@@ -319,7 +319,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await timeoutMiddleware.processEvent(eventData, contextBinnacle);
+                                await timeoutMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -365,8 +365,8 @@ describe("Timeout and Cancellation Integration Tests", () => {
         });
 
         it("should add CancellationError to errorStack when request is cancelled", async () => {
-            container.registerValue(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, createMockLogger());
-            const cancellationMiddleware = container.resolve(CancellationMiddleware);
+            container.registerValue(CANCELLATION_SERVICE_TYPES.LOGGER, createMockLogger());
+            const cancellationMiddleware = container.resolve(CancellationService);
 
             const abortController = TestAbortController.createAborted("User cancelled");
 
@@ -388,7 +388,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await cancellationMiddleware.processEvent(eventData, contextBinnacle);
+                                await cancellationMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -453,9 +453,9 @@ describe("Timeout and Cancellation Integration Tests", () => {
         });
 
         it("should log timeout start, timeout event, with correct format and levels", async () => {
-            container.registerValue(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, { timeout: 50 });
-            container.registerValue(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, mockLogger);
-            const timeoutMiddleware = container.resolve(TimeoutMiddleware);
+            container.registerValue(TIMEOUT_SERVICE_TYPES.CONFIG, { timeout: 50 });
+            container.registerValue(TIMEOUT_SERVICE_TYPES.LOGGER, mockLogger);
+            const timeoutMiddleware = container.resolve(TimeoutService);
 
             const event: any = {
                 eventType: "testEvent",
@@ -473,7 +473,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await timeoutMiddleware.processEvent(eventData, contextBinnacle);
+                                await timeoutMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -510,9 +510,9 @@ describe("Timeout and Cancellation Integration Tests", () => {
         });
 
         it("should log successful completion with elapsed time at debug level", async () => {
-            container.registerValue(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, { timeout: 200 });
-            container.registerValue(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, mockLogger);
-            const timeoutMiddleware = container.resolve(TimeoutMiddleware);
+            container.registerValue(TIMEOUT_SERVICE_TYPES.CONFIG, { timeout: 200 });
+            container.registerValue(TIMEOUT_SERVICE_TYPES.LOGGER, mockLogger);
+            const timeoutMiddleware = container.resolve(TimeoutService);
 
             const event: any = {
                 eventType: "testEvent",
@@ -530,7 +530,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await timeoutMiddleware.processEvent(eventData, contextBinnacle);
+                                await timeoutMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -567,8 +567,8 @@ describe("Timeout and Cancellation Integration Tests", () => {
         });
 
         it("should log cancellation with request ID and reason at warning level", async () => {
-            container.registerValue(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, mockLogger);
-            const cancellationMiddleware = container.resolve(CancellationMiddleware);
+            container.registerValue(CANCELLATION_SERVICE_TYPES.LOGGER, mockLogger);
+            const cancellationMiddleware = container.resolve(CancellationService);
 
             const abortController = TestAbortController.createAborted("Network error");
 
@@ -589,7 +589,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await cancellationMiddleware.processEvent(eventData, contextBinnacle);
+                                await cancellationMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },
@@ -617,8 +617,8 @@ describe("Timeout and Cancellation Integration Tests", () => {
         });
 
         it("should not log when event has no cancellation token", async () => {
-            container.registerValue(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, mockLogger);
-            const cancellationMiddleware = container.resolve(CancellationMiddleware);
+            container.registerValue(CANCELLATION_SERVICE_TYPES.LOGGER, mockLogger);
+            const cancellationMiddleware = container.resolve(CancellationService);
 
             const event: any = {
                 eventType: "testEvent",
@@ -636,7 +636,7 @@ describe("Timeout and Cancellation Integration Tests", () => {
                     {
                         activationContext: {
                             activate: async (contextBinnacle: any, eventData: FlexibleEvent) => {
-                                await cancellationMiddleware.processEvent(eventData, contextBinnacle);
+                                await cancellationMiddleware.processEvent(contextBinnacle, eventData);
                                 return null;
                             }
                         },

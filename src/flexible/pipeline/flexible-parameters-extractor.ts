@@ -6,22 +6,27 @@ import { FlexibleResponse } from "../flexible-response";
 
 export class FlexibleParametersExtractor {
 
-    private extractorRouters: FlexibleRouter<FlexibleExtractor>[] = []; 
+    private extractorRouters: FlexibleRouter<FlexibleExtractor>[] = [];
 
-    constructor(extractorRoutersMap: { 
-        [paramIndex: number]: FlexibleRouter<FlexibleExtractor> 
+    constructor(extractorRoutersMap: {
+        [paramIndex: number]: FlexibleRouter<FlexibleExtractor>
     }) {
         var keys = Object.keys(extractorRoutersMap).sort();
-        
+
         for(let i = 0; i <= parseInt(keys[keys.length -1]); i++) {
             this.extractorRouters.push(extractorRoutersMap[i] || (extractorRoutersMap[i] = new SingleValueRouter(new UndefinedValue())))
         }
     }
 
-    public async extractParams(event: FlexibleEvent, response: FlexibleResponse, filterBinnacle: { [key: string]: string }): Promise<any[]> {
+    public async extractParams(
+        event: FlexibleEvent,
+        response: FlexibleResponse,
+        filterBinnacle: { [key: string]: string },
+        contextBinnacle: { [key: string]: any }
+    ): Promise<any[]> {
        return Promise.all(this.extractorRouters.map(async router => {
             return router.getEventResources(event, filterBinnacle).then(extractors => {
-                return extractors[0].extractValue(event, response, filterBinnacle);
+                return extractors[0].extractValue(event, response, filterBinnacle, contextBinnacle);
             })
         }));
     }

@@ -2,10 +2,10 @@ import "reflect-metadata";
 import "jasmine";
 import * as fc from "fast-check";
 import { container, DependencyContainer } from "tsyringe";
-import { RateLimitMiddleware, RateLimitConfig, RATE_LIMIT_TYPES, MemoryRateLimitStore, RateLimitStore, RateLimitInfo } from "../../../src";
+import { RateLimitService, RateLimitConfig, RATE_LIMIT_TYPES, MemoryRateLimitStore, RateLimitStore, RateLimitInfo } from "../../../src";
 import { FlexibleEvent } from "../../../src/event";
 
-describe("RateLimitMiddleware Property-Based Tests", () => {
+describe("RateLimitService Property-Based Tests", () => {
     let testContainer: DependencyContainer;
 
     beforeEach(() => {
@@ -32,7 +32,7 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
                     const store = new MemoryRateLimitStore();
                     iterationContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: config });
                     iterationContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: store });
-                    const middleware = iterationContainer.resolve(RateLimitMiddleware);
+                    const middleware = iterationContainer.resolve(RateLimitService);
                     const mockEvent = { sourceIp: '192.168.1.1' } as any as FlexibleEvent;
 
                     for (let i = 0; i < max; i++) {
@@ -80,7 +80,7 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
                     const config = new RateLimitConfig({ max, windowMs });
                     iterationContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: config });
                     iterationContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: mockStore });
-                    const middleware = iterationContainer.resolve(RateLimitMiddleware);
+                    const middleware = iterationContainer.resolve(RateLimitService);
                     const mockEvent = { sourceIp: '192.168.1.1' } as any as FlexibleEvent;
                     await middleware.check(mockEvent);
 
@@ -121,7 +121,7 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
                     const store = new MemoryRateLimitStore();
                     iterationContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: config });
                     iterationContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: store });
-                    const middleware = iterationContainer.resolve(RateLimitMiddleware);
+                    const middleware = iterationContainer.resolve(RateLimitService);
 
                     for (const userId of userIds) {
                         for (let i = 0; i < max; i++) {
@@ -171,7 +171,7 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
                     const store = new MemoryRateLimitStore();
                     iterationContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: config });
                     iterationContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: store });
-                    const middleware = iterationContainer.resolve(RateLimitMiddleware);
+                    const middleware = iterationContainer.resolve(RateLimitService);
                     const mockEvent = { sourceIp: '192.168.1.1', skipFlag: shouldSkip } as any as FlexibleEvent;
 
                     if (shouldSkip) {
@@ -204,7 +204,7 @@ describe("RateLimitMiddleware Property-Based Tests", () => {
     });
 });
 
-describe("RateLimitMiddleware Multiple Instance Property Tests", () => {
+describe("RateLimitService Multiple Instance Property Tests", () => {
     /**
      * Feature: rate-limiter-di-config, Property 3: Multiple instance isolation
      * Validates: Requirements 2.1, 2.3
@@ -218,13 +218,13 @@ describe("RateLimitMiddleware Multiple Instance Property Tests", () => {
                     const iterationContainer = container.createChildContainer();
                     const configs = maxValues.map(max => new RateLimitConfig({ max, windowMs }));
                     const stores = configs.map(() => new MemoryRateLimitStore());
-                    const middlewares: RateLimitMiddleware[] = [];
+                    const middlewares: RateLimitService[] = [];
 
                     for (let i = 0; i < configs.length; i++) {
                         const childContainer = iterationContainer.createChildContainer();
                         childContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: configs[i] });
                         childContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: stores[i] });
-                        middlewares.push(childContainer.resolve(RateLimitMiddleware));
+                        middlewares.push(childContainer.resolve(RateLimitService));
                     }
 
                     const mockEvent = { sourceIp: '192.168.1.1' } as any as FlexibleEvent;
@@ -306,7 +306,7 @@ describe("RateLimitMiddleware Multiple Instance Property Tests", () => {
     });
 });
 
-describe("RateLimitMiddleware Mock Compatibility Property Tests", () => {
+describe("RateLimitService Mock Compatibility Property Tests", () => {
     /**
      * Feature: rate-limiter-di-config, Property 5: Mock configuration compatibility
      * Validates: Requirements 4.1, 4.2
@@ -349,7 +349,7 @@ describe("RateLimitMiddleware Mock Compatibility Property Tests", () => {
 
                     iterationContainer.register(RATE_LIMIT_TYPES.CONFIG, { useValue: mockConfig });
                     iterationContainer.register(RATE_LIMIT_TYPES.STORE, { useValue: mockStore });
-                    const middleware = iterationContainer.resolve(RateLimitMiddleware);
+                    const middleware = iterationContainer.resolve(RateLimitService);
                     const mockEvent = { sourceIp: '192.168.1.1' } as any as FlexibleEvent;
                     await middleware.check(mockEvent);
 

@@ -20,7 +20,7 @@ export class FlexibleMiddleware {
 
         if(!this.isErrorMiddleware && !response.errorStack.length ||
             this.isErrorMiddleware && response.errorStack.length) {
-                var params = await this.paramsExtractor.extractParams(event, response, filterBinnacle);
+                var params = await this.paramsExtractor.extractParams(event, response, filterBinnacle, contextBinnacle);
                 return await this.activationContext.activate.apply(this.activationContext, [contextBinnacle, ...params]);
         }
     }

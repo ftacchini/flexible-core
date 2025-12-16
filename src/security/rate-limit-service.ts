@@ -7,13 +7,13 @@ import { SecurityError, SecurityErrorCodes } from './security-error';
 /**
  * Middleware for rate limiting requests.
  *
- * RateLimitMiddleware tracks request counts per client within time windows
+ * RateLimitService tracks request counts per client within time windows
  * and rejects requests that exceed the configured limits.
  *
  * ## Usage with DI Container (Recommended)
  *
  * ```typescript
- * import { RATE_LIMIT_TYPES, RateLimitConfig, RateLimitMiddleware } from 'flexible-core';
+ * import { RATE_LIMIT_TYPES, RateLimitConfig, RateLimitService } from 'flexible-core';
  * import { Controller, Route, BeforeExecution, Param } from 'flexible-decorators';
  *
  * // Configure in DI container
@@ -27,7 +27,7 @@ import { SecurityError, SecurityErrorCodes } from './security-error';
  *
  * @Controller()
  * export class ApiController {
- *     @BeforeExecution(RateLimitMiddleware, 'check')
+ *     @BeforeExecution(RateLimitService, 'check')
  *     @Route(HttpGet)
  *     public async getData(@Param(EventData) event: FlexibleEvent) {
  *         return { data: 'Hello' };
@@ -66,7 +66,7 @@ import { SecurityError, SecurityErrorCodes } from './security-error';
  *
  * Old pattern (deprecated):
  * ```typescript
- * @BeforeExecution(RateLimitMiddleware, 'check', {
+ * @BeforeExecution(RateLimitService, 'check', {
  *     config: { max: 100, windowMs: 60000 }
  * })
  * ```
@@ -79,16 +79,16 @@ import { SecurityError, SecurityErrorCodes } from './security-error';
  * });
  *
  * // Then use without config in decorator
- * @BeforeExecution(RateLimitMiddleware, 'check')
+ * @BeforeExecution(RateLimitService, 'check')
  * ```
  */
 @injectable()
-export class RateLimitMiddleware {
+export class RateLimitService {
     private readonly config: RateLimitConfig;
     private readonly store: RateLimitStore;
 
     /**
-     * Creates a new RateLimitMiddleware instance.
+     * Creates a new RateLimitService instance.
      *
      * Configuration and store are injected via the DI container.
      * If not provided, default values are used.

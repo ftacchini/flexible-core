@@ -3,14 +3,14 @@ import { FlexibleLogger } from '../logging/flexible-logger';
 import { CancellationError } from '../event/cancellation-error';
 
 /**
- * Dependency injection types for CancellationMiddleware.
+ * Dependency injection types for CancellationService.
  */
-export const CANCELLATION_MIDDLEWARE_TYPES = {
+export const CANCELLATION_SERVICE_TYPES = {
     LOGGER: Symbol.for('FlexibleLogger')
 } as const;
 
 /**
- * Context binnacle keys used by CancellationMiddleware.
+ * Context binnacle keys used by CancellationService.
  */
 export const CANCELLATION_CONTEXT_KEYS = {
     TOKEN: '__cancellation_token'
@@ -19,7 +19,7 @@ export const CANCELLATION_CONTEXT_KEYS = {
 /**
  * Middleware for monitoring cancellation tokens and stopping pipeline execution when cancelled.
  *
- * CancellationMiddleware checks if an event has a cancellation token (AbortSignal) and:
+ * CancellationService checks if an event has a cancellation token (AbortSignal) and:
  * 1. Stores the token in the context binnacle for downstream middleware access
  * 2. Checks if the token is already aborted
  * 3. Throws CancellationError if the token is aborted
@@ -27,12 +27,12 @@ export const CANCELLATION_CONTEXT_KEYS = {
  * ## Usage with DI Container
  *
  * ```typescript
- * import { CANCELLATION_MIDDLEWARE_TYPES, CancellationMiddleware } from 'flexible-core';
+ * import { CANCELLATION_SERVICE_TYPES, CancellationService } from 'flexible-core';
  * import { Controller, Route, BeforeExecution } from 'flexible-decorators';
  *
  * @Controller()
  * export class ApiController {
- *     @BeforeExecution(CancellationMiddleware, 'processEvent')
+ *     @BeforeExecution(CancellationService, 'processEvent')
  *     @Route(HttpGet)
  *     public async getData() {
  *         return { data: 'Hello' };
@@ -69,16 +69,16 @@ export const CANCELLATION_CONTEXT_KEYS = {
  * ```
  */
 @injectable()
-export class CancellationMiddleware {
+export class CancellationService {
     private readonly logger: FlexibleLogger;
 
     /**
-     * Creates a new CancellationMiddleware instance.
+     * Creates a new CancellationService instance.
      *
      * @param logger - Logger instance (injected from DI container)
      */
     constructor(
-        @inject(CANCELLATION_MIDDLEWARE_TYPES.LOGGER) logger: FlexibleLogger
+        @inject(CANCELLATION_SERVICE_TYPES.LOGGER) logger: FlexibleLogger
     ) {
         this.logger = logger;
     }
@@ -92,19 +92,18 @@ export class CancellationMiddleware {
      * 3. Checks if the token is already aborted
      * 4. If aborted, throws CancellationError with the reason
      *
-     * @param event - The event being processed
      * @param contextBinnacle - Context storage for request-scoped data
+     * @param event - The event being processed
      * @throws CancellationError if the cancellation token is aborted
      */
     public async processEvent(
-        event: { cancellationToken?: AbortSignal; requestId?: string },
-        contextBinnacle: { [key: string]: any }
+        contextBinnacle: { [key: string]: any },
+        event?: { cancellationToken?: AbortSignal; requestId?: string }
     ): Promise<void> {
-        // If no cancellation token, allow processing to continue
-        if (!event.cancellationToken) {
+        // If no event or no cancellation token, allow processing to continue
+        if (!event || !event.cancellationToken) {
             return;
         }
-
         // Store token in context binnacle for downstream middleware access
         contextBinnacle[CANCELLATION_CONTEXT_KEYS.TOKEN] = event.cancellationToken;
 

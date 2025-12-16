@@ -8,7 +8,12 @@ export class UndefinedValue implements FlexibleExtractor {
     public get staticRouting(): RouteData<string> {
         return {};
     }
-    public async extractValue(event: FlexibleEvent): Promise<any> {
+    public async extractValue(
+        event: FlexibleEvent,
+        response: any,
+        filterBinnacle: { [key: string]: string },
+        contextBinnacle: { [key: string]: any }
+    ): Promise<any> {
         return undefined;
     }
 }

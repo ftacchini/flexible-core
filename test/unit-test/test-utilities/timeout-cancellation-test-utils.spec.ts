@@ -1,13 +1,13 @@
 import "reflect-metadata";
 import "jasmine";
 import {
-    TestTimeoutMiddleware,
-    TestCancellationMiddleware,
+    TestTimeoutService,
+    TestCancellationService,
     TestAbortController,
     createMockLogger
 } from "../../test-utilities/timeout-cancellation-test-utils";
-import { TimeoutMiddleware, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-middleware";
-import { CancellationMiddleware, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-middleware";
+import { TimeoutService, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-service";
+import { CancellationService, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-service";
 import { CancellationError } from "../../../src/event/cancellation-error";
 
 describe("Test Utilities for Timeout and Cancellation", () => {
@@ -30,22 +30,22 @@ describe("Test Utilities for Timeout and Cancellation", () => {
         });
     });
 
-    describe("TestTimeoutMiddleware", () => {
+    describe("TestTimeoutService", () => {
         describe("create", () => {
             /**
              * Requirements: All (testing support)
-             * Test TestTimeoutMiddleware.create()
+             * Test TestTimeoutService.create()
              */
-            it("should create a TimeoutMiddleware instance with specified timeout", () => {
+            it("should create a TimeoutService instance with specified timeout", () => {
                 const timeout = 3000;
-                const middleware = TestTimeoutMiddleware.create(timeout);
+                const middleware = TestTimeoutService.create(timeout);
 
-                expect(middleware).toBeInstanceOf(TimeoutMiddleware);
+                expect(middleware).toBeInstanceOf(TimeoutService);
             });
 
             it("should create middleware that stores timeout configuration", async () => {
                 const timeout = 5000;
-                const middleware = TestTimeoutMiddleware.create(timeout);
+                const middleware = TestTimeoutService.create(timeout);
                 const contextBinnacle: { [key: string]: any } = {};
 
                 await middleware.processEvent(contextBinnacle);
@@ -58,32 +58,32 @@ describe("Test Utilities for Timeout and Cancellation", () => {
                 const timeouts = [100, 1000, 5000, 10000];
 
                 for (const timeout of timeouts) {
-                    const middleware = TestTimeoutMiddleware.create(timeout);
-                    expect(middleware).toBeInstanceOf(TimeoutMiddleware);
+                    const middleware = TestTimeoutService.create(timeout);
+                    expect(middleware).toBeInstanceOf(TimeoutService);
                 }
             });
 
             it("should throw error for invalid timeout values", () => {
-                expect(() => TestTimeoutMiddleware.create(0)).toThrow();
-                expect(() => TestTimeoutMiddleware.create(-100)).toThrow();
+                expect(() => TestTimeoutService.create(0)).toThrow();
+                expect(() => TestTimeoutService.create(-100)).toThrow();
             });
         });
 
         describe("createWithMockLogger", () => {
             /**
              * Requirements: All (testing support)
-             * Test TestTimeoutMiddleware.createWithMockLogger()
+             * Test TestTimeoutService.createWithMockLogger()
              */
             it("should create middleware and return mock logger", () => {
-                const { middleware, logger } = TestTimeoutMiddleware.createWithMockLogger(3000);
+                const { middleware, logger } = TestTimeoutService.createWithMockLogger(3000);
 
-                expect(middleware).toBeInstanceOf(TimeoutMiddleware);
+                expect(middleware).toBeInstanceOf(TimeoutService);
                 expect(logger).toBeDefined();
                 expect(jasmine.isSpy(logger.debug)).toBe(true);
             });
 
             it("should use default timeout when not specified", async () => {
-                const { middleware, logger } = TestTimeoutMiddleware.createWithMockLogger();
+                const { middleware, logger } = TestTimeoutService.createWithMockLogger();
                 const contextBinnacle: { [key: string]: any } = {};
 
                 await middleware.processEvent(contextBinnacle);
@@ -92,7 +92,7 @@ describe("Test Utilities for Timeout and Cancellation", () => {
             });
 
             it("should allow verification of log calls", async () => {
-                const { middleware, logger } = TestTimeoutMiddleware.createWithMockLogger(2000);
+                const { middleware, logger } = TestTimeoutService.createWithMockLogger(2000);
                 const contextBinnacle: { [key: string]: any } = {};
 
                 await middleware.processEvent(contextBinnacle);
@@ -108,29 +108,29 @@ describe("Test Utilities for Timeout and Cancellation", () => {
         });
     });
 
-    describe("TestCancellationMiddleware", () => {
+    describe("TestCancellationService", () => {
         describe("create", () => {
             /**
              * Requirements: All (testing support)
-             * Test TestCancellationMiddleware.create()
+             * Test TestCancellationService.create()
              */
-            it("should create a CancellationMiddleware instance", () => {
-                const middleware = TestCancellationMiddleware.create();
+            it("should create a CancellationService instance", () => {
+                const middleware = TestCancellationService.create();
 
-                expect(middleware).toBeInstanceOf(CancellationMiddleware);
+                expect(middleware).toBeInstanceOf(CancellationService);
             });
 
             it("should create middleware that handles events without tokens", async () => {
-                const middleware = TestCancellationMiddleware.create();
+                const middleware = TestCancellationService.create();
                 const contextBinnacle: { [key: string]: any } = {};
                 const event = { requestId: 'test-123' };
 
-                await expectAsync(middleware.processEvent(event, contextBinnacle)).toBeResolved();
+                await expectAsync(middleware.processEvent(contextBinnacle, event)).toBeResolved();
                 expect(contextBinnacle[CANCELLATION_CONTEXT_KEYS.TOKEN]).toBeUndefined();
             });
 
             it("should create middleware that stores tokens in binnacle", async () => {
-                const middleware = TestCancellationMiddleware.create();
+                const middleware = TestCancellationService.create();
                 const contextBinnacle: { [key: string]: any } = {};
                 const controller = new AbortController();
                 const event = {
@@ -138,7 +138,7 @@ describe("Test Utilities for Timeout and Cancellation", () => {
                     requestId: 'test-456'
                 };
 
-                await middleware.processEvent(event, contextBinnacle);
+                await middleware.processEvent(contextBinnacle, event);
 
                 expect(contextBinnacle[CANCELLATION_CONTEXT_KEYS.TOKEN]).toBe(controller.signal);
             });
@@ -147,18 +147,18 @@ describe("Test Utilities for Timeout and Cancellation", () => {
         describe("createWithMockLogger", () => {
             /**
              * Requirements: All (testing support)
-             * Test TestCancellationMiddleware.createWithMockLogger()
+             * Test TestCancellationService.createWithMockLogger()
              */
             it("should create middleware and return mock logger", () => {
-                const { middleware, logger } = TestCancellationMiddleware.createWithMockLogger();
+                const { middleware, logger } = TestCancellationService.createWithMockLogger();
 
-                expect(middleware).toBeInstanceOf(CancellationMiddleware);
+                expect(middleware).toBeInstanceOf(CancellationService);
                 expect(logger).toBeDefined();
                 expect(jasmine.isSpy(logger.warning)).toBe(true);
             });
 
             it("should allow verification of log calls on cancellation", async () => {
-                const { middleware, logger } = TestCancellationMiddleware.createWithMockLogger();
+                const { middleware, logger } = TestCancellationService.createWithMockLogger();
                 const contextBinnacle: { [key: string]: any } = {};
                 const controller = new AbortController();
                 controller.abort('Test reason');
@@ -169,7 +169,7 @@ describe("Test Utilities for Timeout and Cancellation", () => {
                 };
 
                 try {
-                    await middleware.processEvent(event, contextBinnacle);
+                    await middleware.processEvent(contextBinnacle, event);
                     fail('Expected CancellationError to be thrown');
                 } catch (error) {
                     expect(error).toBeInstanceOf(CancellationError);

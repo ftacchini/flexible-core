@@ -2,10 +2,10 @@ import "reflect-metadata";
 import "jasmine";
 import * as fc from "fast-check";
 import { container, DependencyContainer } from "tsyringe";
-import { TimeoutMiddleware, TIMEOUT_MIDDLEWARE_TYPES, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-middleware";
+import { TimeoutService, TIMEOUT_SERVICE_TYPES, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-service";
 import { FlexibleLogger } from "../../../src/logging/flexible-logger";
 
-describe("TimeoutMiddleware Property-Based Tests", () => {
+describe("TimeoutService Property-Based Tests", () => {
     let testContainer: DependencyContainer;
     let mockLogger: FlexibleLogger;
 
@@ -40,18 +40,18 @@ describe("TimeoutMiddleware Property-Based Tests", () => {
                 (timeout) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                         useValue: { timeout }
                     });
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    let middleware: TimeoutMiddleware | null = null;
+                    let middleware: TimeoutService | null = null;
                     let constructorSucceeded = false;
 
                     try {
-                        middleware = iterationContainer.resolve(TimeoutMiddleware);
+                        middleware = iterationContainer.resolve(TimeoutService);
                         constructorSucceeded = true;
                     } catch (error) {
                         constructorSucceeded = false;
@@ -78,10 +78,10 @@ describe("TimeoutMiddleware Property-Based Tests", () => {
                 (timeout) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                         useValue: { timeout }
                     });
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
@@ -89,7 +89,7 @@ describe("TimeoutMiddleware Property-Based Tests", () => {
                     let errorMessage = '';
 
                     try {
-                        iterationContainer.resolve(TimeoutMiddleware);
+                        iterationContainer.resolve(TimeoutService);
                     } catch (error: any) {
                         threwError = true;
                         errorMessage = error.message;
@@ -120,14 +120,14 @@ describe("TimeoutMiddleware Property-Based Tests", () => {
                 async (timeout) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                         useValue: { timeout }
                     });
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    const middleware = iterationContainer.resolve(TimeoutMiddleware);
+                    const middleware = iterationContainer.resolve(TimeoutService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     const beforeTime = Date.now();
@@ -174,21 +174,21 @@ describe("TimeoutMiddleware Property-Based Tests", () => {
                         debug: jasmine.createSpy('debug')
                     };
 
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.CONFIG, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.CONFIG, {
                         useValue: { timeout }
                     });
-                    iterationContainer.register(TIMEOUT_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(TIMEOUT_SERVICE_TYPES.LOGGER, {
                         useValue: iterationLogger
                     });
 
-                    const middleware = iterationContainer.resolve(TimeoutMiddleware);
+                    const middleware = iterationContainer.resolve(TimeoutService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create event with optional requestId
                     const event = requestId ? { requestId } : {};
 
                     const beforeTime = Date.now();
-                    await middleware.processEvent(event, contextBinnacle);
+                    await middleware.processEvent(contextBinnacle, event);
                     const afterTime = Date.now();
 
                     // Verify debug log was called

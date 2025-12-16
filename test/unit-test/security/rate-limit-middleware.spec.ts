@@ -1,10 +1,10 @@
 import "reflect-metadata";
 import "jasmine";
 import { container, DependencyContainer } from "tsyringe";
-import { RateLimitMiddleware, RateLimitConfig, RATE_LIMIT_TYPES, MemoryRateLimitStore, RateLimitStore } from "../../../src";
+import { RateLimitService, RateLimitConfig, RATE_LIMIT_TYPES, MemoryRateLimitStore, RateLimitStore } from "../../../src";
 import { FlexibleEvent } from "../../../src/event";
 
-describe("RateLimitMiddleware with DI", () => {
+describe("RateLimitService with DI", () => {
     let testContainer: DependencyContainer;
 
     beforeEach(() => {
@@ -35,7 +35,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
 
             expect(middleware).toBeDefined();
         });
@@ -50,7 +50,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: customStore
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
 
             expect(middleware).toBeDefined();
         });
@@ -69,7 +69,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: customStore
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
 
             expect(middleware).toBeDefined();
         });
@@ -89,7 +89,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent = { sourceIp: '192.168.1.3' } as any as FlexibleEvent;
 
             // Exceed limit
@@ -116,7 +116,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent1 = { sourceIp: '192.168.1.10' } as any as FlexibleEvent;
             const mockEvent2 = { sourceIp: '192.168.1.20' } as any as FlexibleEvent;
 
@@ -144,7 +144,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent = { sourceIp: '192.168.1.4' } as any as FlexibleEvent;
 
             // First request succeeds
@@ -169,7 +169,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent = { sourceIp: '192.168.1.5' } as any as FlexibleEvent;
 
             // Make 3 requests (should all succeed)
@@ -196,7 +196,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent = { sourceIp: '192.168.1.6' } as any as FlexibleEvent;
 
             await middleware.check(mockEvent);
@@ -223,7 +223,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent1 = { userId: 'user-123', sourceIp: '192.168.1.1' } as any as FlexibleEvent;
             const mockEvent2 = { userId: 'user-456', sourceIp: '192.168.1.1' } as any as FlexibleEvent;
 
@@ -252,7 +252,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: new MemoryRateLimitStore()
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const normalEvent = { sourceIp: '192.168.1.7' } as any as FlexibleEvent;
             const skippedEvent = { sourceIp: '192.168.1.7', skipRateLimit: true } as any as FlexibleEvent;
 
@@ -286,7 +286,7 @@ describe("RateLimitMiddleware with DI", () => {
                 useValue: customStore
             });
 
-            const middleware = testContainer.resolve(RateLimitMiddleware);
+            const middleware = testContainer.resolve(RateLimitService);
             const mockEvent = { sourceIp: '192.168.1.8' } as any as FlexibleEvent;
 
             await middleware.check(mockEvent);

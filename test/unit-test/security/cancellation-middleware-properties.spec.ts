@@ -2,11 +2,11 @@ import "reflect-metadata";
 import "jasmine";
 import * as fc from "fast-check";
 import { container, DependencyContainer } from "tsyringe";
-import { CancellationMiddleware, CANCELLATION_MIDDLEWARE_TYPES, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-middleware";
+import { CancellationService, CANCELLATION_SERVICE_TYPES, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-service";
 import { CancellationError } from "../../../src/event/cancellation-error";
 import { FlexibleLogger } from "../../../src/logging/flexible-logger";
 
-describe("CancellationMiddleware Property-Based Tests", () => {
+describe("CancellationService Property-Based Tests", () => {
     let testContainer: DependencyContainer;
     let mockLogger: FlexibleLogger;
 
@@ -42,11 +42,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                 async (requestId, isAborted) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create token
@@ -64,7 +64,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     let errorThrown = false;
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                         // If we get here, token was checked and not aborted
                         tokenWasChecked = !isAborted;
                     } catch (error) {
@@ -98,11 +98,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                 async (requestId, reason) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create aborted token
@@ -118,7 +118,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     let errorHasCorrectStructure = false;
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                     } catch (error) {
                         threwCancellationError = error instanceof CancellationError;
                         if (threwCancellationError) {
@@ -150,11 +150,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                 async (requestId) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Event without cancellation token
@@ -166,7 +166,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     let noErrorThrown = false;
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                         processingContinued = true;
                         noErrorThrown = true;
                     } catch (error) {
@@ -198,11 +198,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                 async (requestId, isAborted) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create token
@@ -217,7 +217,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     };
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                     } catch (error) {
                         // Expected if aborted
                     }
@@ -247,11 +247,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                 async (requestId, isAborted) => {
                     const iterationContainer = container.createChildContainer();
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: mockLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create token
@@ -266,7 +266,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     };
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                     } catch (error) {
                         // Expected if aborted
                     }
@@ -313,11 +313,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                         debug: jasmine.createSpy('debug')
                     };
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: iterationLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create aborted token
@@ -330,7 +330,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     };
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                     } catch (error) {
                         // Expected CancellationError
                     }
@@ -374,11 +374,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                         debug: jasmine.createSpy('debug')
                     };
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: iterationLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Create aborted token with reason
@@ -391,7 +391,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                     };
 
                     try {
-                        await middleware.processEvent(event, contextBinnacle);
+                        await middleware.processEvent(contextBinnacle, event);
                     } catch (error) {
                         // Expected CancellationError
                     }
@@ -433,11 +433,11 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                         debug: jasmine.createSpy('debug')
                     };
 
-                    iterationContainer.register(CANCELLATION_MIDDLEWARE_TYPES.LOGGER, {
+                    iterationContainer.register(CANCELLATION_SERVICE_TYPES.LOGGER, {
                         useValue: iterationLogger
                     });
 
-                    const middleware = iterationContainer.resolve(CancellationMiddleware);
+                    const middleware = iterationContainer.resolve(CancellationService);
                     const contextBinnacle: { [key: string]: any } = {};
 
                     // Event without cancellation token
@@ -445,7 +445,7 @@ describe("CancellationMiddleware Property-Based Tests", () => {
                         requestId
                     };
 
-                    await middleware.processEvent(event, contextBinnacle);
+                    await middleware.processEvent(contextBinnacle, event);
 
                     // Verify no log calls were made
                     const noWarningCalls = (iterationLogger.warning as jasmine.Spy).calls.count() === 0;

@@ -43,7 +43,7 @@ import { DependencyContainer } from "tsyringe";
  *         @inject(DELEGATE_EVENT_SOURCE) private nextLayer: DelegateEventSource
  *     ) {}
  *
- *     @BeforeExecution(RateLimitMiddleware)
+ *     @BeforeExecution(RateLimitService)
  *     @Route(Everything)  // Match ALL events
  *     public async processAll(@Param(EventData) event: FlexibleEvent) {
  *         return await this.nextLayer.generateEvent(event);

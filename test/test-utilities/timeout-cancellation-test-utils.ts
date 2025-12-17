@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import { container, DependencyContainer } from "tsyringe";
-import { TimeoutService, TIMEOUT_SERVICE_TYPES, TimeoutServiceConfig } from "../../src/security/timeout-service";
-import { CancellationService, CANCELLATION_SERVICE_TYPES } from "../../src/security/cancellation-service";
-import { FlexibleLogger } from "../../src/logging/flexible-logger";
+import { TimeoutService, TIMEOUT_SERVICE_TYPES, TimeoutServiceConfig } from "../../src/built-ins/middleware/timeout/timeout-service";
+import { CancellationService, CANCELLATION_SERVICE_TYPES } from "../../src/built-ins/middleware/cancellation/cancellation-service";
+import { FlexibleLogger } from "../../src/extension-points/logging/logger.interface";
 
 /**
  * Mock logger for testing purposes.

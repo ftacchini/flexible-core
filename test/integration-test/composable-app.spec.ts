@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import "jasmine";
-import { DelegateEventSource } from "../../src/event/delegate-event-source";
-import { FlexibleEvent } from "../../src/event/flexible-event";
-import { FlexibleResponse } from "../../src/flexible/flexible-response";
+import { DelegateEventSource } from "../../src/built-ins/event-sources/delegate-event-source";
+import { FlexibleEvent } from "../../src/extension-points/event-source/event";
+import { FlexibleResponse } from "../../src/extension-points/event-source/response";
 
 describe("Composable Applications with DelegateEventSource", () => {
     describe("DelegateEventSource", () => {

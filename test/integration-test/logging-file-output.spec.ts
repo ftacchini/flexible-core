@@ -2,9 +2,9 @@ import "reflect-metadata";
 import "jasmine";
 import * as fs from "fs";
 import * as path from "path";
-import { FlexibleConfigurableLogger } from "../../src/flexible/logging/flexible-configurable-logger";
-import { LogContext, LogLevel } from "../../src/logging/flexible-logger";
-import { LoggerConfig } from "../../src/logging/logger-config";
+import { FlexibleConfigurableLogger } from "../../src/built-ins/loggers/configurable-logger";
+import { LogContext, LogLevel } from "../../src/extension-points/logging/logger.interface";
+import { LoggerConfig } from "../../src/extension-points/logging/logger-config";
 
 describe("Logging File Output Integration Tests", () => {
     const testOutputDir = path.join(__dirname, "../../test-logs");

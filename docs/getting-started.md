@@ -247,7 +247,9 @@ Recommended `tsconfig.json`:
 
 Now that you have a basic application running, explore:
 
+- [Timeout and Cancellation Guide](guides/timeout-cancellation.md) - Handle timeouts and client disconnections
 - [Logging Guide](guides/logging.md) - Add structured logging
+- [Composable Apps Guide](guides/composable-apps.md) - Build layered architectures
 - [Architecture Overview](architecture/overview.md) - Understand how it works
 - [Creating Event Sources](guides/creating-event-source.md) - Build custom event sources
 - [Creating Frameworks](guides/creating-framework.md) - Build custom frameworks

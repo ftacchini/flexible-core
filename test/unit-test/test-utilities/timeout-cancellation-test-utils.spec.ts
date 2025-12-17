@@ -6,9 +6,9 @@ import {
     TestAbortController,
     createMockLogger
 } from "../../test-utilities/timeout-cancellation-test-utils";
-import { TimeoutService, TIMEOUT_CONTEXT_KEYS } from "../../../src/security/timeout-service";
-import { CancellationService, CANCELLATION_CONTEXT_KEYS } from "../../../src/security/cancellation-service";
-import { CancellationError } from "../../../src/event/cancellation-error";
+import { TimeoutService, TIMEOUT_CONTEXT_KEYS } from "../../../src/built-ins/middleware/timeout/timeout-service";
+import { CancellationService, CANCELLATION_CONTEXT_KEYS } from "../../../src/built-ins/middleware/cancellation/cancellation-service";
+import { CancellationError } from "../../../src/built-ins/middleware/cancellation/cancellation-error";
 
 describe("Test Utilities for Timeout and Cancellation", () => {
     describe("createMockLogger", () => {

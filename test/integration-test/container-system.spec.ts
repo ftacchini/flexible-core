@@ -1,14 +1,14 @@
 import "reflect-metadata";
 import "jasmine";
-import { FlexibleAppBuilder } from "../../src/flexible/flexible-app-builder";
-import { FlexibleApp } from "../../src/flexible/flexible-app";
-import { FlexibleFrameworkModule } from "../../src/framework/flexible-framework-module";
+import { FlexibleAppBuilder } from "../../src/engine/app/app-builder";
+import { FlexibleApp } from "../../src/engine/app/flexible-app";
+import { FlexibleFrameworkModule } from "../../src/extension-points/framework/framework-module";
 import { DummyEventSource, DummyFramework } from "../../src";
 import { DependencyContainer } from "tsyringe";
-import { FlexibleContainer } from "../../src/container/flexible-container";
-import { FlexibleEventSourceModule } from "../../src/event";
+import { FlexibleContainer } from "../../src/platform/di/container";
+import { FlexibleEventSourceModule } from "../../src/extension-points/event-source";
 import { FlexibleModule } from "../../src";
-import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
+import { SilentLoggerModule } from "../../src/built-ins/loggers/silent-logger-module";
 
 const [
     CONTAINER_DEPENDENCY,

@@ -1,14 +1,15 @@
 import "reflect-metadata";
 import "jasmine";
-import { FlexibleApp } from "../../src/flexible/flexible-app";
+import { FlexibleApp } from "../../src/engine/app/flexible-app";
 import { DummyEventSource, DummyFramework } from "../../src";
 import { DependencyContainer } from "tsyringe";
-import { FlexibleEvent } from "../../src/event";
-import { IfEventIs } from "../../src/flexible/filter/if-event-is";
-import { EventData } from "../../src/flexible/extractor/event-data";
-import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
-import { RateLimitService, MemoryRateLimitStore, SecurityError, RateLimitConfig, RATE_LIMIT_TYPES } from "../../src/security";
-import { FlexibleContainer } from "../../src/container/flexible-container";
+import { FlexibleEvent } from "../../src/extension-points/event-source";
+import { IfEventIs } from "../../src/built-ins/filters/if-event-is";
+import { EventData } from "../../src/built-ins/extractors/event-data";
+import { SilentLoggerModule } from "../../src/built-ins/loggers/silent-logger-module";
+import { RateLimitService, MemoryRateLimitStore, RateLimitConfig, RATE_LIMIT_TYPES } from "../../src/built-ins/middleware/rate-limiting";
+import { SecurityError } from "../../src/platform/errors";
+import { FlexibleContainer } from "../../src/platform/di/container";
 
 describe("RateLimitService Integration Tests", () => {
 

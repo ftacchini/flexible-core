@@ -1,21 +1,21 @@
 import "reflect-metadata";
 import "jasmine";
-import { FlexibleApp } from "../../src/flexible/flexible-app";
+import { FlexibleApp } from "../../src/engine/app/flexible-app";
 import { DummyEventSource, DummyFramework } from "../../src";
 import { DependencyContainer } from "tsyringe";
-import { FlexibleEvent } from "../../src/event";
-import { IfEventIs } from "../../src/flexible/filter/if-event-is";
-import { EventData } from "../../src/flexible/extractor/event-data";
-import { FullEvent } from "../../src/flexible/extractor/full-event";
-import { PreviousError } from "../../src/flexible/extractor/previous-error";
-import { SilentLoggerModule } from "../../src/flexible/logging/silent-logger-module";
-import { FlexibleContainer } from "../../src/container/flexible-container";
-import { TimeoutService, TIMEOUT_SERVICE_TYPES } from "../../src/security/timeout-service";
-import { CancellationService, CANCELLATION_SERVICE_TYPES } from "../../src/security/cancellation-service";
-import { TimeoutError } from "../../src/event/timeout-error";
-import { CancellationError } from "../../src/event/cancellation-error";
+import { FlexibleEvent } from "../../src/extension-points/event-source";
+import { IfEventIs } from "../../src/built-ins/filters/if-event-is";
+import { EventData } from "../../src/built-ins/extractors/event-data";
+import { FullEvent } from "../../src/built-ins/extractors/full-event";
+import { PreviousError } from "../../src/built-ins/extractors/previous-error";
+import { SilentLoggerModule } from "../../src/built-ins/loggers/silent-logger-module";
+import { FlexibleContainer } from "../../src/platform/di/container";
+import { TimeoutService, TIMEOUT_SERVICE_TYPES } from "../../src/built-ins/middleware/timeout/timeout-service";
+import { CancellationService, CANCELLATION_SERVICE_TYPES } from "../../src/built-ins/middleware/cancellation/cancellation-service";
+import { TimeoutError } from "../../src/built-ins/middleware/timeout/timeout-error";
+import { CancellationError } from "../../src/built-ins/middleware/cancellation/cancellation-error";
 import { TestAbortController, createMockLogger, MockLogger } from "../test-utilities/timeout-cancellation-test-utils";
-import { DelegateEventSource } from "../../src/event/delegate-event-source";
+import { DelegateEventSource } from "../../src/built-ins/event-sources/delegate-event-source";
 
 describe("Timeout and Cancellation Integration Tests", () => {
 

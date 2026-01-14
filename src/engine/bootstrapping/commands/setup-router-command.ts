@@ -1,8 +1,7 @@
 import { FlexibleMiddlewareFactory } from "../middleware-factory";
 import { FlexiblePipeline } from "../../pipeline/pipeline";
 import { FlexibleAppState } from "../../app/app-state";
-import { isArray } from "util";
-import { flatten } from "lodash";
+import { isArray, flatten } from "lodash";
 import { FlexibleFramework } from "../../../extension-points/framework/framework.interface";
 import { FlexibleRecipeFactory } from "../recipe-factory";
 import { FlexibleFilter } from "../../../extension-points/routing/filter.interface";

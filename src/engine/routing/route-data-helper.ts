@@ -1,8 +1,7 @@
 import { RouteValue, RouteData } from '../../extension-points/routing/route-data';
-import { isObject, isArray, isString, isNumber, isBoolean } from "util";
+import { isObject, isArray, isString, isNumber, isBoolean, join } from "lodash";
 import { injectable } from 'tsyringe';
 import { PlainRouteData } from './tree-router/plain-route-data';
-import { join } from "lodash";
 
 const SEPARATOR = "@";
 

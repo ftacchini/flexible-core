@@ -1,7 +1,7 @@
 import { FlexibleRecipeFactory } from "./recipe-factory";
 import { FlexibleMiddlewareDocument } from "../../extension-points/framework/middleware-document";
 import { FlexibleMiddleware } from "../pipeline/middleware.interface";
-import { isArray } from "util";
+import { isArray } from "lodash";
 import { FlexibleExtractor } from "../../extension-points/routing/extractor.interface";
 import { FlexibleParametersExtractor } from "../pipeline/parameters-extractor";
 import { injectable, inject } from "tsyringe";

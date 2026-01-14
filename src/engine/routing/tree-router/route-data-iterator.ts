@@ -1,5 +1,5 @@
 import { PlainRouteData, PlainRouteValue } from "./plain-route-data";
-import { isNullOrUndefined } from "util";
+import { isNil } from "lodash";
 import { RouteValueMatcher } from "./route-value-matcher";
 import { RouteDataHelper } from "../route-data-helper";
 
@@ -58,7 +58,7 @@ export class RouteDataIterator {
             current = current[this.currentValueIndex];
         }
 
-        if(isNullOrUndefined(current)) {
+        if(isNil(current)) {
             return current;
         }
 
@@ -81,7 +81,7 @@ export class RouteDataIterator {
         var currentPropertyValue = this.getValueFromPropertyIndex(this.currentPropertyIndex);
 
         if (this.routeDataHelper.isRouteDataArray(currentPropertyValue) &&
-            !isNullOrUndefined(currentPropertyValue[this.currentValueIndex + 1])) {
+            !isNil(currentPropertyValue[this.currentValueIndex + 1])) {
             this.currentValueIndex++;
         }
         else {

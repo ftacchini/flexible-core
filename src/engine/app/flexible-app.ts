@@ -1,10 +1,11 @@
 import { FlexibleEventSource } from "../../extension-points/event-source/event-source.interface";
-import { FlexiblePipeline } from "../pipeline/pipeline";
 import { FlexibleRouter } from "../../extension-points/routing/router.interface";
 import { FlexibleLogger } from "../../extension-points/logging/logger.interface";
 import { SetupManager } from "../bootstrapping/setup-manager";
 import { RequestIdGenerator } from "../../platform/utils/request-id-generator";
 import { FlexibleAppBuilder } from "./app-builder";
+import { RoutablePipeline } from "../pipeline/routable-pipeline";
+import { FlexiblePipeline } from "../pipeline/pipeline";
 
 /**
  * The main application class that orchestrates event sources, routing, and request handling.
@@ -145,16 +146,19 @@ export class FlexibleApp {
 
             //Events should be routable by event type.
             event.routeData.eventType = event.eventType;
-            var filterBinnacle = {};
-            var contextBinnacle = {};
 
             this.logger.debug("Routing request - Finding matching pipelines", { requestId });
-            var pipelines = await router.getEventResources(event, filterBinnacle);
-            this.logger.debug("Found matching pipelines", { requestId, pipelineCount: pipelines.length });
+            var routedPipelines = await router.getEventResources(event);
+            this.logger.debug("Found matching pipelines", { requestId, pipelineCount: routedPipelines.length });
 
-            var responses = await Promise.all(pipelines.map((pipeline, index) => {
-                this.logger.debug("Processing pipeline", { requestId, pipelineIndex: index + 1, totalPipelines: pipelines.length });
-                return pipeline.processEvent(event, filterBinnacle, contextBinnacle);
+            // Convert RoutedResource<FlexiblePipeline> to RoutablePipeline
+            var routablePipelines = routedPipelines.map(routed => 
+                new RoutablePipeline(routed.getResource(), routed.getFilterBinnacle())
+            );
+
+            var responses = await Promise.all(routablePipelines.map((routablePipeline, index) => {
+                this.logger.debug("Processing pipeline", { requestId, pipelineIndex: index + 1, totalPipelines: routablePipelines.length });
+                return routablePipeline.processEvent(event);
             }));
 
             this.logger.debug("Request completed", { requestId, responseCount: responses.length });

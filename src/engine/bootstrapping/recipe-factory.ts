@@ -16,11 +16,7 @@ export class FlexibleRecipeFactory {
             throw RECIPE_HAS_NO_TYPE_ERROR;
         }
 
-        if(!this.container.isRegistered(recipe.type.name)) {
-            this.container.register(recipe.type.name, { useClass: recipe.type });
-        }
-
-        var instance = this.container.resolve<recipeType>(recipe.type.name);
+        var instance = this.container.resolve<recipeType>(recipe.type as any);
 
         return Object.assign(instance, recipe.configuration || {});
     }

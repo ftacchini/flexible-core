@@ -22,7 +22,7 @@ const isArray = Array.isArray;
  * ```
  */
 @injectable()
-export class FilterCascadeBuilder<Resource> {
+export class FilterCascadeBuilder<Resource extends object> {
 
     private filterNodes!: FilterCascadeNode<Resource>[];
     private resource!: Resource;

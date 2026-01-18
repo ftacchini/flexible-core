@@ -26,9 +26,17 @@ export class FlexibleParametersExtractor {
         contextBinnacle: { [key: string]: any }
     ): Promise<any[]> {
        return Promise.all(this.extractorRouters.map(async router => {
-            return router.getEventResources(event, filterBinnacle).then(extractors => {
-                return extractors[0].extractValue(event, response, filterBinnacle, contextBinnacle);
-            })
+            // Get routed extractors from the router
+            const routedExtractors = await router.getEventResources(event);
+            
+            // Use the first extractor if available
+            if (routedExtractors.length > 0) {
+                const extractor = routedExtractors[0].getResource();
+                return extractor.extractValue(event, response, filterBinnacle, contextBinnacle);
+            }
+            
+            // If no extractor found, return undefined
+            return undefined;
         }));
     }
 

@@ -10,6 +10,7 @@ import { FilterCascadeNode } from "../filter-cascade/filter-cascade-node";
 import { RouteDataHelper } from "../route-data-helper";
 import { FlexibleLogger } from "../../../extension-points/logging/logger.interface";
 import { FLEXIBLE_APP_TYPES } from "../../app/app-types";
+import { RoutedResource } from "../routed-resource";
 
 /**
  * A high-performance router implementation using a decision tree data structure.
@@ -39,7 +40,7 @@ import { FLEXIBLE_APP_TYPES } from "../../app/app-types";
  * ```
  */
 @injectable()
-export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
+export class FlexibleTreeRouter<Resource extends object> implements FlexibleRouter<Resource> {
 
     private baseNode: DecisionTreeNode<FilterCascadeNode<Resource>>;
     private routeCount: number = 0;
@@ -61,14 +62,13 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
      * The matching process:
      * 1. Converts event route data to a flat structure
      * 2. Traverses the decision tree to find matching filter cascades
-     * 3. Evaluates each filter cascade (static + dynamic filters)
-     * 4. Returns resources from matching cascades
+     * 3. Evaluates each filter cascade with a fresh filterBinnacle
+     * 4. Returns matched resources with their filterBinnacle
      *
      * @param event - The event to match against registered resources
-     * @param filterBinnacle - Object for storing filter state/context during matching
-     * @returns Array of matching resources
+     * @returns Array of RoutedResource instances (resource + filterBinnacle)
      */
-    public async getEventResources(event: FlexibleEvent, filterBinnacle: { [key: string]: string }): Promise<Resource[]> {
+    public async getEventResources(event: FlexibleEvent): Promise<RoutedResource<Resource>[]> {
         var plainRouteData = this.routeDataHelper.turnIntoPlainRouteData(event.routeData);
 
         this.logger?.debug("Tree router: Finding matching routes", {
@@ -83,8 +83,20 @@ export class FlexibleTreeRouter<Resource> implements FlexibleRouter<Resource> {
             candidateCount: filters.length
         });
 
-        const results = await Promise.all(filters.map(filter => filter.getEventResources(event, filterBinnacle, true)));
-        const matchedResources = results.filter((resource): resource is Awaited<Resource> => resource !== null) as Resource[];
+        const results = await Promise.all(filters.map(async filter => {
+            // Create a fresh filterBinnacle for each filter cascade to avoid state pollution
+            const filterBinnacle: { [key: string]: string } = {};
+            const resource = await filter.getEventResources(event, filterBinnacle, true);
+            
+            // If this cascade matched, wrap the resource with its filterBinnacle
+            if (resource !== null) {
+                return new RoutedResource(resource, filterBinnacle);
+            }
+            
+            return null;
+        }));
+        
+        const matchedResources = results.filter((routed) => routed !== null) as RoutedResource<Resource>[];
 
         this.logger?.debug("Tree router: Matched resources", {
             matchedCount: matchedResources.length
